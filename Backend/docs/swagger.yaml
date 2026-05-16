@@ -1,0 +1,1165 @@
+openapi: 3.0.0
+info:
+  title: API de Gestión de Cursos Universitarios
+  description: API para administrar alumnos, calificaciones, asistencias y grupos del curso.
+  version: 1.0.0
+security:
+  - bearerAuth: []
+paths:
+  /usuarios:
+      get:
+        summary: "Listar usuarios del sistema (Administradores y Profesores)"
+        tags:
+          - Usuarios
+        parameters:
+          - $ref: '#/components/parameters/Limit'
+          - $ref: '#/components/parameters/Offset'
+        responses:
+          '200':
+            $ref: '#/components/responses/GetUsuarioList200'
+          '204':
+            $ref: '#/components/responses/NoContent'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+      post:
+        summary: "Registrar / Crear un nuevo usuario"
+        description: "Permite dar de alta a un nuevo profesor o administrador en el sistema."
+        tags:
+          - Usuarios
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsuarioBase'
+        responses:
+          '201':
+            $ref: '#/components/responses/Created'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '409':
+            $ref: '#/components/responses/Conflict'
+          '500':
+            $ref: '#/components/responses/InternalServerError'
+
+  /usuarios/login:
+    post:
+      security: []
+      summary: "Iniciar sesión de usuario"
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - usuario
+                - contraseña
+              properties:
+                usuario:
+                  type: string
+                  example: "admin"
+                contraseña:
+                  type: string
+                  example: "1234"
+      responses:
+        '200':
+          description: "Login exitoso, devuelve el token JWT"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                  rol:
+                    type: string
+                    example: "admin"
+        '401':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /usuarios/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        description: "ID único del usuario"
+        example: 1
+    get:
+      summary: "Obtener un usuario por ID"
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Detalle del usuario
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Usuario'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: "Reemplazar o modificar un usuario"
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UsuarioBase'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar un usuario del sistema"
+      tags:
+        - Usuarios
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /alumnos:
+    get:
+      summary: "Listar alumnos"
+      tags:
+        - Alumnos
+      parameters:
+        - $ref: '#/components/parameters/AbandonoParam'
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          $ref: '#/components/responses/GetAlumnoList200'
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Crear alumno manualmente"
+      tags:
+        - Alumnos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlumnoBase'
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /alumnos/importar:
+    post:
+      summary: "Importar alumnos mediante archivo CSV"
+      tags:
+        - Alumnos
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: "Archivo CSV con columnas legajo, nombre, apellido, email"
+      responses:
+        '200':
+          description: "Importación exitosa"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  procesados:
+                    type: integer
+                    example: 45
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /alumnos/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdAlumno'
+    get:
+      summary: "Obtener un alumno por ID"
+      tags:
+        - Alumnos
+      responses:
+        '200':
+          description: Detalle del alumno
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Alumno'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      summary: "Actualizar parcialmente un alumno (ej: marcar abandono)"
+      tags:
+        - Alumnos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AlumnoActualizacion'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar alumno"
+      tags:
+        - Alumnos
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /notas:
+    put:
+      summary: "Registrar o actualizar la calificación de un alumno"
+      tags:
+        - Calificaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotaRegistro'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /asistencia/qr:
+    post:
+      summary: "Generar un código QR dinámico para la clase actual"
+      tags:
+        - Asistencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - fecha
+              properties:
+                fecha:
+                  type: string
+                  example: "2026-05-20"
+      responses:
+        '200':
+          description: "QR generado exitosamente (devuelve enlace o base64)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qr_code_url:
+                    type: string
+                    example: "https://api.tuapp.com/static/qrs/clase_20260520.png"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /evaluaciones:
+    get:
+      summary: "Listar los tipos de evaluación del curso"
+      tags:
+        - Evaluaciones
+      responses:
+        '200':
+          description: "Lista de tipos de evaluación (Parcial, TP, etc.)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evaluaciones:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EvaluacionTipo'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Crear un nuevo tipo de evaluación"
+      tags:
+        - Evaluaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+              properties:
+                nombre:
+                  type: string
+                  example: "Parcialito"
+                descripcion:
+                  type: string
+                  example: "Evaluación corta de lectura previa"
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /evaluaciones/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    put:
+      summary: "Modificar un tipo de evaluación existente"
+      tags:
+        - Evaluaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+              properties:
+                nombre:
+                  type: string
+                  example: "Trabajo Práctico Integrador"
+                descripcion:
+                  type: string
+                  example: "TP grupal obligatorio de la materia"
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar un tipo de evaluación"
+      tags:
+        - Evaluaciones
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /grupos:
+    get:
+      summary: "Listar los grupos formados en el curso"
+      tags:
+        - Grupos
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: "Lista de grupos con sus respectivos integrantes"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  grupos:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GrupoDetalle'
+                  _links:
+                    $ref: '#/components/schemas/Links'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Crear un nuevo grupo de alumnos"
+      tags:
+        - Grupos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrupoCrear'
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /actividad:
+    get:
+      summary: "Listar el registro de actividad (log) del sistema"
+      tags:
+        - Log de Actividad
+      parameters:
+        - $ref: '#/components/parameters/Limit'
+        - $ref: '#/components/parameters/Offset'
+      responses:
+        '200':
+          description: "Listado de logs"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogActividadList'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /grupos/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 12
+    get:
+      summary: "Obtener detalle de un grupo"
+      tags:
+        - Grupos
+      responses:
+        '200':
+          description: "Detalle del grupo"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GrupoDetalle'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: "Modificar un grupo (nombre, TPs asociados, o integrantes)"
+      tags:
+        - Grupos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GrupoCrear'
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      summary: "Eliminar un grupo"
+      tags:
+        - Grupos
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /alumnos/{id}/notas:
+    parameters:
+      - $ref: '#/components/parameters/IdAlumno'
+    get:
+      summary: "Consultar las notas de un alumno"
+      tags:
+        - Calificaciones
+      responses:
+        '200':
+          description: "Listado de notas del alumno"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotaDetalle'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /asistencia/registrar:
+    post:
+      summary: "Registrar asistencia usando código QR/dinámico"
+      tags:
+        - Asistencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - codigo_qr
+              properties:
+                codigo_qr:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsIn..."
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /asistencia/qr/enviar:
+    post:
+      summary: "Enviar código QR dinámico por mail al alumno"
+      tags:
+        - Asistencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - id_alumno
+                - fecha
+              properties:
+                id_alumno:
+                  type: integer
+                  example: 1
+                fecha:
+                  type: string
+                  example: "2026-05-20"
+      responses:
+        '200':
+          description: "Email enviado exitosamente"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /alumnos/{id}/asistencias:
+    parameters:
+      - $ref: '#/components/parameters/IdAlumno'
+    get:
+      summary: "Consultar el historial de asistencias de un alumno"
+      tags:
+        - Asistencia
+      responses:
+        '200':
+          description: "Historial de asistencias"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    fecha:
+                      type: string
+                      example: "2026-05-20"
+                    presente:
+                      type: boolean
+                      example: true
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /informes/alumnos:
+    get:
+      summary: "Emitir informe PDF con listado de alumnos"
+      tags:
+        - Informes
+      parameters:
+        - $ref: '#/components/parameters/AbandonoParam'
+      responses:
+        '200':
+          description: "Archivo PDF generado"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /informes/estadisticas:
+    get:
+      summary: "Emitir informe PDF con estadísticas de aprobación"
+      tags:
+        - Informes
+      responses:
+        '200':
+          description: "Archivo PDF generado"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /informes/equipos:
+    get:
+      summary: "Emitir informe PDF con listado de equipos"
+      tags:
+        - Informes
+      responses:
+        '200':
+          description: "Archivo PDF generado"
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /materiales:
+    get:
+      summary: "Listar material de estudio (Público)"
+      security: []
+      tags:
+        - Materiales
+      responses:
+        '200':
+          description: "Lista de materiales"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Material'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    post:
+      summary: "Subir nuevo material de estudio"
+      tags:
+        - Materiales
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                titulo:
+                  type: string
+                  example: "Guía de Ejercicios TP1"
+                file:
+                  type: string
+                  format: binary
+      responses:
+        '201':
+          $ref: '#/components/responses/Created'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /materiales/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    delete:
+      summary: "Eliminar material de estudio"
+      tags:
+        - Materiales
+      responses:
+        '204':
+          $ref: '#/components/responses/NoContent'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+
+    LogActividad:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 101
+        usuario:
+          type: string
+          example: "admin"
+        accion:
+          type: string
+          example: "Creación de usuario"
+        fecha:
+          type: string
+          format: date-time
+          example: "2026-05-16T14:30:00Z"
+        detalles:
+          type: string
+          example: "Se creó el usuario gkenobi"
+
+    LogActividadList:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogActividad'
+
+    NotaDetalle:
+      type: object
+      properties:
+        evaluacion:
+          $ref: '#/components/schemas/EvaluacionTipo'
+        nota:
+          type: number
+          format: float
+          example: 8.5
+        fecha_carga:
+          type: string
+          format: date-time
+          example: "2026-05-16T10:00:00Z"
+
+    Material:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        titulo:
+          type: string
+          example: "Guía de Ejercicios TP1"
+        url_archivo:
+          type: string
+          example: "https://api.tuapp.com/static/materiales/tp1.pdf"
+        fecha_subida:
+          type: string
+          format: date-time
+          example: "2026-05-01T09:00:00Z"
+    
+    UsuarioBase:
+      type: "object"
+      description: "Datos necesarios para registrar o modificar un usuario"
+      required:
+        - username
+        - email
+        - password
+        - rol
+      properties:
+        username:
+          type: "string"
+          description: "Nombre de usuario único para el login"
+          example: "gkenobi"
+        email:
+          type: "string"
+          format: "email"
+          example: "gkenobi@fi.uba.ar"
+        password:
+          type: "string"
+          description: "Contraseña en texto plano"
+          example: "ClaveSegura2026"
+        rol:
+          type: "string"
+          enum: ["admin", "profesor"]
+          example: "profesor"
+
+    UsuarioResumen:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 2
+        username:
+          type: "string"
+          example: "gkenobi"
+        rol:
+          type: "string"
+          example: "profesor"
+
+    Usuario:
+      allOf:
+        - $ref: '#/components/schemas/UsuarioResumen'
+        - type: "object"
+          properties:
+            email:
+              type: "string"
+              example: "gkenobi@fi.uba.ar"
+            activo:
+              type: "boolean"
+              example: true
+
+    UsuarioListResponse:
+      type: "object"
+      properties:
+        usuarios:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/UsuarioResumen'
+        _links:
+          $ref: '#/components/schemas/Links'
+    
+    AlumnoBase:
+      type: "object"
+      required:
+        - legajo
+        - nombre
+        - apellido
+        - email
+      properties:
+        legajo:
+          type: "string"
+          example: "62045"
+        nombre:
+          type: "string"
+          example: "Peter"
+        apellido:
+          type: "string"
+          example: "Parker"
+        email:
+          type: "string"
+          example: "pparker@fi.uba.ar"
+
+    AlumnoActualizacion:
+      type: "object"
+      description: "Campos opcionales para actualizar de un alumno"
+      properties:
+        nombre:
+          type: "string"
+          example: "Peter"
+        apellido:
+          type: "string"
+          example: "Parker"
+        email:
+          type: "string"
+          example: "pparker@fi.uba.ar"
+        abandono:
+          type: "boolean"
+          example: true
+
+    AlumnoResumen:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          example: 1
+        legajo:
+          type: "string"
+          example: "62045"
+        nombre:
+          type: "string"
+          example: "Peter"
+        apellido:
+          type: "string"
+          example: "Parker"
+
+    Alumno:
+      allOf:
+        - $ref: '#/components/schemas/AlumnoResumen'
+        - type: "object"
+          properties:
+            email:
+              type: "string"
+              example: "pparker@fi.uba.ar"
+            abandono:
+              type: "boolean"
+              example: false
+
+    AlumnoListResponse:
+      type: "object"
+      properties:
+        alumnos:
+          type: "array"
+          items:
+            $ref: '#/components/schemas/AlumnoResumen'
+        _links:
+          $ref: '#/components/schemas/Links'
+
+    NotaRegistro:
+      type: "object"
+      required:
+        - id_alumno
+        - id_evaluacion
+        - nota
+      properties:
+        id_alumno:
+          type: "integer"
+          example: 1
+        id_evaluacion:
+          type: "integer"
+          description: "ID del tipo de evaluación (1: Parcial, 2: TP...)"
+          example: 1
+        nota:
+          type: "number"
+          format: float
+          example: 8.5
+
+    EvaluacionTipo:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Trabajo Práctico"
+        descripcion:
+          type: string
+          example: "Evaluaciones de desarrollo de software grupales"
+
+    GrupoCrear:
+      type: object
+      required:
+        - nombre_equipo
+        - integrantes
+      properties:
+        nombre_equipo:
+          type: string
+          example: "Grupo 1"
+        ids_tp:
+          type: array
+          description: "Lista de IDs de las evaluaciones tipo TP a las que aplica este grupo"
+          items:
+            type: integer
+          example: [3, 4]
+        integrantes:
+          type: array
+          description: "Listado de IDs de los alumnos que conforman el grupo"
+          items:
+            type: integer
+          example: [1, 2, 3, 4, 5, 6, 7, 8]
+
+    GrupoDetalle:
+      type: object
+      properties:
+        id_grupo:
+          type: integer
+          example: 12
+        nombre_equipo:
+          type: string
+          example: "Grupo 1"
+        ids_tp:
+          type: array
+          items:
+            type: integer
+          example: [3]
+        integrantes:
+          type: array
+          items:
+            $ref: '#/components/schemas/AlumnoResumen'
+
+    Errores:  
+      type: "object"
+      properties:
+        errors:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Error"
+
+    Error:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+          example: "VALIDATION_ERROR"
+        message:
+          type: "string"
+          example: "El formato del legajo es inválido"
+        level:
+          type: "string"
+          example: "error"
+          enum: [info, warning, error]
+        description:
+          type: string
+          example: "El legajo debe contener únicamente caracteres alfanuméricos."
+
+    Links:
+      type: "object"
+      properties:
+        _first:
+          type: "object"
+          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=0&_limit=10" } }
+        _prev:
+          type: "object"
+          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=0&_limit=10" } }
+        _next:
+          type: "object"
+          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=10&_limit=10" } }
+        _last:
+          type: "object"
+          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=40&_limit=10" } }
+
+  parameters:
+    IdAlumno:
+      name: id
+      in: path
+      schema:
+        type: "integer"
+      required: true
+      example: 1
+    AbandonoParam:
+      name: abandono
+      in: query
+      schema:
+        type: "boolean"
+      required: false
+      example: false
+    Limit:
+      name: _limit
+      in: query
+      schema:
+        type: "integer"
+        minimum: 1
+        default: 10
+      required: false
+      example: 10
+    Offset:
+      name: _offset
+      in: query
+      schema:
+        type: "integer"
+        minimum: 0
+        default: 0
+      required: false
+      example: 0
+
+  responses:
+    GetUsuarioList200:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UsuarioListResponse"
+
+    GetAlumnoList200:
+      description: "OK"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AlumnoListResponse"
+    Created:
+      description: "Created"
+    NoContent:
+      description: "No Content"
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+          example:
+            errors:
+              - code: "VALIDATION_ERROR"
+                message: "El formato de los datos enviados es inválido."
+                level: "error"
+                description: "Verifique que todos los campos requeridos estén presentes y tengan el formato correcto."
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+          example:
+            errors:
+              - code: "NOT_FOUND"
+                message: "Recurso no encontrado"
+                level: "error"
+                description: "El recurso solicitad no existe en la base de datos."
+    Conflict:
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+          example:
+            errors:
+              - code: "RESOURCE_ALREADY_EXISTS"
+                message: "Conflicto con recurso existente"
+                level: "error"
+                description: "Ya existe un registro con esos datos."
+    InternalServerError:
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Errores'
+          example:
+            errors:
+              - code: "INTERNAL_SERVER_ERROR"
+                message: "Error interno del servidor"
+                level: "error"
+                description: "Ocurrió un error inesperado. Por favor, intente más tarde."
