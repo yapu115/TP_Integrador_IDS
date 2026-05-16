@@ -13,42 +13,44 @@ body {
     align-items: center;
 }
 
-.login-container {
+.registro-container {
     width: 100%;
-    max-width: 900px;
+    max-width: 950px;
     padding: 20px;
 }
 
-.login-card {
+.registro-card {
     display: flex;
     background: #2f4350;
     border-radius: 12px;
     overflow: hidden;
-    min-height: 420px;
+    min-height: 520px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
 }
 
-.login-info {
+.registro-info {
     flex: 1;
     background: #263642;
     color: white;
-    padding: 40px;
+    padding: 45px;
     display: flex;
     flex-direction: column;
     justify-content: center;
 }
 
-.login-info h1 {
-    font-size: 32px;
+.registro-info h1 {
+    font-size: 34px;
     margin-bottom: 15px;
 }
 
-.login-info p {
+.registro-info p {
     font-size: 16px;
+    line-height: 1.5;
     color: #d3d3d3;
 }
 
-.login-form {
-    flex: 1;
+.registro-form {
+    flex: 1.2;
     background: #344955;
     padding: 40px;
     display: flex;
@@ -56,20 +58,22 @@ body {
     justify-content: center;
 }
 
-.login-form h2 {
+.registro-form h2 {
     color: white;
-    margin-bottom: 25px;
+    margin-bottom: 22px;
     text-align: center;
+    font-size: 26px;
 }
 
 .form-group {
-    margin-bottom: 18px;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
     color: white;
     margin-bottom: 6px;
+    font-size: 14px;
 }
 
 .form-group input {
@@ -78,9 +82,16 @@ body {
     border: none;
     border-radius: 6px;
     outline: none;
+    font-size: 14px;
+    background: #f4f4f4;
+}
+
+.form-group input:focus {
+    box-shadow: 0 0 0 2px #8e44ff;
 }
 
 button {
+    margin-top: 8px;
     padding: 12px;
     border: none;
     border-radius: 6px;
@@ -88,27 +99,59 @@ button {
     color: white;
     font-size: 16px;
     cursor: pointer;
+    transition: background 0.2s ease;
 }
 
 button:hover {
     background: #7a35df;
 }
 
-.error {
-    background: #ffdddd;
-    color: #b00020;
+.mensaje {
     padding: 10px;
     border-radius: 6px;
     margin-bottom: 15px;
     text-align: center;
-}
-.register-text {
-    margin-top: 15px;
     font-size: 14px;
-    text-align: center;
 }
 
-.register-text a {
+.error {
+    background: #ffdddd;
+    color: #b00020;
+}
+
+.exito {
+    background: #ddffea;
+    color: #087a32;
+}
+
+.login-link {
+    margin-top: 18px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+}
+
+.login-link a {
+    color: #c9a7ff;
     text-decoration: none;
     font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .registro-card {
+        flex-direction: column;
+    }
+
+    .registro-info {
+        padding: 30px;
+        text-align: center;
+    }
+
+    .registro-form {
+        padding: 30px;
+    }
 }

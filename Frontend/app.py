@@ -20,7 +20,13 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/registrar", methods=["GET", "POST"])
+def registrar():
+    if request.method == "POST":
+        # Procesar los datos del formulario de registro
+        pass
+    return render_template("registrar.html")
 
 
-
-app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
