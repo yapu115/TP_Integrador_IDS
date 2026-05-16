@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS usuarios (
     password_hash VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'profesor') DEFAULT 'profesor',
     ultimo_acceso DATETIME,
-    activo BOOLEAN DEFAULT TRUE
+    activo BOOLEAN DEFAULT TRUE,
+        fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS alumnos (
@@ -27,6 +28,8 @@ CREATE TABLE IF NOT EXISTS tipos_evaluacion (
     nombre VARCHAR(50) NOT NULL,
     descripcion TEXT
 );
+
+
 
 CREATE TABLE IF NOT EXISTS notas (
     id INT AUTO_INCREMENT PRIMARY KEY,
