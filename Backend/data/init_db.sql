@@ -1,5 +1,4 @@
 -- Script potencial, no final
-
 CREATE DATABASE IF NOT EXISTS curso_universitario;
 USE curso_universitario;
 
@@ -76,5 +75,11 @@ INSERT IGNORE INTO tipos_evaluacion (nombre) VALUES
 ('Parcialito'), 
 ('Trabajo Práctico');
 
-INSERT IGNORE INTO usuarios (username, password_hash, rol) 
-VALUES ('admin', 'hash_de_prueba', 'admin');
+INSERT IGNORE INTO usuarios (username, email, password_hash, rol, activo) 
+VALUES (
+    'admin', 
+    'admin@fi.uba.ar', 
+    'scrypt:32768:8:1$oBmzlHyWpksghi0Y$bb052984618802029759b2ac1fb186076fe7cc7ecad4c3da04bb2e0c5923ae0548269cf05698927f8c9e7dbce387c1c35dc6fc72609e985da4defc0800748266', -- admin123
+    'admin',
+    TRUE
+);

@@ -1,5 +1,5 @@
 from curso.db import get_connection
-from werkzeug.security import check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 import jwt
 from datetime import datetime, timezone, timedelta
 from curso.utils.security import SECRET_KEY
@@ -41,4 +41,63 @@ def login_usuario(username, password):
     cursor.close()
     connection.close()
         
+    return retorno
+
+
+def obtener_usuario(id_usuario):
+    """
+    Función auxiliar para buscar un usuario por su ID y devolver sus datos sin la contraseña.
+    """
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    query = """
+        SELECT id, username, email, rol, activo, ultimo_acceso, fecha_creacion
+        FROM usuarios
+        WHERE id = %s
+    """
+    cursor.execute(query, (id_usuario,))
+    usuario = cursor.fetchone()
+    
+    cursor.close()
+    connection.close()
+    
+    if usuario:
+        if usuario['ultimo_acceso']:
+            usuario['ultimo_acceso'] = usuario['ultimo_acceso'].isoformat()
+        if usuario['fecha_creacion']:
+            usuario['fecha_creacion'] = usuario['fecha_creacion'].isoformat()
+            
+    return usuario
+
+
+def crear_usuario(datos):
+    """
+    Comprueba duplicados, encripta la contraseña y guarda el usuario en la BD.
+    """
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    retorno = None
+    
+    query_check = "SELECT id FROM usuarios WHERE username = %s OR email = %s"
+    cursor.execute(query_check, (datos['username'], datos['email']))
+    
+    if cursor.fetchone():
+        retorno = {"error": "RESOURCE_ALREADY_EXISTS", "mensaje": "El nombre de usuario o email ya están en uso."}
+    else:
+        password_hash = generate_password_hash(datos['password'])
+        
+        query = """
+            INSERT INTO usuarios (username, email, password_hash, rol, activo)
+            VALUES (%s, %s, %s, %s, %s)
+        """
+        cursor.execute(query, (datos['username'], datos['email'], password_hash, datos['rol'], datos['activo']))
+        connection.commit()
+        
+        nuevo_id = cursor.lastrowid
+        retorno = obtener_usuario(nuevo_id)
+        
+    cursor.close()
+    connection.close()
+    
     return retorno

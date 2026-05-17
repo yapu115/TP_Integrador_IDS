@@ -4,7 +4,7 @@ from curso.routes.usuarios import usuarios_bp
 
 app = Flask(__name__)
 
-app.register_blueprint(asistencia_bp)
+# app.register_blueprint(asistencia_bp)
 app.register_blueprint(usuarios_bp)
 
 
