@@ -56,5 +56,24 @@ CREATE TABLE IF NOT EXISTS equipo_integrantes (
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id) ON DELETE CASCADE
 );
 
-INSERT INTO tipos_evaluacion (nombre) VALUES ('Parcial'), ('Parcialito'), ('Trabajo Práctico');
-INSERT INTO usuarios (username, password_hash, rol) VALUES ('admin', 'hash_de_prueba', 'admin');
+
+CREATE TABLE IF NOT EXISTS asistencias (
+    id_asistencia INT AUTO_INCREMENT PRIMARY KEY,
+    id_alumno INT NOT NULL,
+    fecha DATE NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'presente',
+    codigo_qr VARCHAR(255) NOT NULL,
+    creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    UNIQUE KEY uq_alumno_fecha (id_alumno, fecha),
+
+    FOREIGN KEY (id_alumno) REFERENCES alumnos(id) ON DELETE CASCADE
+);
+
+INSERT IGNORE INTO tipos_evaluacion (nombre) VALUES 
+('Parcial'), 
+('Parcialito'), 
+('Trabajo Práctico');
+
+INSERT IGNORE INTO usuarios (username, password_hash, rol) 
+VALUES ('admin', 'hash_de_prueba', 'admin');

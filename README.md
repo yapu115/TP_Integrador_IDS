@@ -4,6 +4,7 @@ Sistema web integral para gestionar en forma completa el ciclo de vida de un cur
 
 ## Integrantes (nombre-legajo)
 - Franco Yapura / 115280
+- Jeanc Carlos / 114122
 - xxx / xxx
 
 ## Características Principales
