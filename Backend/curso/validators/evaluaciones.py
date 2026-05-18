@@ -1,26 +1,4 @@
 from curso.db import get_connection
-def validar_evaluaciones():
-    conexion = None
-    cursor = None
-    try:
-        conexion=get_connection()
-        cursor=conexion.cursor(dictionary=True)
-    
-        query="SELECT * FROM tipos_evaluacion;"
-        cursor.execute(query)
-        resultado=cursor.fetchall()
-    
-        if len(resultado)<1:
-            return None
-        return resultado
-    except Exception as e:
-        print(f"Error al validar evaluaciones: {e}")
-        return None
-    finally:
-        if cursor is not None:
-            cursor.close()
-        if conexion is not None:
-            conexion.close()
 
 def validar_campos_evaluaciones(data):
     nombre = data["nombre"]
@@ -35,4 +13,23 @@ def validar_campos_evaluaciones(data):
         campos_validos=False
     return campos_validos
     
-    
+def validar_evaluacion(id_evaluacion):
+    conexion = None
+    cursor = None
+    try:
+        conexion=get_connection()
+        cursor=conexion.cursor(dictionary=True)
+
+        query="SELECT nombre, descripcion FROM tipos_evaluacion WHERE id = %s;"
+        cursor.execute(query,(id_evaluacion,))
+        resultado=cursor.fetchone()
+
+        return resultado
+    except Exception as e:
+        print(f"Error al buscar evaluacion: {e}")
+        return None
+    finally:
+        if cursor is not None:
+            cursor.close()
+        if conexion is not None:
+            conexion.close() 
