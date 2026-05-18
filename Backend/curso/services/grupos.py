@@ -19,4 +19,28 @@ def ver_grupos():
 
     return grupos
 
-def agregar_grupo(nombre_grupo, ids_tp, integrantes):
+def crear_grupo(nombre_equipo, id_tp, ids_alumnos):
+    """
+    Falta verificacion y manejo de errores.
+    """
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query_grupos = """
+    INSERT INTO equipos (nombre_equipo, id_tp)
+    VALUES (%s,%d);
+    """
+    query_alumnos = """
+    INSERT INTO equipos_integrantes (id_equipo, id_alumno)
+    VALUES (%s,%s);
+    """
+
+    cursor.execute(query_grupos, (nombre_equipo, id_tp))
+    connection.commit()
+    id_equipo = cursor.lastrowid
+    for id_alumno in ids_alumnos:
+        cursor.execute(query_alumnos, (id_equipo, id_alumno))
+    cursor.close()
+    connection.close()
+
+
