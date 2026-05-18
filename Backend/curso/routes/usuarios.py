@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from curso.validators.usuarios import validar_login, validar_crear_usuario
-from curso.services.usuarios import login_usuario, crear_usuario
+from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios
 from curso.utils.security import token_required
 
 usuarios_bp = Blueprint("usuarios", __name__)
@@ -79,5 +79,27 @@ def post_usuario():
             }), 409
         else:
             retorno = jsonify(resultado), 201
+            
+    return retorno
+
+@usuarios_bp.route("/usuarios", methods=["GET"])
+@token_required
+def get_usuarios():
+    limit = request.args.get("limit", default=10, type=int)
+    offset = request.args.get("offset", default=0, type=int)
+    retorno = None
+    
+
+    resultado = listar_usuarios(limit, offset)
+    if "error" in resultado:
+        retorno = jsonify({
+            "errors": [{
+                "code": resultado["error"], 
+                "message": resultado["mensaje"],
+                "description": "Error al obtener la lista de usuarios"
+            }]
+        }), 409
+    else:
+        retorno = jsonify(resultado), 200
             
     return retorno

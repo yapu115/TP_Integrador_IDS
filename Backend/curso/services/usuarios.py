@@ -101,3 +101,32 @@ def crear_usuario(datos):
     connection.close()
     
     return retorno
+
+def listar_usuarios(limit, offset):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    query_total = "SELECT COUNT(*) as total FROM usuarios"
+    cursor.execute(query_total)
+
+    total = cursor.fetchone()['total']
+    
+    query_data = """
+        SELECT id, username, email, rol, activo, ultimo_acceso, fecha_creacion 
+        FROM usuarios 
+        LIMIT %s 
+        OFFSET %s
+    """
+    cursor.execute(query_data, (limit, offset))
+    usuarios = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    
+    for u in usuarios:
+        if u['ultimo_acceso']:
+            u['ultimo_acceso'] = u['ultimo_acceso'].isoformat()
+        if u['fecha_creacion']:
+            u['fecha_creacion'] = u['fecha_creacion'].isoformat()
+    
+    return {"usuarios": usuarios, "total": total, "limit": limit, "offset": offset}
