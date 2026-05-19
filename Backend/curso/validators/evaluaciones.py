@@ -1,6 +1,7 @@
 from curso.db import get_connection
 
 def validar_campos_evaluaciones(data):
+    #valida que la request este bien compuesta
     nombre = data["nombre"]
     descripcion = data["descripcion"]
     campos_validos=True
@@ -16,6 +17,7 @@ def validar_campos_evaluaciones(data):
 def validar_evaluacion(id_evaluacion):
     conexion = None
     cursor = None
+    #valida la existencia del recurso evaluacion por id, si existe devuelve toda la fila asignada a esa id
     try:
         conexion=get_connection()
         cursor=conexion.cursor(dictionary=True)

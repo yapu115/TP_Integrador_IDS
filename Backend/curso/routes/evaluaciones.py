@@ -6,9 +6,9 @@ evaluacion_bp= Blueprint('evaluaciones',__name__)
 
 @evaluacion_bp.route("/evaluaciones",methods=['GET'])
 def listar_evaluaciones_route():
-    
-    evaluaciones=listar_evaluaciones_service()
     try:
+        #lista toda la tabla tipos_evaluacion
+        evaluaciones=listar_evaluaciones_service()
         if evaluaciones is None:
             return error_respuesta("No se encontraron evaluaciones",404)
         else:
@@ -19,16 +19,19 @@ def listar_evaluaciones_route():
     
 @evaluacion_bp.route("/evaluaciones",methods=['POST'])
 def crear_evaluacion_route():
+    #guarda la request del servidor en data, luego la envia a una funcion para validar que sea correcta
     data = request.get_json()
 
     campos=validar_campos_evaluaciones(data)
     if not campos:
         return error_respuesta("Todos los campos deben ser completados",400)
     try:
+        #envia la request a una funcion para crear el nuevo recurso
         evaluacion=crear_evaluacion_servicio(data)
+        #la funcion devuelve la cantidad de cambios hechos en la base de datos
         if evaluacion is None:
             return error_respuesta("error en la base de datos",500)
-    
+
         if evaluacion<1:
             return error_respuesta("No se realizaron cambios en la base de datos",204)
         
@@ -40,6 +43,7 @@ def crear_evaluacion_route():
 @evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>",methods=['GET'])
 def mostrar_evaluacion_route(id_evaluacion):  
     try:
+        #envia la id obtenida del endpoint a una funcion para que valide si existe y la trae
         evaluacion=validar_evaluacion(id_evaluacion)
         if evaluacion is None:
             return error_respuesta("No se econtro la evaluacion",404)
@@ -52,13 +56,20 @@ def mostrar_evaluacion_route(id_evaluacion):
 @evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>",methods=['PUT'])
 def modificar_evaluacion_route(id_evaluacion):
     data = request.get_json()
+    #guarda la request del servidor en data, luego la envia a una funcion para validar que sea correcta 
+    campos=validar_campos_evaluaciones(data)
+    if not campos:
+        return error_respuesta("Todos los campos deben ser completados",400)
     try:
+
         evaluacion=validar_evaluacion(id_evaluacion)
-        
+        #valida la id, devuelve None si no se encontro la id o si es invalido
         if evaluacion is None:
             return error_respuesta("Evaluacion no encontrada o id invalido",404)
         
         cambios=modificar_evaluacion_service(id_evaluacion,data)
+        #se le pasa a una funcion el id que se va a modificar y la request con los cambios a realizar
+        #devuelve la cantidad de cambios hechos en la base de datos
         if cambios <1:
             return error_respuesta("No se encontraron evaluaciones",204)
         else:
@@ -71,11 +82,12 @@ def modificar_evaluacion_route(id_evaluacion):
 def eliminar_evaluacion_route(id_evaluacion):
     try:
         evaluacion=validar_evaluacion(id_evaluacion)
-
+        #comprueba la existencia de ese id en la base de datos
         if evaluacion is None:
            return error_respuesta("No se econtro la evaluacion o el id es invalido",404)
         
         cambios=eliminar_evaluacion_service(id_evaluacion)
+        #envia la id a una funcion para que sea eliminida, devuelve los cambios hechos en la base de datos
         if cambios<1:
             return error_respuesta("No se pudo eliminar la evaluacion",204)
         else:
