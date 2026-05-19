@@ -1,9 +1,11 @@
 from flask import Flask, jsonify
 from curso.routes.asistencia import asistencia_bp
+from curso.routes.informes import informes_bp
 
 app = Flask(__name__)
 
 app.register_blueprint(asistencia_bp)
+app.register_blueprint(informes_bp)
 
 
 @app.route("/health", methods=["GET"])
