@@ -111,10 +111,11 @@ def ver_grupo_id(id_grupo):
 def editar_grupo(id_grupo, valores):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
-
+    #Necesita cambiarse mas adelante para poder editar multiples valores
     nombre_equipo = valores["nombre_equipo"]
     id_tp = = valores["id_tp"]
-    id_alumno = valores["id_alumno"]
+    id_alumno_nuevo = valores["id_alumno_nuevo"]
+    id_alumno_anterior = valores["id_alumno_anterior"]
 
     query_equipos = """
     UPDATE equipos
@@ -134,11 +135,11 @@ def editar_grupo(id_grupo, valores):
 
     #Dependiendo del valor que se reciba para editar, se ejecuta un query distinto
     if(nombre_equipo):
-        cursor.execute(query_equipos, ())
+        cursor.execute(query_equipos, (nombre_equipo, id_grupo))
     else if(id_tp):
-        cursor.execute(query,())
+        cursor.execute(query,(id_tp, id_grupo))
     else if(id_alumno):
-        cursor.execute(query_integrantes, ())
+        cursor.execute(query_integrantes, (id_alumno_nuevo, id_alumno_anterior))
     connection.commmit
     cambios = cursor.rowcount
 
