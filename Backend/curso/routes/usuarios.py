@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
-from curso.validators.usuarios import validar_login, validar_crear_usuario
-from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios
+from curso.validators.usuarios import validar_login, validar_crear_usuario, validar_actualizar_usuario
+from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios, actualizar_usuario, obtener_usuario
 from curso.utils.security import token_required
 
 usuarios_bp = Blueprint("usuarios", __name__)
@@ -103,3 +103,55 @@ def get_usuarios():
         retorno = jsonify(resultado), 200
             
     return retorno
+
+@usuarios_bp.route("/usuarios/<int:id_usuario>", methods=["PUT"])
+@token_required
+def put_usuario(id_usuario):
+    data = request.get_json()
+    retorno = None
+
+    if not data:
+        retorno = jsonify({
+            "errors": [{
+                "code": "VALIDATION_ERROR", 
+                "message": "El cuerpo de la petición debe ser JSON.",
+                "description": "Asegúrese de enviar los datos en formato JSON."
+            }]
+        }), 400
+    
+    if not retorno:
+        errores, datos_validados = validar_actualizar_usuario(data)
+        if errores:
+            retorno = jsonify({"errors": errores}), 400
+        
+    if not retorno:
+        resultado = actualizar_usuario(id_usuario, datos_validados)
+        if "error" in resultado:
+            retorno = jsonify({
+                "errors": [{
+                    "code": resultado["error"], 
+                    "message": resultado["mensaje"],
+                    "description": "Por favor elija otro nombre de usuario o correo."
+                }]
+            }), 409
+        else:
+            retorno = jsonify(resultado), 200
+    
+    
+    return retorno
+
+@usuarios_bp.route("/usuarios/<int:id_usuario>", methods=["GET"])
+@token_required
+def get_usuario(id_usuario):
+    usuario = obtener_usuario(id_usuario)
+    
+    if not usuario:
+        return jsonify({
+            "errors": [{
+                "code": "NOT_FOUND", 
+                "message": "Usuario no encontrado.",
+                "description": f"No existe un usuario con el ID {id_usuario}."
+            }]
+        }), 404
+        
+    return jsonify(usuario), 200
