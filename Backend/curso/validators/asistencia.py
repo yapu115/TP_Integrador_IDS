@@ -2,33 +2,78 @@ from datetime import datetime, date
 
 
 def validar_fecha(fecha):
+    es_valida = False
     try:
         datetime.strptime(fecha, "%Y-%m-%d")
-        return True
+        es_valida = True
     except ValueError:
-        return False
+        pass
+    return es_valida
 
 
 def validar_generar_qr(data):
+    errores = []
+
+    fecha = data.get("fecha")
+
+    if not fecha:
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Falta el campo fecha.",
+            "description": "Debe especificar una fecha para generar el QR de la clase."
+        })
+    elif not validar_fecha(fecha):
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Formato de fecha inválido.",
+            "description": "La fecha debe tener formato YYYY-MM-DD."
+        })
+
+    return errores, {
+        "fecha": fecha
+    }
+
+
+def validar_enviar_qr(data):
     errores = []
 
     id_alumno = data.get("id_alumno")
     fecha = data.get("fecha")
 
     if not id_alumno:
-        errores.append("El campo id_alumno es obligatorio.")
-
-    try:
-        id_alumno = int(id_alumno)
-        if id_alumno <= 0:
-            errores.append("El id_alumno debe ser mayor a 0.")
-    except (ValueError, TypeError):
-        errores.append("El id_alumno debe ser un número entero.")
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Falta el campo id_alumno.",
+            "description": "Debe especificar a qué alumno enviar el QR."
+        })
+    else:
+        try:
+            id_alumno = int(id_alumno)
+            if id_alumno <= 0:
+                errores.append({
+                    "code": "VALIDATION_ERROR",
+                    "message": "El id_alumno debe ser mayor a 0.",
+                    "description": "El id_alumno debe ser un entero positivo."
+                })
+        except (ValueError, TypeError):
+            errores.append({
+                "code": "VALIDATION_ERROR",
+                "message": "El id_alumno debe ser un número entero.",
+                "description": "Tipo de dato incorrecto para id_alumno."
+            })
 
     if not fecha:
-        fecha = date.today().strftime("%Y-%m-%d")
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Falta el campo fecha.",
+            "description": "Debe especificar una fecha para el QR del alumno."
+        })
     elif not validar_fecha(fecha):
-        errores.append("La fecha debe tener formato YYYY-MM-DD.")
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Formato de fecha inválido.",
+            "description": "La fecha debe tener formato YYYY-MM-DD."
+        })
 
     return errores, {
         "id_alumno": id_alumno,
@@ -39,37 +84,15 @@ def validar_generar_qr(data):
 def validar_registrar_asistencia(data):
     errores = []
 
-    id_alumno = data.get("id_alumno")
-    fecha = data.get("fecha")
     codigo_qr = data.get("codigo_qr")
-    estado = data.get("estado", "presente")
-
-    if not id_alumno:
-        errores.append("El campo id_alumno es obligatorio.")
-
-    try:
-        id_alumno = int(id_alumno)
-        if id_alumno <= 0:
-            errores.append("El id_alumno debe ser mayor a 0.")
-    except (ValueError, TypeError):
-        errores.append("El id_alumno debe ser un número entero.")
-
-    if not fecha:
-        errores.append("El campo fecha es obligatorio.")
-    elif not validar_fecha(fecha):
-        errores.append("La fecha debe tener formato YYYY-MM-DD.")
 
     if not codigo_qr:
-        errores.append("El campo codigo_qr es obligatorio.")
-
-    estados_validos = ["presente", "ausente", "tarde"]
-
-    if estado not in estados_validos:
-        errores.append("El estado debe ser presente, ausente o tarde.")
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Falta el campo codigo_qr.",
+            "description": "Debe proporcionar el texto del código QR escaneado."
+        })
 
     return errores, {
-        "id_alumno": id_alumno,
-        "fecha": fecha,
-        "codigo_qr": codigo_qr,
-        "estado": estado
+        "codigo_qr": codigo_qr
     }

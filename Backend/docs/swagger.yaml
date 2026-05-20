@@ -288,39 +288,6 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /asistencia/qr:
-    post:
-      summary: "Generar un código QR dinámico para la clase actual"
-      tags:
-        - Asistencia
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - fecha
-              properties:
-                fecha:
-                  type: string
-                  example: "2026-05-20"
-      responses:
-        "200":
-          description: "QR generado exitosamente (devuelve enlace o base64)"
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  qr_code_url:
-                    type: string
-                    example: "https://api.tuapp.com/static/qrs/clase_20260520.png"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "500":
-          $ref: "#/components/responses/InternalServerError"
-
   /evaluaciones:
     get:
       summary: "Listar los tipos de evaluación del curso"
@@ -548,9 +515,9 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
 
-  /asistencia/registrar:
+  /asistencia/qr:
     post:
-      summary: "Registrar asistencia usando código QR/dinámico"
+      summary: "Generar un código QR dinámico para la clase actual"
       tags:
         - Asistencia
       requestBody:
@@ -560,14 +527,22 @@ paths:
             schema:
               type: object
               required:
-                - codigo_qr
+                - fecha
               properties:
-                codigo_qr:
+                fecha:
                   type: string
-                  example: "eyJhbGciOiJIUzI1NiIsIn..."
+                  example: "2026-05-20"
       responses:
-        "204":
-          $ref: "#/components/responses/NoContent"
+        "200":
+          description: "QR generado exitosamente (devuelve enlace o base64)"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  qr_code_url:
+                    type: string
+                    example: "https://api.tuapp.com/static/qrs/clase_20260520.png"
         "400":
           $ref: "#/components/responses/BadRequest"
         "500":
@@ -601,6 +576,31 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+
+  /asistencia/registrar:
+    post:
+      summary: "Registrar asistencia usando código QR/dinámico"
+      tags:
+        - Asistencia
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - codigo_qr
+              properties:
+                codigo_qr:
+                  type: string
+                  example: "eyJhbGciOiJIUzI1NiIsIn..."
+      responses:
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
 
