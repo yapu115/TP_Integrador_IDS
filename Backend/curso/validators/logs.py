@@ -3,15 +3,15 @@ def validar_crear_log(data):
     errores = {}
     datos_validados = {}
 
-    usuario_id = data.get("usuario_id")
+    usuario = data.get("usuario")
     accion = data.get("accion")
-    descripcion = data.get("descripcion")
+    detalles = data.get("detalles")
 
-    if usuario_id is not None:
-        if not isinstance(usuario_id, int):
-            errores["usuario_id"] = "El usuario_id debe ser un número entero."
+    if usuario:
+        if not isinstance(usuario, str):
+            errores["usuario"] = "El usuario debe ser un número entero."
         else:
-            datos_validados["usuario_id"] = usuario_id
+            datos_validados["usuario"] = usuario
 
     if not accion:
         errores["accion"] = "La acción es obligatoria."
@@ -22,12 +22,12 @@ def validar_crear_log(data):
     else:
         datos_validados["accion"] = accion.strip().upper()
 
-    if descripcion is not None:
-        if not isinstance(descripcion, str):
-            errores["descripcion"] = "La descripción debe ser un texto."
-        elif len(descripcion.strip()) > 255:
-            errores["descripcion"] = "La descripción no puede superar los 255 caracteres."
+    if detalles is not None:
+        if not isinstance(detalles, str):
+            errores["detalles"] = "La descripción debe ser un texto."
+        elif len(detalles.strip()) > 255:
+            errores["detalles"] = "La descripción no puede superar los 255 caracteres."
         else:
-            datos_validados["descripcion"] = descripcion.strip()
+            datos_validados["detalles"] = detalles.strip()
 
     return errores, datos_validados
