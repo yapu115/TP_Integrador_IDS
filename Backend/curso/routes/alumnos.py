@@ -2,12 +2,14 @@ from flask import Blueprint, jsonify, request
 from validators.alumnos import validar_get_alumnos, validar_id_entero
 from services.alumnos import obtener_todos_los_alumnos
 from db import execute  # Usamos execute para los GETs simples de sub-recursos
+from security import token_required  # <-- Sumo la seguridad de security.py
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
 
 # 1. GET /alumnos (Con paginación y filtros)
 @alumnos_bp.route('/alumnos', methods=['GET'])
+@token_required
 def get_alumnos():
 
     # Pasar por el validador 
@@ -23,6 +25,7 @@ def get_alumnos():
 
 # 2. GET /alumnos/{id} (Detalle de un alumno)
 @alumnos_bp.route('/alumnos/<id_url>', methods=['GET'])
+@token_required
 def get_alumno_por_id(id_url):
 
     # Valida que el ID de la URL sea un entero válido
@@ -43,6 +46,7 @@ def get_alumno_por_id(id_url):
 
 # 3. GET /alumnos/{id}/notas (Notas del alumno)
 @alumnos_bp.route('/alumnos/<id_url>/notas', methods=['GET'])
+@token_required
 def get_notas_alumno(id_url):
     id_int, error_val = validar_id_entero(id_url)
     if error_val:
@@ -66,6 +70,7 @@ def get_notas_alumno(id_url):
 
 # 4. GET /alumnos/{id}/asistencias (Asistencias del alumno)
 @alumnos_bp.route('/alumnos/<id_url>/asistencias', methods=['GET'])
+@token_required
 def get_asistencias_alumno(id_url):
     id_int, error_val = validar_id_entero(id_url)
     if error_val:
