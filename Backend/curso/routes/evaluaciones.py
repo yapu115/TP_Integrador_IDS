@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request
-from curso.utils import error_respuesta
+from curso.utils.utils import error_respuesta
 from curso.validators.evaluaciones import validar_campos_evaluaciones,validar_evaluacion
 from curso.services.evaluaciones import crear_evaluacion_servicio,listar_evaluaciones_service,modificar_evaluacion_service,eliminar_evaluacion_service
 evaluacion_bp= Blueprint('evaluaciones',__name__)

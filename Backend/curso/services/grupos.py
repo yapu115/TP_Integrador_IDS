@@ -5,11 +5,12 @@ def ver_grupos():
     cursor = connection.cursor(dictionary=True)
 
     query = """
-    SELECT equipos.id, equipos.nombre_equipo, equipos.ids_tp, alumnos.id, alumnos.legajo, alumnos.nombre, alumnos.apellido
-    FROM ((equipos_integrantes
-    JOIN equipos ON equipos.id=equipos_integrantes.id_equipo)
-    LEFT JOIN alumnos ON alumnos.id=equipos_integrantes.id_alumno)
-    ORDER BY equipos.nombre_equipo;
+    SELECT grupos.id, grupos.nombre_grupo, grupo_evaluaciones.id_evaluacion as ids_tp, alumnos.id as alumno_id, alumnos.legajo, alumnos.nombre, alumnos.apellido
+    FROM grupos
+    LEFT JOIN grupo_evaluaciones ON grupos.id = grupo_evaluaciones.id_grupo
+    LEFT JOIN grupo_integrantes ON grupos.id = grupo_integrantes.id_grupo
+    LEFT JOIN alumnos ON alumnos.id = grupo_integrantes.id_alumno
+    ORDER BY grupos.nombre_grupo;
     """
     cursor.execute(query)
     grupos = cursor.fetchall

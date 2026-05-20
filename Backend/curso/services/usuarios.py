@@ -101,3 +101,118 @@ def crear_usuario(datos):
     connection.close()
     
     return retorno
+
+def listar_usuarios(limit, offset):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    
+    query_total = "SELECT COUNT(*) as total FROM usuarios"
+    cursor.execute(query_total)
+
+    total = cursor.fetchone()['total']
+    
+    query_data = """
+        SELECT id, username, email, rol, activo, ultimo_acceso, fecha_creacion 
+        FROM usuarios 
+        LIMIT %s 
+        OFFSET %s
+    """
+    cursor.execute(query_data, (limit, offset))
+    usuarios = cursor.fetchall()
+    
+    cursor.close()
+    connection.close()
+    
+    for u in usuarios:
+        if u['ultimo_acceso']:
+            u['ultimo_acceso'] = u['ultimo_acceso'].isoformat()
+        if u['fecha_creacion']:
+            u['fecha_creacion'] = u['fecha_creacion'].isoformat()
+    
+    return {"usuarios": usuarios, "total": total, "limit": limit, "offset": offset}
+
+
+def actualizar_usuario(id_usuario, datos):
+    usuario_actual = obtener_usuario(id_usuario)
+    if not usuario_actual:
+        return {"error": "NOT_FOUND", "mensaje": "Usuario no encontrado."}
+    
+    if not datos:
+        return usuario_actual
+        
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    retorno = None
+
+    try:
+        if "username" in datos or "email" in datos:
+            check_username = datos.get("username", usuario_actual["username"])
+            check_email = datos.get("email", usuario_actual["email"])
+            
+            query_check = "SELECT id FROM usuarios WHERE (username = %s OR email = %s) AND id != %s"
+            cursor.execute(query_check, (check_username, check_email, id_usuario))
+            
+            if cursor.fetchone():
+                return {"error": "RESOURCE_ALREADY_EXISTS", "mensaje": "El nombre de usuario o email ya están en uso."}
+                
+        campos_update = []
+        valores_update = []
+        
+        if "username" in datos:
+            campos_update.append("username = %s")
+            valores_update.append(datos["username"])
+            
+        if "email" in datos:
+            campos_update.append("email = %s")
+            valores_update.append(datos["email"])
+            
+        if "password" in datos:
+            campos_update.append("password_hash = %s")
+            valores_update.append(generate_password_hash(datos["password"]))
+            
+        if "rol" in datos:
+            campos_update.append("rol = %s")
+            valores_update.append(datos["rol"])
+            
+        if "activo" in datos:
+            campos_update.append("activo = %s")
+            valores_update.append(datos["activo"])
+            
+        if campos_update:
+            query = f"UPDATE usuarios SET {', '.join(campos_update)} WHERE id = %s"
+            valores_update.append(id_usuario)
+            
+            cursor.execute(query, tuple(valores_update))
+            connection.commit()
+            
+        retorno = obtener_usuario(id_usuario)
+            
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return retorno
+
+def eliminar_usuario(id_usuario):
+    """
+    Elimina un usuario de la base de datos por su ID.
+    """
+    if not obtener_usuario(id_usuario):
+        return {"error": "NOT_FOUND", "mensaje": "Usuario no encontrado."}
+        
+    connection = get_connection()
+    cursor = connection.cursor()
+    retorno = None
+    
+    try:
+        query = "DELETE FROM usuarios WHERE id = %s"
+        cursor.execute(query, (id_usuario,))
+        connection.commit()
+        retorno = {"mensaje": "Usuario eliminado exitosamente"}
+    except Exception as e:
+        retorno = {"error": "INTERNAL_SERVER_ERROR", "mensaje": str(e)}
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return retorno
