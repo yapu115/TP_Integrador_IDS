@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from curso.validators.usuarios import validar_login, validar_crear_usuario, validar_actualizar_usuario
-from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios, actualizar_usuario, obtener_usuario
+from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios, actualizar_usuario, obtener_usuario, eliminar_usuario
 from curso.utils.security import token_required
 
 usuarios_bp = Blueprint("usuarios", __name__)
@@ -127,15 +127,24 @@ def put_usuario(id_usuario):
     if not retorno:
         resultado = actualizar_usuario(id_usuario, datos_validados)
         if "error" in resultado:
-            retorno = jsonify({
-                "errors": [{
-                    "code": resultado["error"], 
-                    "message": resultado["mensaje"],
-                    "description": "Por favor elija otro nombre de usuario o correo."
-                }]
-            }), 409
+            if resultado["error"] == "NOT_FOUND":
+                retorno = jsonify({
+                    "errors": [{
+                        "code": "NOT_FOUND",
+                        "message": resultado["mensaje"],
+                        "description": "El usuario a actualizar no existe."
+                    }]
+                }), 404
+            else:
+                retorno = jsonify({
+                    "errors": [{
+                        "code": resultado["error"], 
+                        "message": resultado["mensaje"],
+                        "description": "Por favor elija otro nombre de usuario o correo."
+                    }]
+                }), 409
         else:
-            retorno = jsonify(resultado), 200
+            retorno = "", 204
     
     
     return retorno
@@ -155,3 +164,28 @@ def get_usuario(id_usuario):
         }), 404
         
     return jsonify(usuario), 200
+
+@usuarios_bp.route("/usuarios/<int:id_usuario>", methods=["DELETE"])
+@token_required
+def delete_usuario(id_usuario):
+    resultado = eliminar_usuario(id_usuario)
+    
+    if "error" in resultado:
+        if resultado["error"] == "NOT_FOUND":
+            return jsonify({
+                "errors": [{
+                    "code": "NOT_FOUND", 
+                    "message": resultado["mensaje"],
+                    "description": f"No existe un usuario con el ID {id_usuario}."
+                }]
+            }), 404
+        else:
+            return jsonify({
+                "errors": [{
+                    "code": resultado["error"], 
+                    "message": resultado["mensaje"],
+                    "description": "Error al eliminar el usuario."
+                }]
+            }), 500
+            
+    return "", 204

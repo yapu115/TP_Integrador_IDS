@@ -192,3 +192,27 @@ def actualizar_usuario(id_usuario, datos):
         connection.close()
         
     return retorno
+
+def eliminar_usuario(id_usuario):
+    """
+    Elimina un usuario de la base de datos por su ID.
+    """
+    if not obtener_usuario(id_usuario):
+        return {"error": "NOT_FOUND", "mensaje": "Usuario no encontrado."}
+        
+    connection = get_connection()
+    cursor = connection.cursor()
+    retorno = None
+    
+    try:
+        query = "DELETE FROM usuarios WHERE id = %s"
+        cursor.execute(query, (id_usuario,))
+        connection.commit()
+        retorno = {"mensaje": "Usuario eliminado exitosamente"}
+    except Exception as e:
+        retorno = {"error": "INTERNAL_SERVER_ERROR", "mensaje": str(e)}
+    finally:
+        cursor.close()
+        connection.close()
+        
+    return retorno

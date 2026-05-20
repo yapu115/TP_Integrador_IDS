@@ -13,14 +13,14 @@ def validar_login(data):
     if not username:
         errores.append({
             "code": "VALIDATION_ERROR",
-            "message": "Falta el campo username.",
+            "message": "Falta el campo usuario.",
             "description": "El nombre de usuario es requerido para iniciar sesión."
         })
 
     if not password:
         errores.append({
             "code": "VALIDATION_ERROR",
-            "message": "Falta el campo password.",
+            "message": "Falta el campo contraseña.",
             "description": "La contraseña es requerida para iniciar sesión."
         })
         

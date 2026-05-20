@@ -7,42 +7,42 @@ security:
   - bearerAuth: []
 paths:
   /usuarios:
-      get:
-        summary: "Listar usuarios del sistema (Administradores y Profesores)"
-        tags:
-          - Usuarios
-        parameters:
-          - $ref: '#/components/parameters/Limit'
-          - $ref: '#/components/parameters/Offset'
-        responses:
-          '200':
-            $ref: '#/components/responses/GetUsuarioList200'
-          '204':
-            $ref: '#/components/responses/NoContent'
-          '400':
-            $ref: '#/components/responses/BadRequest'
-          '500':
-            $ref: '#/components/responses/InternalServerError'
-      post:
-        summary: "Registrar / Crear un nuevo usuario"
-        description: "Permite dar de alta a un nuevo profesor o administrador en el sistema."
-        tags:
-          - Usuarios
-        requestBody:
-          required: true
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UsuarioBase'
-        responses:
-          '201':
-            $ref: '#/components/responses/Created'
-          '400':
-            $ref: '#/components/responses/BadRequest'
-          '409':
-            $ref: '#/components/responses/Conflict'
-          '500':
-            $ref: '#/components/responses/InternalServerError'
+    get:
+      summary: "Listar usuarios del sistema (Administradores y Profesores)"
+      tags:
+        - Usuarios
+      parameters:
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetUsuarioList200"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      summary: "Registrar / Crear un nuevo usuario"
+      description: "Permite dar de alta a un nuevo profesor o administrador en el sistema."
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UsuarioBase"
+      responses:
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /usuarios/login:
     post:
@@ -57,17 +57,17 @@ paths:
             schema:
               type: object
               required:
-                - usuario
-                - contraseña
+                - username
+                - password
               properties:
-                usuario:
+                username:
                   type: string
                   example: "admin"
-                contraseña:
+                password:
                   type: string
                   example: "1234"
       responses:
-        '200':
+        "200":
           description: "Login exitoso, devuelve el token JWT"
           content:
             application/json:
@@ -80,10 +80,10 @@ paths:
                   rol:
                     type: string
                     example: "admin"
-        '401':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "401":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /usuarios/{id}:
     parameters:
@@ -99,18 +99,18 @@ paths:
       tags:
         - Usuarios
       responses:
-        '200':
+        "200":
           description: Detalle del usuario
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Usuario'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Usuario"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     put:
       summary: "Reemplazar o modificar un usuario"
       tags:
@@ -120,29 +120,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UsuarioBase'
+              $ref: "#/components/schemas/UsuarioBase"
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: "Eliminar un usuario del sistema"
       tags:
         - Usuarios
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /alumnos:
     get:
@@ -150,18 +150,18 @@ paths:
       tags:
         - Alumnos
       parameters:
-        - $ref: '#/components/parameters/AbandonoParam'
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Offset'
+        - $ref: "#/components/parameters/AbandonoParam"
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
       responses:
-        '200':
-          $ref: '#/components/responses/GetAlumnoList200'
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "200":
+          $ref: "#/components/responses/GetAlumnoList200"
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       summary: "Crear alumno manualmente"
       tags:
@@ -171,16 +171,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AlumnoBase'
+              $ref: "#/components/schemas/AlumnoBase"
       responses:
-        '201':
-          $ref: '#/components/responses/Created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '409':
-          $ref: '#/components/responses/Conflict'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /alumnos/importar:
     post:
@@ -199,7 +199,7 @@ paths:
                   format: binary
                   description: "Archivo CSV con columnas legajo, nombre, apellido, email"
       responses:
-        '200':
+        "200":
           description: "Importación exitosa"
           content:
             application/json:
@@ -209,31 +209,31 @@ paths:
                   procesados:
                     type: integer
                     example: 45
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /alumnos/{id}:
     parameters:
-      - $ref: '#/components/parameters/IdAlumno'
+      - $ref: "#/components/parameters/IdAlumno"
     get:
       summary: "Obtener un alumno por ID"
       tags:
         - Alumnos
       responses:
-        '200':
+        "200":
           description: Detalle del alumno
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Alumno'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/Alumno"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     patch:
       summary: "Actualizar parcialmente un alumno (ej: marcar abandono)"
       tags:
@@ -243,29 +243,29 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AlumnoActualizacion'
+              $ref: "#/components/schemas/AlumnoActualizacion"
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: "Eliminar alumno"
       tags:
         - Alumnos
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /notas:
     put:
@@ -277,16 +277,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NotaRegistro'
+              $ref: "#/components/schemas/NotaRegistro"
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /asistencia/qr:
     post:
@@ -306,7 +306,7 @@ paths:
                   type: string
                   example: "2026-05-20"
       responses:
-        '200':
+        "200":
           description: "QR generado exitosamente (devuelve enlace o base64)"
           content:
             application/json:
@@ -316,10 +316,10 @@ paths:
                   qr_code_url:
                     type: string
                     example: "https://api.tuapp.com/static/qrs/clase_20260520.png"
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /evaluaciones:
     get:
@@ -327,7 +327,7 @@ paths:
       tags:
         - Evaluaciones
       responses:
-        '200':
+        "200":
           description: "Lista de tipos de evaluación (Parcial, TP, etc.)"
           content:
             application/json:
@@ -337,9 +337,9 @@ paths:
                   evaluaciones:
                     type: array
                     items:
-                      $ref: '#/components/schemas/EvaluacionTipo'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                      $ref: "#/components/schemas/EvaluacionTipo"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       summary: "Crear un nuevo tipo de evaluación"
       tags:
@@ -360,12 +360,12 @@ paths:
                   type: string
                   example: "Evaluación corta de lectura previa"
       responses:
-        '201':
-          $ref: '#/components/responses/Created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /evaluaciones/{id}:
     parameters:
@@ -395,23 +395,23 @@ paths:
                   type: string
                   example: "TP grupal obligatorio de la materia"
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: "Eliminar un tipo de evaluación"
       tags:
         - Evaluaciones
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /grupos:
     get:
@@ -419,10 +419,10 @@ paths:
       tags:
         - Grupos
       parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Offset'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
       responses:
-        '200':
+        "200":
           description: "Lista de grupos con sus respectivos integrantes"
           content:
             application/json:
@@ -432,11 +432,11 @@ paths:
                   grupos:
                     type: array
                     items:
-                      $ref: '#/components/schemas/GrupoDetalle'
+                      $ref: "#/components/schemas/GrupoDetalle"
                   _links:
-                    $ref: '#/components/schemas/Links'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                    $ref: "#/components/schemas/Links"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       summary: "Crear un nuevo grupo de alumnos"
       tags:
@@ -446,14 +446,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GrupoCrear'
+              $ref: "#/components/schemas/GrupoCrear"
       responses:
-        '201':
-          $ref: '#/components/responses/Created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /actividad:
     get:
@@ -461,17 +461,17 @@ paths:
       tags:
         - Log de Actividad
       parameters:
-        - $ref: '#/components/parameters/Limit'
-        - $ref: '#/components/parameters/Offset'
+        - $ref: "#/components/parameters/Limit"
+        - $ref: "#/components/parameters/Offset"
       responses:
-        '200':
+        "200":
           description: "Listado de logs"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/LogActividadList'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/LogActividadList"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /grupos/{id}:
     parameters:
@@ -486,16 +486,16 @@ paths:
       tags:
         - Grupos
       responses:
-        '200':
+        "200":
           description: "Detalle del grupo"
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GrupoDetalle'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                $ref: "#/components/schemas/GrupoDetalle"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     put:
       summary: "Modificar un grupo (nombre, TPs asociados, o integrantes)"
       tags:
@@ -505,48 +505,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/GrupoCrear'
+              $ref: "#/components/schemas/GrupoCrear"
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     delete:
       summary: "Eliminar un grupo"
       tags:
         - Grupos
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /alumnos/{id}/notas:
     parameters:
-      - $ref: '#/components/parameters/IdAlumno'
+      - $ref: "#/components/parameters/IdAlumno"
     get:
       summary: "Consultar las notas de un alumno"
       tags:
         - Calificaciones
       responses:
-        '200':
+        "200":
           description: "Listado de notas del alumno"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/NotaDetalle'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/NotaDetalle"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /asistencia/registrar:
     post:
@@ -566,12 +566,12 @@ paths:
                   type: string
                   example: "eyJhbGciOiJIUzI1NiIsIn..."
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /asistencia/qr/enviar:
     post:
@@ -595,24 +595,24 @@ paths:
                   type: string
                   example: "2026-05-20"
       responses:
-        '200':
+        "200":
           description: "Email enviado exitosamente"
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /alumnos/{id}/asistencias:
     parameters:
-      - $ref: '#/components/parameters/IdAlumno'
+      - $ref: "#/components/parameters/IdAlumno"
     get:
       summary: "Consultar el historial de asistencias de un alumno"
       tags:
         - Asistencia
       responses:
-        '200':
+        "200":
           description: "Historial de asistencias"
           content:
             application/json:
@@ -627,10 +627,10 @@ paths:
                     presente:
                       type: boolean
                       example: true
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /informes/alumnos:
     get:
@@ -638,17 +638,17 @@ paths:
       tags:
         - Informes
       parameters:
-        - $ref: '#/components/parameters/AbandonoParam'
+        - $ref: "#/components/parameters/AbandonoParam"
       responses:
-        '200':
+        "200":
           description: "Archivo PDF generado"
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /informes/estadisticas:
     get:
@@ -656,15 +656,15 @@ paths:
       tags:
         - Informes
       responses:
-        '200':
+        "200":
           description: "Archivo PDF generado"
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /informes/equipos:
     get:
@@ -672,15 +672,15 @@ paths:
       tags:
         - Informes
       responses:
-        '200':
+        "200":
           description: "Archivo PDF generado"
           content:
             application/pdf:
               schema:
                 type: string
                 format: binary
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /materiales:
     get:
@@ -689,16 +689,16 @@ paths:
       tags:
         - Materiales
       responses:
-        '200':
+        "200":
           description: "Lista de materiales"
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Material'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+                  $ref: "#/components/schemas/Material"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
     post:
       summary: "Subir nuevo material de estudio"
       tags:
@@ -717,12 +717,12 @@ paths:
                   type: string
                   format: binary
       responses:
-        '201':
-          $ref: '#/components/responses/Created'
-        '400':
-          $ref: '#/components/responses/BadRequest'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
+        "201":
+          $ref: "#/components/responses/Created"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
   /materiales/{id}:
     parameters:
@@ -737,13 +737,12 @@ paths:
       tags:
         - Materiales
       responses:
-        '204':
-          $ref: '#/components/responses/NoContent'
-        '404':
-          $ref: '#/components/responses/NotFound'
-        '500':
-          $ref: '#/components/responses/InternalServerError'
-
+        "204":
+          $ref: "#/components/responses/NoContent"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
 
 components:
   securitySchemes:
@@ -752,7 +751,6 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
-
     LogActividad:
       type: object
       properties:
@@ -779,13 +777,13 @@ components:
         logs:
           type: array
           items:
-            $ref: '#/components/schemas/LogActividad'
+            $ref: "#/components/schemas/LogActividad"
 
     NotaDetalle:
       type: object
       properties:
         evaluacion:
-          $ref: '#/components/schemas/EvaluacionTipo'
+          $ref: "#/components/schemas/EvaluacionTipo"
         nota:
           type: number
           format: float
@@ -811,7 +809,7 @@ components:
           type: string
           format: date-time
           example: "2026-05-01T09:00:00Z"
-    
+
     UsuarioBase:
       type: "object"
       description: "Datos necesarios para registrar o modificar un usuario"
@@ -853,7 +851,7 @@ components:
 
     Usuario:
       allOf:
-        - $ref: '#/components/schemas/UsuarioResumen'
+        - $ref: "#/components/schemas/UsuarioResumen"
         - type: "object"
           properties:
             email:
@@ -869,10 +867,10 @@ components:
         usuarios:
           type: "array"
           items:
-            $ref: '#/components/schemas/UsuarioResumen'
+            $ref: "#/components/schemas/UsuarioResumen"
         _links:
-          $ref: '#/components/schemas/Links'
-    
+          $ref: "#/components/schemas/Links"
+
     AlumnoBase:
       type: "object"
       required:
@@ -929,7 +927,7 @@ components:
 
     Alumno:
       allOf:
-        - $ref: '#/components/schemas/AlumnoResumen'
+        - $ref: "#/components/schemas/AlumnoResumen"
         - type: "object"
           properties:
             email:
@@ -945,9 +943,9 @@ components:
         alumnos:
           type: "array"
           items:
-            $ref: '#/components/schemas/AlumnoResumen'
+            $ref: "#/components/schemas/AlumnoResumen"
         _links:
-          $ref: '#/components/schemas/Links'
+          $ref: "#/components/schemas/Links"
 
     NotaRegistro:
       type: "object"
@@ -1020,9 +1018,9 @@ components:
         integrantes:
           type: array
           items:
-            $ref: '#/components/schemas/AlumnoResumen'
+            $ref: "#/components/schemas/AlumnoResumen"
 
-    Errores:  
+    Errores:
       type: "object"
       properties:
         errors:
@@ -1052,16 +1050,44 @@ components:
       properties:
         _first:
           type: "object"
-          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=0&_limit=10" } }
+          properties:
+            {
+              href:
+                {
+                  type: "string",
+                  example: "https://api.hostname.com/alumnos?_offset=0&_limit=10",
+                },
+            }
         _prev:
           type: "object"
-          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=0&_limit=10" } }
+          properties:
+            {
+              href:
+                {
+                  type: "string",
+                  example: "https://api.hostname.com/alumnos?_offset=0&_limit=10",
+                },
+            }
         _next:
           type: "object"
-          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=10&_limit=10" } }
+          properties:
+            {
+              href:
+                {
+                  type: "string",
+                  example: "https://api.hostname.com/alumnos?_offset=10&_limit=10",
+                },
+            }
         _last:
           type: "object"
-          properties: { href: { type: "string", example: "https://api.hostname.com/alumnos?_offset=40&_limit=10" } }
+          properties:
+            {
+              href:
+                {
+                  type: "string",
+                  example: "https://api.hostname.com/alumnos?_offset=40&_limit=10",
+                },
+            }
 
   parameters:
     IdAlumno:
@@ -1120,7 +1146,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Errores'
+            $ref: "#/components/schemas/Errores"
           example:
             errors:
               - code: "VALIDATION_ERROR"
@@ -1132,7 +1158,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Errores'
+            $ref: "#/components/schemas/Errores"
           example:
             errors:
               - code: "NOT_FOUND"
@@ -1144,7 +1170,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Errores'
+            $ref: "#/components/schemas/Errores"
           example:
             errors:
               - code: "RESOURCE_ALREADY_EXISTS"
@@ -1156,7 +1182,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/Errores'
+            $ref: "#/components/schemas/Errores"
           example:
             errors:
               - code: "INTERNAL_SERVER_ERROR"
