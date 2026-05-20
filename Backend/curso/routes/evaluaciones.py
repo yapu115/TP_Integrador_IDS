@@ -1,97 +1,106 @@
 from flask import Blueprint, jsonify, request
-from curso.utils.utils import error_respuesta
-from curso.validators.evaluaciones import validar_campos_evaluaciones,validar_evaluacion
-from curso.services.evaluaciones import crear_evaluacion_servicio,listar_evaluaciones_service,modificar_evaluacion_service,eliminar_evaluacion_service
-evaluacion_bp= Blueprint('evaluaciones',__name__)
+from curso.validators.evaluaciones import validar_campos_evaluaciones, validar_evaluacion
+from curso.services.evaluaciones import (
+    crear_evaluacion_servicio,
+    listar_evaluaciones_service,
+    modificar_evaluacion_service,
+    eliminar_evaluacion_service
+)
+from curso.utils.security import token_required
 
-@evaluacion_bp.route("/evaluaciones",methods=['GET'])
+evaluacion_bp = Blueprint('evaluaciones', __name__)
+
+@evaluacion_bp.route("/evaluaciones", methods=['GET'])
+@token_required
 def listar_evaluaciones_route():
+    retorno = None
     try:
-        #lista toda la tabla tipos_evaluacion
-        evaluaciones=listar_evaluaciones_service()
+        evaluaciones = listar_evaluaciones_service()
         if evaluaciones is None:
-            return error_respuesta("No se encontraron evaluaciones",404)
+            retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error al listar las evaluaciones."}]}), 500
         else:
-            return jsonify({"status":"exitoso",
-                            "message":"Mostrando evaluaciones"},evaluaciones),200
+            retorno = jsonify(evaluaciones), 200
     except Exception:
-        return error_respuesta("error interno del servidor",500)
+        retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500
+        
+    return retorno
     
-@evaluacion_bp.route("/evaluaciones",methods=['POST'])
+@evaluacion_bp.route("/evaluaciones", methods=['POST'])
+@token_required
 def crear_evaluacion_route():
-    #guarda la request del servidor en data, luego la envia a una funcion para validar que sea correcta
-    data = request.get_json()
+    retorno = None
+    data = request.get_json(silent=True) or {}
 
-    campos=validar_campos_evaluaciones(data)
-    if not campos:
-        return error_respuesta("Todos los campos deben ser completados",400)
-    try:
-        #envia la request a una funcion para crear el nuevo recurso
-        evaluacion=crear_evaluacion_servicio(data)
-        #la funcion devuelve la cantidad de cambios hechos en la base de datos
-        if evaluacion is None:
-            return error_respuesta("error en la base de datos",500)
+    errores = validar_campos_evaluaciones(data)
+    if errores:
+        retorno = jsonify({"errors": errores}), 400
+    else:
+        try:
+            evaluacion = crear_evaluacion_servicio(data)
+            if evaluacion is None:
+                retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error en la base de datos."}]}), 500
+            else:
+                retorno = "", 201
+        except Exception:
+            retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500
+            
+    return retorno
 
-        if evaluacion<1:
-            return error_respuesta("No se realizaron cambios en la base de datos",204)
-        
-        return jsonify({"status":"exitoso",
-                        "message":"Se agrego un recurso nuevo"})
-    except Exception:
-        return error_respuesta("error interno del servidor",500)
-
-@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>",methods=['GET'])
+@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>", methods=['GET'])
+@token_required
 def mostrar_evaluacion_route(id_evaluacion):  
+    retorno = None
     try:
-        #envia la id obtenida del endpoint a una funcion para que valide si existe y la trae
-        evaluacion=validar_evaluacion(id_evaluacion)
+        evaluacion = validar_evaluacion(id_evaluacion)
         if evaluacion is None:
-            return error_respuesta("No se econtro la evaluacion",404)
+            retorno = jsonify({"errors": [{"code": "NOT_FOUND", "message": "Evaluación no encontrada."}]}), 404
         else:
-            return jsonify({"status":"exitoso",
-                            "message":"mostrando evaluacion"},[evaluacion]),200
+            retorno = jsonify(evaluacion), 200
     except Exception:
-        return error_respuesta("error interno del servidor",500)
+        retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500
+        
+    return retorno
 
-@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>",methods=['PUT'])
+@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>", methods=['PUT'])
+@token_required
 def modificar_evaluacion_route(id_evaluacion):
-    data = request.get_json()
-    #guarda la request del servidor en data, luego la envia a una funcion para validar que sea correcta 
-    campos=validar_campos_evaluaciones(data)
-    if not campos:
-        return error_respuesta("Todos los campos deben ser completados",400)
-    try:
+    retorno = None
+    data = request.get_json(silent=True) or {}
+    
+    errores = validar_campos_evaluaciones(data)
+    if errores:
+        retorno = jsonify({"errors": errores}), 400
+    else:
+        try:
+            evaluacion = validar_evaluacion(id_evaluacion)
+            if evaluacion is None:
+                retorno = jsonify({"errors": [{"code": "NOT_FOUND", "message": "Evaluación no encontrada."}]}), 404
+            else:
+                cambios = modificar_evaluacion_service(id_evaluacion, data)
+                if cambios is None:
+                    retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error al modificar."}]}), 500
+                else:
+                    retorno = "", 204
+        except Exception:
+            retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500
+            
+    return retorno
 
-        evaluacion=validar_evaluacion(id_evaluacion)
-        #valida la id, devuelve None si no se encontro la id o si es invalido
-        if evaluacion is None:
-            return error_respuesta("Evaluacion no encontrada o id invalido",404)
-        
-        cambios=modificar_evaluacion_service(id_evaluacion,data)
-        #se le pasa a una funcion el id que se va a modificar y la request con los cambios a realizar
-        #devuelve la cantidad de cambios hechos en la base de datos
-        if cambios <1:
-            return error_respuesta("No se encontraron evaluaciones",204)
-        else:
-            return jsonify({"status":"exitoso",
-                            "message":"Cambios realizados"}),200
-    except Exception:
-        return error_respuesta("error interno del servidor",500)
-
-@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>",methods=['DELETE'])
+@evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>", methods=['DELETE'])
+@token_required
 def eliminar_evaluacion_route(id_evaluacion):
+    retorno = None
     try:
-        evaluacion=validar_evaluacion(id_evaluacion)
-        #comprueba la existencia de ese id en la base de datos
+        evaluacion = validar_evaluacion(id_evaluacion)
         if evaluacion is None:
-           return error_respuesta("No se econtro la evaluacion o el id es invalido",404)
-        
-        cambios=eliminar_evaluacion_service(id_evaluacion)
-        #envia la id a una funcion para que sea eliminida, devuelve los cambios hechos en la base de datos
-        if cambios<1:
-            return error_respuesta("No se pudo eliminar la evaluacion",204)
+           retorno = jsonify({"errors": [{"code": "NOT_FOUND", "message": "Evaluación no encontrada."}]}), 404
         else:
-            return jsonify({"status":"exitoso",
-                            "message":"Cambios realizados"}),200
+            cambios = eliminar_evaluacion_service(id_evaluacion)
+            if cambios is None:
+                retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error al eliminar."}]}), 500
+            else:
+                retorno = "", 204
     except Exception:
-        return error_respuesta("error interno del servidor",500)    
+        retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500    
+        
+    return retorno

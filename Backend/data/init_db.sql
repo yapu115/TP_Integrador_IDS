@@ -105,3 +105,8 @@ VALUES (
     'admin',
     TRUE
 );
+
+INSERT INTO alumnos (legajo, nombre, apellido)
+VALUES
+  (1001, 'Juan', 'Pérez'),
+  (1002, 'María', 'Gómez');
