@@ -1,8 +1,21 @@
+# Módulos estándar
+import csv
+import io
+
+# Módulos de terceros (Flask)
 from flask import Blueprint, jsonify, request
-from validators.alumnos import validar_get_alumnos, validar_id_entero
-from services.alumnos import obtener_todos_los_alumnos
-from db import execute  # Usamos execute para los GETs simples de sub-recursos
+
+# Módulos propios del proyecto (agrupados por funcionalidad)
+from db import execute
 from utils.security import token_required
+from validators.alumnos import validar_get_alumnos, validar_id_entero
+from services.alumnos import (
+    obtener_todos_los_alumnos, 
+    insertar_alumno, 
+    importar_desde_csv,
+    actualizar_abandono, 
+    eliminar_alumno      
+)
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
@@ -24,66 +37,91 @@ def get_alumnos():
 
 
 # 2. GET /alumnos/{id} (Detalle de un alumno)
-@alumnos_bp.route('/alumnos/<id_url>', methods=['GET'])
+@alumnos_bp.route('/alumnos/<int:id>', methods=['GET'])
 @token_required
-def get_alumno_por_id(id_url):
-
-    # Valida que el ID de la URL sea un entero válido
-    id_int, error_val = validar_id_entero(id_url)
-    if error_val:
-        return jsonify(error_val[0]), error_val[1]
-        
-    # Consulta a la base de datos si existe el alumno
-    query = f"SELECT id, legajo, nombre, apellido, email, abandono FROM alumnos WHERE id = {id_int}"
-    alumno = execute(query)
+def get_alumno_por_id(id):
+    query = "SELECT id, legajo, nombre, apellido, email, abandono FROM alumnos WHERE id = %s"
+    alumno = execute(query, (id,))
     
     if not alumno:
-        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id_int} no encontrado", "level": "error"}]}), 404
+        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado", "level": "error"}]}), 404
         
     return jsonify(alumno[0]), 200
 
 
 
 # 3. GET /alumnos/{id}/notas (Notas del alumno)
-@alumnos_bp.route('/alumnos/<id_url>/notas', methods=['GET'])
+@alumnos_bp.route('/alumnos/<int:id>/notas', methods=['GET'])
 @token_required
-def get_notas_alumno(id_url):
-    id_int, error_val = validar_id_entero(id_url)
-    if error_val:
-        return jsonify(error_val[0]), error_val[1]
+def get_notas_alumno(id):
+
+    # Verificación de existencia
+    if not execute("SELECT id FROM alumnos WHERE id = %s", (id,)):
+        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado", "level": "error"}]}), 404
         
-    # Se verifica si el alumno existe para tirar 404 si corresponde
-    if not execute(f"SELECT id FROM alumnos WHERE id = {id_int}"):
-        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id_int} no encontrado", "level": "error"}]}), 404
-        
-    # Se trae las notas cruzando con la tabla de tipos_evaluacion para sacar el nombre (Parcial, TP, etc.)
-    query = f"""
+    query = """
         SELECT t.nombre AS evaluacion, n.nota, n.fecha_carga 
         FROM notas n
         JOIN tipos_evaluacion t ON n.id_evaluacion = t.id
-        WHERE n.id_alumno = {id_int}
+        WHERE n.id_alumno = %s
     """
-    notas = execute(query)
+    notas = execute(query, (id,))
     return jsonify(notas), 200
 
 
 
 # 4. GET /alumnos/{id}/asistencias (Asistencias del alumno)
-@alumnos_bp.route('/alumnos/<id_url>/asistencias', methods=['GET'])
+@alumnos_bp.route('/alumnos/<int:id>/asistencias', methods=['GET'])
 @token_required
-def get_asistencias_alumno(id_url):
-    id_int, error_val = validar_id_entero(id_url)
-    if error_val:
-        return jsonify(error_val[0]), error_val[1]
+def get_asistencias_alumno(id):
+
+    if not execute("SELECT id FROM alumnos WHERE id = %s", (id,)):
+        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado", "level": "error"}]}), 404
         
-    # Verificar si el alumno existe
-    if not execute(f"SELECT id FROM alumnos WHERE id = {id_int}"):
-        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id_int} no encontrado", "level": "error"}]}), 404
-        
-    # Traer historial de asistencias formateando la fecha a string
-    query = f"SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha, estado as presente FROM asistencias WHERE id_alumno = {id_int}"
-    asistencias = execute(query)
+    query = "SELECT DATE_FORMAT(fecha, '%Y-%m-%d') as fecha, estado as presente FROM asistencias WHERE id_alumno = %s"
+    asistencias = execute(query, (id,))
     
-    # se mapea el estado de la BD ('presente', 'ausente') a lo que pida el swagger (ej: true/false o el string)
-    # En teoria, según la tabla guardo un VARCHAR 'presente', y devuelvo la lista tal cual.
     return jsonify(asistencias), 200
+
+
+# 1. POST /alumnos 
+@alumnos_bp.route('/alumnos', methods=['POST'])
+@token_required
+def crear_alumno():
+    data = request.get_json()
+    insertar_alumno(data)
+    return jsonify({"message": "Alumno creado exitosamente"}), 201
+
+# 2. POST /alumnos/importar 
+@alumnos_bp.route('/alumnos/importar', methods=['POST'])
+@token_required
+def importar_alumnos():
+    if 'file' not in request.files:
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "No se envió archivo"}]}), 400
+    
+    file = request.files['file']
+    stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+    csv_reader = list(csv.DictReader(stream))
+    
+    importar_desde_csv(csv_reader)
+    return jsonify({"procesados": len(csv_reader)}), 200
+
+
+# 1. PATCH /alumnos/{id} 
+@alumnos_bp.route('/alumnos/<int:id>', methods=['PATCH'])
+@token_required
+def marcar_abandono(id):
+    data = request.get_json()
+    if not data or 'abandono' not in data:
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Falta el campo 'abandono'"}]}), 400
+    
+    actualizar_abandono(id, data['abandono'])
+    return jsonify({"message": "Estado de abandono actualizado"}), 200
+
+
+# 1. DELETE /alumnos/{id}
+@alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
+@token_required
+def borrar_alumno(id):
+    eliminar_alumno(id)
+    return jsonify({"message": "Alumno eliminado exitosamente"}), 200

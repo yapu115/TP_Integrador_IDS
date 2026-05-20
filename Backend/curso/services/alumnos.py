@@ -1,7 +1,8 @@
 from flask import request
 from db import execute
 
-#1.Funciones para GET
+
+#-- 1.Funciones para GET --
 
 #1.1.Funciones para GET /alumnos
 
@@ -79,3 +80,39 @@ def obtener_todos_los_alumnos():
     }
 
     return respuesta, 200
+
+#-- 2.Funciones para Post --
+
+#2.1.Funcion para POST /alumnos
+
+# Pre: data contiene 'legajo', 'nombre', 'apellido', 'email'
+# Post: alumno insertado en tabla 'alumnos'
+def insertar_alumno(data):
+    query = "INSERT INTO alumnos (legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s)"
+    execute(query, (data['legajo'], data['nombre'], data['apellido'], data['email']))
+
+#2.2.Funcion para POST /alumnos/importar
+
+# Pre: rows es lista de dicts con 'legajo', 'nombre', 'apellido', 'email'
+# Post: todos los alumnos insertados en tabla 'alumnos'
+def importar_desde_csv(rows):
+    # Como vi que no usamos pandas en reqirements.txt use el módulo csv nativo
+    query = "INSERT INTO alumnos (legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s)"
+    for row in rows:
+        execute(query, (row['legajo'], row['nombre'], row['apellido'], row['email']))
+
+#-- 3.funcion para Patch --
+
+# Pre: estado es un booleano (True/False)
+# Post: se actualiza la columna 'abandono' en la tabla alumnos para el id_alumno dado
+def actualizar_abandono(id_alumno, estado):
+    query = "UPDATE alumnos SET abandono = %s WHERE id = %s"
+    execute(query, (estado, id_alumno))
+
+#-- 4.Funcion para Delete --
+
+# Pre: id_alumno es un entero válido
+# Post: se elimina el registro del alumno de la tabla alumnos
+def eliminar_alumno(id_alumno):
+    query = "DELETE FROM alumnos WHERE id = %s"
+    execute(query, (id_alumno,))
