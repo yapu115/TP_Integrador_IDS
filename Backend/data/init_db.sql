@@ -1,4 +1,4 @@
--- Script potencial, no final
+-- drop database curso_universitario;
 
 CREATE DATABASE IF NOT EXISTS curso_universitario;
 USE curso_universitario;
@@ -6,6 +6,7 @@ USE curso_universitario;
 CREATE TABLE IF NOT EXISTS usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(100) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     rol ENUM('admin', 'profesor') DEFAULT 'profesor',
     ultimo_acceso DATETIME,
@@ -41,19 +42,40 @@ CREATE TABLE IF NOT EXISTS notas (
     FOREIGN KEY (id_evaluacion) REFERENCES tipos_evaluacion(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS equipos (
+CREATE TABLE IF NOT EXISTS grupos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_equipo VARCHAR(50),
-    id_tp INT,
-    FOREIGN KEY (id_tp) REFERENCES tipos_evaluacion(id)
+    nombre_grupo VARCHAR(50)
 );
 
-CREATE TABLE IF NOT EXISTS equipo_integrantes (
-    id_equipo INT,
+CREATE TABLE IF NOT EXISTS grupo_evaluaciones (
+    id_grupo INT,
+    id_evaluacion INT,
+    PRIMARY KEY (id_grupo, id_evaluacion),
+    FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_evaluacion) REFERENCES tipos_evaluacion(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS grupo_integrantes (
+    id_grupo INT,
     id_alumno INT,
-    PRIMARY KEY (id_equipo, id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id) ON DELETE CASCADE,
+    PRIMARY KEY (id_grupo, id_alumno),
+    FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE,
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS logs_actividad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL,
+    accion VARCHAR(255) NOT NULL,
+    detalles TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS materiales (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    url_archivo VARCHAR(255) NOT NULL,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -75,5 +97,16 @@ INSERT IGNORE INTO tipos_evaluacion (nombre) VALUES
 ('Parcialito'), 
 ('Trabajo Práctico');
 
-INSERT IGNORE INTO usuarios (username, password_hash, rol) 
-VALUES ('admin', 'hash_de_prueba', 'admin');
+INSERT IGNORE INTO usuarios (username, email, password_hash, rol, activo) 
+VALUES (
+    'admin', 
+    'admin@fi.uba.ar', 
+    'scrypt:32768:8:1$oBmzlHyWpksghi0Y$bb052984618802029759b2ac1fb186076fe7cc7ecad4c3da04bb2e0c5923ae0548269cf05698927f8c9e7dbce387c1c35dc6fc72609e985da4defc0800748266', -- admin123
+    'admin',
+    TRUE
+);
+
+INSERT INTO alumnos (legajo, nombre, apellido)
+VALUES
+  (1001, 'Juan', 'Pérez'),
+  (1002, 'María', 'Gómez');
