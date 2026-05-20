@@ -1,37 +1,50 @@
 from curso.db import get_connection
 
 def validar_campos_evaluaciones(data):
-    #valida que la request este bien compuesta
-    nombre = data["nombre"]
-    descripcion = data["descripcion"]
-    campos_validos=True
-    if not data or "nombre" not in data or "descripcion" not in data:
-        campos_validos=False
-    if not nombre or nombre.isspace():
-        campos_validos=False
+    errores = []
+    
+    if not data:
+        errores.append({
+            "code": "VALIDATION_ERROR",
+            "message": "Cuerpo de la petición vacío."
+        })
+    else:
+        nombre = data.get("nombre")
+        descripcion = data.get("descripcion")
 
-    if not descripcion or descripcion.isspace():
-        campos_validos=False
-    return campos_validos
+        if not nombre or str(nombre).isspace():
+            errores.append({
+                "code": "VALIDATION_ERROR",
+                "message": "Falta el campo nombre o está vacío."
+            })
+
+        if not descripcion or str(descripcion).isspace():
+            errores.append({
+                "code": "VALIDATION_ERROR",
+                "message": "Falta el campo descripcion o está vacío."
+            })
+
+    retorno = errores
+    return retorno
     
 def validar_evaluacion(id_evaluacion):
+    resultado = None
     conexion = None
     cursor = None
-    #valida la existencia del recurso evaluacion por id, si existe devuelve toda la fila asignada a esa id
     try:
-        conexion=get_connection()
-        cursor=conexion.cursor(dictionary=True)
+        conexion = get_connection()
+        cursor = conexion.cursor(dictionary=True)
 
-        query="SELECT nombre, descripcion FROM tipos_evaluacion WHERE id = %s;"
-        cursor.execute(query,(id_evaluacion,))
-        resultado=cursor.fetchone()
-
-        return resultado
+        query = "SELECT id, nombre, descripcion FROM tipos_evaluacion WHERE id = %s;"
+        cursor.execute(query, (id_evaluacion,))
+        resultado = cursor.fetchone()
     except Exception as e:
         print(f"Error al buscar evaluacion: {e}")
-        return None
+        resultado = None
     finally:
         if cursor is not None:
             cursor.close()
         if conexion is not None:
             conexion.close() 
+
+    return resultado
