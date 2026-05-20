@@ -1,4 +1,3 @@
--- Script potencial, no final
 CREATE DATABASE IF NOT EXISTS curso_universitario;
 USE curso_universitario;
 
@@ -27,6 +26,7 @@ CREATE TABLE IF NOT EXISTS tipos_evaluacion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     descripcion TEXT
+    -- Faltan alumnos asociados a las evaluaciones?
 );
 
 
