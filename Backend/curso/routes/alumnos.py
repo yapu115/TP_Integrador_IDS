@@ -2,7 +2,7 @@ from flask import Blueprint, jsonify, request
 from validators.alumnos import validar_get_alumnos, validar_id_entero
 from services.alumnos import obtener_todos_los_alumnos
 from db import execute  # Usamos execute para los GETs simples de sub-recursos
-from security import token_required  # <-- Sumo la seguridad de security.py
+from utils.security import token_required
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
