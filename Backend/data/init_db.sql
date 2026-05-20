@@ -1,3 +1,5 @@
+-- drop database curso_universitario;
+
 CREATE DATABASE IF NOT EXISTS curso_universitario;
 USE curso_universitario;
 
@@ -26,7 +28,6 @@ CREATE TABLE IF NOT EXISTS tipos_evaluacion (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(50) NOT NULL,
     descripcion TEXT
-    -- Faltan alumnos asociados a las evaluaciones?
 );
 
 
@@ -41,19 +42,40 @@ CREATE TABLE IF NOT EXISTS notas (
     FOREIGN KEY (id_evaluacion) REFERENCES tipos_evaluacion(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS equipos (
+CREATE TABLE IF NOT EXISTS grupos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre_equipo VARCHAR(50),
-    id_tp INT,
-    FOREIGN KEY (id_tp) REFERENCES tipos_evaluacion(id)
+    nombre_grupo VARCHAR(50)
 );
 
-CREATE TABLE IF NOT EXISTS equipo_integrantes (
-    id_equipo INT,
+CREATE TABLE IF NOT EXISTS grupo_evaluaciones (
+    id_grupo INT,
+    id_evaluacion INT,
+    PRIMARY KEY (id_grupo, id_evaluacion),
+    FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_evaluacion) REFERENCES tipos_evaluacion(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS grupo_integrantes (
+    id_grupo INT,
     id_alumno INT,
-    PRIMARY KEY (id_equipo, id_alumno),
-    FOREIGN KEY (id_equipo) REFERENCES equipos(id) ON DELETE CASCADE,
+    PRIMARY KEY (id_grupo, id_alumno),
+    FOREIGN KEY (id_grupo) REFERENCES grupos(id) ON DELETE CASCADE,
     FOREIGN KEY (id_alumno) REFERENCES alumnos(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS logs_actividad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    usuario VARCHAR(50) NOT NULL,
+    accion VARCHAR(255) NOT NULL,
+    detalles TEXT,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS materiales (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(255) NOT NULL,
+    url_archivo VARCHAR(255) NOT NULL,
+    fecha_subida TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
