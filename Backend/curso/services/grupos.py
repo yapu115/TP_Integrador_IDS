@@ -21,21 +21,29 @@ def ver_grupos():
         return grupos
     except Exception as e:
         return {
-        "code": "INTERNAL_SERVER_ERROR",
-        "message": "Error interno del servidor",
-        "level": "error",
-        "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
-        }
+            "errors": [
+                {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Error interno del servidor",
+                "level": "error",
+                "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
+                }
+            ]
+            }
 
 def crear_grupo(nombre_equipo, id_tp, ids_alumnos):
     try:
         if(not nombre_equipo or not id_tp or not ids_alumnos):
             return {
-            "code": "VALIDATION_ERROR",
-            "message": "El formato de los datos enviados es inválido.",
-            "level": "error",
-            "description": "Verifique que todos los campos requeridos estén presentes y tengan el formato correcto."
-            }
+                "errors": [
+                    {
+                    "code": "NOT_FOUND",
+                    "message": "Recurso no encontrado",
+                    "level": "error",
+                    "description": "El recurso solicitad no existe en la base de datos."
+                    }
+                ]
+                }
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
@@ -56,14 +64,18 @@ def crear_grupo(nombre_equipo, id_tp, ids_alumnos):
             cursor.execute(query_agregar_alumnos, (id_equipo, id_alumno))
         cursor.close()
         connection.close()
-        
+
     except Exception as e:
         return {
-        "code": "INTERNAL_SERVER_ERROR",
-        "message": "Error interno del servidor",
-        "level": "error",
-        "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
-        }
+            "errors": [
+                {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Error interno del servidor",
+                "level": "error",
+                "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
+                }
+            ]
+            }
     
 def ver_grupo_id(id_grupo):
     try:
@@ -86,11 +98,15 @@ def ver_grupo_id(id_grupo):
         return grupo
     except Exception as e:
         return {
-        "code": "INTERNAL_SERVER_ERROR",
-        "message": "Error interno del servidor",
-        "level": "error",
-        "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
-        }
+            "errors": [
+                {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Error interno del servidor",
+                "level": "error",
+                "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
+                }
+            ]
+            }
 
 def editar_grupo(id_grupo, valores):
     connection = get_connection()
@@ -130,3 +146,50 @@ def editar_grupo(id_grupo, valores):
     connection.close()
 
     return cambios
+
+def eliminar_grupo(id_grupo):
+    #Posiblemente necesite un cambio a la base de datos, para eliminar grupos mediante una variable booleana
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+        query = """
+        DELETE FROM equipos
+        WHERE id = %d;
+        """
+        query_check = """
+        SELECT * FROM equipos
+        WHERE id = %d;
+        """
+        cursor.execute(query_check, id_grupo)
+        grupo_encontrado = (cursor.rowcount > 0)
+        if(not grupo_encontrado):
+            return {
+                "errors": [
+                    {
+                    "code": "NOT_FOUND",
+                    "message": "Recurso no encontrado",
+                    "level": "error",
+                    "description": "El recurso solicitad no existe en la base de datos."
+                    }
+                ]
+                }
+        
+        cursor.execute(query, id_grupo)
+        connection.commmit
+        cambios = cursor.rowcount
+
+        connection.close()
+        cursor.close()
+        return cambios
+
+    except Exception as e:
+        return {
+            "errors": [
+                {
+                "code": "INTERNAL_SERVER_ERROR",
+                "message": "Error interno del servidor",
+                "level": "error",
+                "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
+                }
+            ]
+            }
