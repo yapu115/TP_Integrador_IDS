@@ -31,7 +31,6 @@ CREATE TABLE IF NOT EXISTS tipos_evaluacion (
 );
 
 
-
 CREATE TABLE IF NOT EXISTS notas (
     id INT AUTO_INCREMENT PRIMARY KEY,
     id_alumno INT,
@@ -65,10 +64,11 @@ CREATE TABLE IF NOT EXISTS grupo_integrantes (
 
 CREATE TABLE IF NOT EXISTS logs_actividad (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    usuario VARCHAR(50) NOT NULL,
+    id_usuario INT,
     accion VARCHAR(255) NOT NULL,
     detalles TEXT,
-    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS materiales (
@@ -106,7 +106,7 @@ VALUES (
     TRUE
 );
 
-INSERT INTO alumnos (legajo, nombre, apellido)
+INSERT INTO alumnos (legajo, nombre, apellido, email)
 VALUES
-  (1001, 'Juan', 'Pérez'),
-  (1002, 'María', 'Gómez');
+  (1001, 'Juan', 'Pérez', "jperez@fi.uba.ar"),
+  (1002, 'María', 'Gómez', "mgomez@fi.uba.ar");
