@@ -58,36 +58,6 @@ def notas():
     return "", 204
     
 
-@notas_bp.route("/alumnos/<int:id_alumno>/notas", methods=["GET"])
-@token_required
-def obtener_notas_alumno(id_alumno):
-    try:
-        notas = devolver_notas(id_alumno)
 
-        if len(notas) == 0:
-            return jsonify({
-                "errors": [
-                    {
-                        "code": "NOT_FOUND",
-                        "message": "Recurso no encontrado",
-                        "level": "error",
-                        "description": "El recurso solicitado no existe en la base de datos."
-                    }
-                ]
-            }), 404
-
-        return jsonify(notas), 200
-
-    except Exception as e:
-        return jsonify({
-            "errors": [
-                {
-                    "code": "INTERNAL_SERVER_ERROR",
-                    "message": "Error interno del servidor",
-                    "level": "error",
-                    "description": "Ocurrió un error inesperado. Por favor, intente más tarde."
-                }
-            ]
-        }), 500
 
 
