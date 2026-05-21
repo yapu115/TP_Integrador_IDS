@@ -91,7 +91,7 @@ def devolver_notas(id_alumno):
             n.nota,
             n.fecha_carga
         FROM notas n
-        INNER JOIN evaluaciones e ON n.id_evaluacion = e.id
+        INNER JOIN tipos_evaluacion e ON n.id_evaluacion = e.id
         WHERE n.id_alumno = %s
     """
 

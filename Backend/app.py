@@ -8,6 +8,7 @@ from curso.routes.grupos import grupos_bp
 from curso.routes.informes import informes_bp
 from curso.routes.logs import logs_bp
 from curso.routes.alumnos import alumnos_bp
+from curso.routes.notas import notas_bp
 
 
 app = Flask(__name__, static_folder='curso/static')
@@ -20,6 +21,7 @@ app.register_blueprint(grupos_bp)
 app.register_blueprint(logs_bp)
 app.register_blueprint(informes_bp)
 app.register_blueprint(alumnos_bp)
+app.register_blueprint(notas_bp)
 
 
 @app.route("/health", methods=["GET"])
