@@ -6,6 +6,7 @@ from curso.services.materiales import listar_materiales, guardar_material, elimi
 materiales_bp = Blueprint("materiales", __name__)
 
 @materiales_bp.route("/materiales", methods=["GET"])
+@token_required
 def get_materiales():
     retorno = None
     materiales = listar_materiales()
