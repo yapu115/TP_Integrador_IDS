@@ -4,7 +4,7 @@ def obtener_log_por_id(id_log):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    query = "SELECT * FROM logs WHERE id_log = %s"
+    query = "SELECT * FROM logs_actividad WHERE id = %s"
     cursor.execute(query, (id_log,))
 
     log = cursor.fetchone()
@@ -20,14 +20,14 @@ def crear_log(datos):
     cursor = connection.cursor(dictionary=True)
 
     query = """
-        INSERT INTO logs (usuario_id, accion, descripcion)
+        INSERT INTO logs_actividad (usuario, accion, detalles)
         VALUES (%s, %s, %s)
     """
 
     cursor.execute(query, (
-        datos.get("usuario_id"),
+        datos.get("usuario"),
         datos["accion"],
-        datos.get("descripcion")
+        datos.get("detalles")
     ))
 
     connection.commit()
@@ -36,23 +36,23 @@ def crear_log(datos):
 
 
 
-def listar_logs(usuario_id=None, accion=None, fecha=None):
+def listar_logs(usuario=None, accion=None, fecha=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
 
-    query = "SELECT * FROM logs WHERE 1=1" #El where significa que es siempre verdadera
+    query = "SELECT * FROM logs_actividad WHERE 1=1" #El where significa que es siempre verdadera
     params = []
 
-    if usuario_id:
-        query += " AND usuario_id = %s"
-        params.append(usuario_id)
+    if usuario:
+        query += " AND usuario = %s"
+        params.append(usuario)
 
     if accion:
         query += " AND accion = %s"
         params.append(accion)
 
     if fecha:
-        query += " AND DATE(fecha_hora) = %s"
+        query += " AND DATE(fecha) = %s"
         params.append(fecha)
 
     cursor.execute(query, tuple(params))

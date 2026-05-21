@@ -5,5 +5,10 @@ Flask-Cors==4.0.1
 # Base de Datos
 mysql-connector-python==9.0.0
 
+
+# PDF Generation
+reportlab==4.2.0
+
 # Autenticación
 PyJWT==2.8.0
+
