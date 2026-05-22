@@ -25,12 +25,15 @@ INSERT IGNORE INTO notas (id_alumno, id_evaluacion, nota) VALUES
 (1, 3, 9.0), (2, 3, 7.0), (3, 3, 8.0), (4, 3, 10.0), (6, 3, 8.5),
 (7, 3, 6.0), (9, 3, 7.5), (10, 3, 9.0);
 
--- Equipos
-INSERT IGNORE INTO equipos (id, nombre_equipo, id_tp) VALUES
-(1, 'Los Binarios', 3),
-(2, 'Los Algorítmicos', 3);
+-- Grupos (equipos) de prueba
+INSERT IGNORE INTO grupos (id, nombre_grupo) VALUES
+(1, 'Los Binarios'),
+(2, 'Los Algorítmicos');
 
--- Integrantes de equipos
-INSERT IGNORE INTO equipo_integrantes (id_equipo, id_alumno) VALUES
+INSERT IGNORE INTO grupo_evaluaciones (id_grupo, id_evaluacion) VALUES
+(1, 3),
+(2, 3);
+
+INSERT IGNORE INTO grupo_integrantes (id_grupo, id_alumno) VALUES
 (1, 1), (1, 2), (1, 3), (1, 4),
 (2, 6), (2, 7), (2, 9), (2, 10);
