@@ -44,7 +44,6 @@ def login():
 
 
 @usuarios_bp.route("/usuarios", methods=["POST"])
-@token_required
 def post_usuario():
     """
     Crea un nuevo usuario en el sistema.
