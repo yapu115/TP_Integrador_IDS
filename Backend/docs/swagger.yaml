@@ -685,7 +685,6 @@ paths:
   /materiales:
     get:
       summary: "Listar material de estudio (Público)"
-      security: []
       tags:
         - Materiales
       responses:

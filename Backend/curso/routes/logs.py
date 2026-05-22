@@ -14,7 +14,7 @@ from curso.services.logs import (
 logs_bp = Blueprint("logs", __name__)
 
 
-@logs_bp.route("/logs", methods=["GET"])
+@logs_bp.route("/log", methods=["GET"])
 @token_required
 def get_logs():
     usuario_id = request.args.get("usuario_id")
@@ -26,18 +26,24 @@ def get_logs():
     return jsonify(resultado), 200
 
 
-@logs_bp.route("/logs/<int:id_log>", methods=["GET"])
+@logs_bp.route("/log/<int:id_log>", methods=["GET"])
 @token_required
 def get_log_por_id(id_log):
     resultado = obtener_log_por_id(id_log)
 
     if resultado is None:
-        return jsonify({"error": "Log no encontrado"}), 404
+        return jsonify({
+            "errors": [{
+                "code": "NOT_FOUND",
+                "message": "Log no encontrado",
+                "level": "error",
+            }]
+        }), 404
 
     return jsonify(resultado), 200
 
 
-@logs_bp.route("/logs", methods=["POST"])
+@logs_bp.route("/log", methods=["POST"])
 @token_required
 def post_log():
     data = request.get_json(silent=True) or {}
