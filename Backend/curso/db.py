@@ -8,14 +8,20 @@ def get_connection():
         database="curso_universitario"
     )
 
-def execute(query):
+def execute(query, params=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute(query)
-        results = cursor.fetchall()
+        if params is not None:
+            cursor.execute(query, params)
+        else:
+            cursor.execute(query)
+
+        if query.lstrip().upper().startswith(('INSERT', 'UPDATE', 'DELETE')):
+            connection.commit()
+            return cursor.rowcount
+
+        return cursor.fetchall()
     finally:
         cursor.close()
-        connection.close
-    return results
-
+        connection.close()

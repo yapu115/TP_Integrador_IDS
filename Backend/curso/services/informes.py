@@ -8,6 +8,8 @@ from reportlab.platypus import (
 )
 from curso.db import get_connection
 
+NOTA_MINIMA_APROBACION = 4
+
 
 def _build_pdf_response(title, headers, rows, landscape_mode=False):
     buffer = BytesIO()
@@ -105,31 +107,32 @@ def _build_estadisticas_pdf(summary_headers, summary_rows, detail_headers, detai
 def informe_alumnos(abandono=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
+    try:
+        if abandono is not None:
+            query = """
+                SELECT legajo, nombre, apellido, email, abandono
+                FROM alumnos
+                WHERE abandono = %s
+                ORDER BY apellido, nombre
+            """
+            cursor.execute(query, (abandono,))
+        else:
+            query = """
+                SELECT legajo, nombre, apellido, email, abandono
+                FROM alumnos
+                ORDER BY apellido, nombre
+            """
+            cursor.execute(query)
 
-    if abandono is not None:
-        query = """
-            SELECT legajo, nombre, apellido, email, abandono
-            FROM alumnos
-            WHERE abandono = %s
-            ORDER BY apellido, nombre
-        """
-        cursor.execute(query, (abandono,))
-    else:
-        query = """
-            SELECT legajo, nombre, apellido, email, abandono
-            FROM alumnos
-            ORDER BY apellido, nombre
-        """
-        cursor.execute(query)
-
-    alumnos = cursor.fetchall()
-    cursor.close()
-    connection.close()
+        alumnos = cursor.fetchall()
+    finally:
+        cursor.close()
+        connection.close()
 
     headers = ["Legajo", "Nombre", "Apellido", "Email", "Abandono"]
     rows = [
         [
-            a["legajo"],
+            str(a["legajo"]),
             a["nombre"],
             a["apellido"],
             a["email"],
@@ -144,97 +147,118 @@ def informe_alumnos(abandono=None):
 def informe_estadisticas():
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT COUNT(*) AS total FROM alumnos")
+        total_alumnos = cursor.fetchone()["total"]
 
-    cursor.execute("SELECT COUNT(*) AS total FROM alumnos")
-    total_alumnos = cursor.fetchone()["total"]
+        cursor.execute("SELECT COUNT(*) AS total FROM alumnos WHERE abandono = TRUE")
+        total_abandonos = cursor.fetchone()["total"]
 
-    cursor.execute("SELECT COUNT(*) AS total FROM alumnos WHERE abandono = TRUE")
-    total_abandonos = cursor.fetchone()["total"]
-
-    cursor.execute("SELECT id, nombre FROM tipos_evaluacion")
-    evaluaciones = cursor.fetchall()
-
-    stats_rows = []
-    for ev in evaluaciones:
         cursor.execute(
-            """
-            SELECT
-                COUNT(*) AS total_notas,
-                COALESCE(AVG(nota), 0) AS promedio,
-                SUM(CASE WHEN nota >= 4 THEN 1 ELSE 0 END) AS aprobados,
-                SUM(CASE WHEN nota < 4 THEN 1 ELSE 0 END) AS desaprobados
-            FROM notas
-            WHERE id_evaluacion = %s
-            """,
-            (ev["id"],),
+            "SELECT COUNT(*) AS total FROM alumnos WHERE abandono = FALSE"
         )
-        row = cursor.fetchone()
-        stats_rows.append([
-            ev["nombre"],
-            row["total_notas"],
-            f'{row["promedio"]:.2f}',
-            row["aprobados"] or 0,
-            row["desaprobados"] or 0,
-        ])
+        total_activos = cursor.fetchone()["total"]
 
-    cursor.close()
-    connection.close()
+        cursor.execute("SELECT id, nombre FROM tipos_evaluacion ORDER BY id")
+        evaluaciones = cursor.fetchall()
+
+        stats_rows = []
+        for ev in evaluaciones:
+            cursor.execute(
+                """
+                SELECT
+                    COUNT(*) AS total_notas,
+                    AVG(n.nota) AS promedio,
+                    SUM(CASE WHEN n.nota >= %s THEN 1 ELSE 0 END) AS aprobados,
+                    SUM(CASE WHEN n.nota < %s THEN 1 ELSE 0 END) AS desaprobados
+                FROM notas n
+                INNER JOIN alumnos a ON n.id_alumno = a.id
+                WHERE n.id_evaluacion = %s AND a.abandono = FALSE
+                """,
+                (NOTA_MINIMA_APROBACION, NOTA_MINIMA_APROBACION, ev["id"]),
+            )
+            row = cursor.fetchone()
+            total_notas = row["total_notas"] or 0
+            promedio = (
+                f'{float(row["promedio"]):.2f}'
+                if total_notas > 0 and row["promedio"] is not None
+                else "N/A"
+            )
+            stats_rows.append([
+                ev["nombre"],
+                total_notas,
+                promedio,
+                row["aprobados"] or 0,
+                row["desaprobados"] or 0,
+            ])
+    finally:
+        cursor.close()
+        connection.close()
 
     headers = ["Evaluación", "Notas Cargadas", "Promedio", "Aprobados", "Desaprobados"]
-    rows = stats_rows
-
-    summary_headers = ["Métrica", "Valor"]
     summary_rows = [
         ["Total Alumnos", str(total_alumnos)],
+        ["Alumnos Activos", str(total_activos)],
         ["Abandonos", str(total_abandonos)],
         ["Tasa de Abandono", f"{(total_abandonos / total_alumnos * 100) if total_alumnos else 0:.1f}%"],
+        [f"Nota mínima de aprobación", str(NOTA_MINIMA_APROBACION)],
     ]
 
     return _build_estadisticas_pdf(
         ["Métrica", "Valor"], summary_rows,
-        headers, rows,
+        headers, stats_rows,
     )
 
 
 def informe_equipos():
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
-
-    query = """
-        SELECT
-            e.id AS id_equipo,
-            e.nombre_equipo,
-            a.id AS id_alumno,
-            a.legajo,
-            a.nombre,
-            a.apellido,
-            a.email
-        FROM equipos e
-        LEFT JOIN equipo_integrantes ei ON e.id = ei.id_equipo
-        LEFT JOIN alumnos a ON ei.id_alumno = a.id
-        ORDER BY e.nombre_equipo, a.apellido, a.nombre
-    """
-    cursor.execute(query)
-    results = cursor.fetchall()
-    cursor.close()
-    connection.close()
+    try:
+        query = """
+            SELECT
+                g.id AS id_grupo,
+                g.nombre_grupo,
+                te.nombre AS nombre_evaluacion,
+                a.id AS id_alumno,
+                a.legajo,
+                a.nombre,
+                a.apellido
+            FROM grupos g
+            LEFT JOIN grupo_evaluaciones ge ON g.id = ge.id_grupo
+            LEFT JOIN tipos_evaluacion te ON ge.id_evaluacion = te.id
+            LEFT JOIN grupo_integrantes gi ON g.id = gi.id_grupo
+            LEFT JOIN alumnos a ON gi.id_alumno = a.id
+            ORDER BY g.nombre_grupo, a.apellido, a.nombre
+        """
+        cursor.execute(query)
+        results = cursor.fetchall()
+    finally:
+        cursor.close()
+        connection.close()
 
     equipos_dict = {}
     for row in results:
-        equipo_id = row["id_equipo"]
-        if equipo_id not in equipos_dict:
-            equipos_dict[equipo_id] = {
-                "nombre": row["nombre_equipo"],
+        grupo_id = row["id_grupo"]
+        if grupo_id not in equipos_dict:
+            equipos_dict[grupo_id] = {
+                "nombre": row["nombre_grupo"],
+                "tps": set(),
                 "integrantes": [],
             }
+        if row["nombre_evaluacion"]:
+            equipos_dict[grupo_id]["tps"].add(row["nombre_evaluacion"])
         if row["id_alumno"]:
-            equipos_dict[equipo_id]["integrantes"].append(
-                f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
-            )
+            integrante = f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
+            if integrante not in equipos_dict[grupo_id]["integrantes"]:
+                equipos_dict[grupo_id]["integrantes"].append(integrante)
 
-    headers = ["Equipo", "Integrantes"]
+    headers = ["Equipo", "TPs asociados", "Integrantes"]
     rows = [
-        [data["nombre"], "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes"]
+        [
+            data["nombre"],
+            ", ".join(sorted(data["tps"])) if data["tps"] else "Sin TPs asignados",
+            "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes",
+        ]
         for data in equipos_dict.values()
     ]
 

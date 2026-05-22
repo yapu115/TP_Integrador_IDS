@@ -1,5 +1,8 @@
 from flask import Blueprint, jsonify, request, send_file
 from io import BytesIO
+
+from curso.utils.security import token_required
+from curso.validators.informes import validar_abandono_informe
 from curso.services.informes import (
     informe_alumnos,
     informe_estadisticas,
@@ -9,22 +12,28 @@ from curso.services.informes import (
 informes_bp = Blueprint("informes", __name__)
 
 
+def _respuesta_error_interno(detalle):
+    return jsonify({
+        "errors": [{
+            "code": "INTERNAL_SERVER_ERROR",
+            "message": "Error al generar el informe.",
+            "level": "error",
+            "description": detalle,
+        }]
+    }), 500
+
+
 @informes_bp.route("/informes/alumnos", methods=["GET"])
+@token_required
 def descargar_informe_alumnos():
-    abandono_param = request.args.get("abandono")
-    abandono = None
-    if abandono_param is not None:
-        if abandono_param.lower() in ("true", "1", "si", "sí"):
-            abandono = True
-        elif abandono_param.lower() in ("false", "0", "no"):
-            abandono = False
-        else:
-            return jsonify({"error": "El parámetro 'abandono' debe ser true o false."}), 400
+    abandono, error_validacion = validar_abandono_informe()
+    if error_validacion:
+        return jsonify(error_validacion[0]), error_validacion[1]
 
     try:
         pdf_bytes = informe_alumnos(abandono)
     except Exception as e:
-        return jsonify({"error": f"Error al generar el informe: {str(e)}"}), 500
+        return _respuesta_error_interno(str(e))
 
     return send_file(
         BytesIO(pdf_bytes),
@@ -35,11 +44,12 @@ def descargar_informe_alumnos():
 
 
 @informes_bp.route("/informes/estadisticas", methods=["GET"])
+@token_required
 def descargar_informe_estadisticas():
     try:
         pdf_bytes = informe_estadisticas()
     except Exception as e:
-        return jsonify({"error": f"Error al generar el informe: {str(e)}"}), 500
+        return _respuesta_error_interno(str(e))
 
     return send_file(
         BytesIO(pdf_bytes),
@@ -50,11 +60,12 @@ def descargar_informe_estadisticas():
 
 
 @informes_bp.route("/informes/equipos", methods=["GET"])
+@token_required
 def descargar_informe_equipos():
     try:
         pdf_bytes = informe_equipos()
     except Exception as e:
-        return jsonify({"error": f"Error al generar el informe: {str(e)}"}), 500
+        return _respuesta_error_interno(str(e))
 
     return send_file(
         BytesIO(pdf_bytes),
