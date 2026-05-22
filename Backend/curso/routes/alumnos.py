@@ -22,7 +22,6 @@ from curso.services.alumnos import (
     eliminar_alumno,
 )
 from curso.services.notas import devolver_notas
-from curso.services.asistencia import obtener_asistencias_por_alumno
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
@@ -66,19 +65,6 @@ def get_notas_alumno(id):
 
     notas = devolver_notas(id)
     return jsonify(notas), 200
-
-
-# 4. GET /alumnos/{id}/asistencias (Asistencias del alumno)
-@alumnos_bp.route('/alumnos/<int:id>/asistencias', methods=['GET'])
-@token_required
-def get_asistencias_alumno(id):
-
-    asistencias = obtener_asistencias_por_alumno(id)
-
-    if asistencias is None:
-        return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado", "level": "error"}]}), 404
-
-    return jsonify(asistencias), 200
 
 
 # 1. POST /alumnos
