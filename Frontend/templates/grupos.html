@@ -14,7 +14,7 @@
             <div class="scrollableWrapper">
                 <div class="scrollableContent">
                     {% for id_grupo in grupos_dict %}
-                    <button class="boton-info-grupo"> {{ grupos_dict[id_grupo].nombre }} </button>
+                        <button class="boton-info-grupo" id="{{ grupos_dict[id_grupo].id }}"> {{ grupos_dict[id_grupo].nombre }} </button>
                     {% endfor %}
                 </div>
             </div>
@@ -22,15 +22,17 @@
         <!-- Solo mostrar info de un grupo si se hizo click en su respectivo botón -->
         <!-- Falta mantener 3 alumnos por fila, igual que en el mockup -->
         <div style="margin-left: 620px;"> 
-        <!-- alumnos obtenidos mediante un query distinto al de grupos, con los ids de los integrantes contenidos en el grupo actual -->
-        {% for alumno in alumnos %}
-        <div> (info del alumno) </div>
-        {% endfor %}
+            <!-- alumnos obtenidos mediante un query distinto al de grupos, con los ids de los integrantes contenidos en el grupo actual -->
+            {% for alumno in alumnos %}
+            <div class="info-alumno-grupo" aria-hidden="true">
+                Info de los alumnos
+            </div>
+            {% endfor %}
         </div>
         
     </div>
     {% else %}
-    <div>No se encontraron grupos.</div>
+        <div>No se encontraron grupos.</div>
     {% endif %}
 
 </body>
