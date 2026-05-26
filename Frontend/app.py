@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request
-
+from routes.home import home_bp
+from routes.evaluaciones import evaluaciones_bp
 app = Flask(__name__)
 
 #por mientras para probar el frontend
-
+app.register_blueprint(home_bp)
+app.register_blueprint(evaluaciones_bp)
 @app.route("/login", methods=["GET", "POST"])
 def login():
 

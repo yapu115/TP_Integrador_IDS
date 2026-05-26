@@ -1,0 +1,53 @@
+{%extends "base.html"%}
+{%block title%}Evaluaciones{%endblock%}
+
+{%block content%}
+<div class="evaluaciones-container">
+
+    <header class="evaluaciones-header">
+        <div class="evaluaciones-banner">
+            <h2>Parciales y trabajos practicos</h2>
+        </div>
+        
+        <div class="evaluaciones-actions">
+            <button class="btn btn--add">Agregar actividad</button>
+            <button class="btn btn--delete">Eliminar actividad</button>
+        </div>
+    </header>
+
+    <section class="evaluaciones-list">
+        
+        <article class="evaluacion-card">
+            <div class="evaluacion-card__header">
+                <h3>Parcial</h3>
+            </div>
+            <div class="evaluacion-card__body">
+                <div class="evaluacion-card__meta">
+                    <span><strong>Fecha:</strong> 28/05/2026</span>
+                    <span><strong>Hora:</strong> 19:00</span>
+                    <span><strong>Estado:</strong> Pendiente</span>
+                    <span><strong>Nota:</strong> Pendiente</span>
+                </div>
+                <div class="evaluacion-card__details">
+                    <p><strong>Temas a evaluar:</strong> Contenidos</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="evaluacion-card">
+            <div class="evaluacion-card__header">
+                <h3>Primer trabajo practico</h3>
+            </div>
+            <div class="evaluacion-card__body">
+                <div class="evaluacion-card__meta">
+                    <span><strong>Fecha:</strong> 15/06/2026</span>
+                    <span><strong>Hora:</strong> 23:59</span>
+                    <span><strong>Estado:</strong> Pendiente</span>
+                    <span><strong>Nota:</strong> Pendiente</span>
+                </div>
+            </div>
+        </article>
+
+        </section>
+</div>
+{% endblock %}

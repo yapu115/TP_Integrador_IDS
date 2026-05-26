@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Inicio{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+    <div class="app-layout">
+    <!--
+        <aside class="sidebar">
+            <nav class="sidebar__nav">
+                <a href="{{ url_for('home.index') }}" class="sidebar__link" title="Inicio">
+                    <div class="sidebar__box"></div>
+                </a>
+                <a href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}" class="sidebar__link" title="Evaluaciones">
+                    <div class="sidebar__box"></div>
+                </a>
+            </nav>
+        </aside>
+    -->
+        <div class="app-container">
+            
+            <header class="topbar">
+                <button class="topbar__menu-btn">
+                    &#9776;
+                </button>
+                
+                <nav class="breadcrumbs" aria-label="Breadcrumb">
+                    {% block breadcrumbs %}
+                    <span class="breadcrumbs__item">INICIO</span>
+                    {% endblock %}
+                </nav>
+            </header>
+            
+            <main class="main-content">
+                {% block content %}{% endblock %}
+            </main>
+
+            <footer class="footer">
+                <p>Curso universitario</p>
+            </footer>
+
+        </div>
+    </div>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
