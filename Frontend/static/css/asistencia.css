@@ -1,0 +1,214 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    background: #1e1e1e;
+    color: white;
+}
+
+/* Aca esta el encabezado principal */
+
+.hero-profesor {
+    background: #263642;
+    color: white;
+    padding: 40px 20px;
+    text-align: center;
+    border-bottom: 4px solid #8e44ff;
+}
+
+.hero-profesor h1 {
+    font-size: 34px;
+    margin-bottom: 12px;
+}
+
+.hero-profesor p {
+    font-size: 16px;
+    color: #d3d3d3;
+}
+
+/* Aca esta el contenedor general */
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* Aca el estilo de generación del QR */
+
+.card-asistencia {
+    background: #2f4350;
+    border-radius: 12px;
+    overflow: hidden;
+    min-height: 260px;
+    display: flex;
+    gap: 30px;
+    padding: 35px;
+    margin-bottom: 35px;
+}
+
+.info-asistencia {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.info-asistencia h2 {
+    font-size: 26px;
+    margin-bottom: 12px;
+}
+
+.info-asistencia p {
+    color: #d3d3d3;
+    margin-bottom: 8px;
+    font-size: 16px;
+}
+
+/* Botón */
+
+.btn {
+    margin-top: 22px;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    background: #8e44ff;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.btn:hover {
+    background: #7a35df;
+}
+
+/* Donde va a estar el qr*/
+
+.qr-box {
+    flex: 1;
+    background: #344955;
+    border-radius: 12px;
+    border: 2px dashed #d3d3d3;
+    padding: 30px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.qr-box h3 {
+    font-size: 22px;
+    margin-bottom: 10px;
+}
+
+.qr-box p {
+    color: #d3d3d3;
+    margin-bottom: 15px;
+}
+
+.qr-box img {
+    max-width: 160px;
+    margin: 0 auto;
+}
+
+/* Seccion de  tabla */
+
+.tabla-seccion {
+    background: #2f4350;
+    border-radius: 12px;
+    padding: 35px;
+}
+
+.tabla-seccion h2 {
+    font-size: 26px;
+    margin-bottom: 8px;
+}
+
+.tabla-seccion p {
+    color: #d3d3d3;
+    margin-bottom: 25px;
+}
+
+/* La tabla de los alumnos */
+
+.tabla-contenedor {
+    width: 100%;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #344955;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+thead {
+    background: #263642;
+}
+
+th,
+td {
+    padding: 14px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+th {
+    color: white;
+    font-weight: bold;
+}
+
+td {
+    color: #d3d3d3;
+}
+
+/* El estado de asistencia de los alumnos*/
+
+.status {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.status.presente {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status.pendiente {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.status.ausente {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+/* El estado de la asistencia = el responsive*/
+
+@media (max-width: 768px) {
+    .card-asistencia {
+        flex-direction: column;
+    }
+
+    .btn {
+        width: 100%;
+    }
+
+    .hero-profesor h1 {
+        font-size: 28px;
+    }
+}
