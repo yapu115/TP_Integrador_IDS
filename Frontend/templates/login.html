@@ -1,60 +1,66 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Iniciar sesión</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/auth.css') }}"
+    />
+  </head>
+  <body class="auth-page">
+    <div class="auth-shell">
+      <section class="auth-card">
+        <div
+          class="auth-panel-image auth-panel-image--login"
+          role="img"
+          aria-label="Facultad"
+        ></div>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
-</head>
-<body>
+        <form
+          class="auth-panel-form"
+          method="POST"
+          action="{{ url_for('auth.login') }}"
+        >
+          <h1>Iniciar Sesión</h1>
 
-    <main class="login-container">
-        <section class="login-card">
+          {% if error %}
+          <p class="auth-message auth-message--error">{{ error }}</p>
+          {% endif %}
 
-            <div class="login-info">
-                <h1>Plataforma de Curso</h1>
-                <p>Administración y control académico</p>
-            </div>
+          <div class="form-group">
+            <label for="username">Email o usuario</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              placeholder="Email"
+              required
+              autocomplete="username"
+            />
+          </div>
 
-            <form class="login-form" method="POST" action="/login">
-                <h2>Iniciar sesión</h2>
+          <div class="form-group">
+            <label for="password">Contraseña</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Contraseña"
+              required
+              autocomplete="current-password"
+            />
+          </div>
 
-                {% if error %}
-                    <p class="error">{{ error }}</p>
-                {% endif %}
+          <button type="submit" class="auth-submit">Iniciar sesión</button>
 
-                <div class="form-group">
-                    <label for="usuario">Usuario</label>
-                    <input 
-                        type="text" 
-                        id="usuario" 
-                        name="usuario" 
-                        placeholder="Ingrese su usuario"
-                        required
-                    >
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Contraseña</label>
-                    <input 
-                        type="password" 
-                        id="password" 
-                        name="password" 
-                        placeholder="Ingrese su contraseña"
-                        required
-                    >
-                </div>
-
-                <button type="submit">Ingresar</button>
-
-                <p class="register-text">
-                    ¿No tienes cuenta?
-                    <a href="/registrar">Regístrate aquí</a>
-                </p>                
-            </form>
-
-        </section>
-    </main>
-
-</body>
+          <p class="auth-footer-link">
+            ¿No tenés cuenta?
+            <a href="{{ url_for('auth.registrar') }}">Registrate aquí</a>
+          </p>
+        </form>
+      </section>
+    </div>
+  </body>
 </html>
