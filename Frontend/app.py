@@ -11,6 +11,7 @@ from config import SECRET_KEY
 from routes.auth import auth_bp
 from routes.home import home_bp
 from routes.evaluaciones import evaluaciones_bp
+from routes.asistencia import asistencia_bp
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -18,11 +19,7 @@ app.secret_key = SECRET_KEY
 app.register_blueprint(auth_bp)
 app.register_blueprint(home_bp)
 app.register_blueprint(evaluaciones_bp)
-
-
-@app.route("/asistencia")
-def asistencia():
-    return render_template("asistencia.html")
+app.register_blueprint(asistencia_bp)
 
 
 if __name__ == "__main__":
