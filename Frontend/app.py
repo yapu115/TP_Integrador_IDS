@@ -20,5 +20,10 @@ app.register_blueprint(home_bp)
 app.register_blueprint(evaluaciones_bp)
 
 
+@app.route("/asistencia")
+def asistencia():
+    return render_template("asistencia.html")
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=5001)
