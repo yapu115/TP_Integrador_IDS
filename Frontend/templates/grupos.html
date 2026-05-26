@@ -10,27 +10,32 @@
     <!-- Falta pasar el inicio del html a una template de jinja -->
     {% if grupos %}
     <div>
-        <div style="width: 600px; float: left;">
-            <div class="scrollableWrapper">
-                <div class="scrollableContent">
-                    {% for id_grupo in grupos_dict %}
-                    <button class="boton-info-grupo"> {{ grupos_dict[id_grupo].nombre }} </button>
-                    {% endfor %}
+        <form action="" method="post">
+            <div style="width: 600px; float: left;">
+                <div class="scrollableWrapper">
+                    <div class="scrollableContent">
+                        {% for id_grupo in grupos_dict %}
+                            <input type="radio"  name="boton-info-grupo" id="{{ grupos_dict[id_grupo].id }}" value="{{ grupos_dict[id_grupo].id }}">
+                            <label for="{{ grupos_dict[id_grupo].id }}">{{ grupos_dict[id_grupo].nombre }}</label>
+                        {% endfor %}
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Solo mostrar info de un grupo si se hizo click en su respectivo botón -->
+        </form>
         <!-- Falta mantener 3 alumnos por fila, igual que en el mockup -->
         <div style="margin-left: 620px;"> 
-        <!-- alumnos obtenidos mediante un query distinto al de grupos, con los ids de los integrantes contenidos en el grupo actual -->
-        {% for alumno in alumnos %}
-        <div> (info del alumno) </div>
-        {% endfor %}
+            {% if alumnos %}
+                {% for alumno in alumnos %}
+                <div class="info-alumno-grupo" aria-hidden="true">
+                    Info de los alumnos
+                </div>
+                {% endfor %}
+            {% endif %}
         </div>
         
     </div>
     {% else %}
-    <div>No se encontraron grupos.</div>
+        <div>No se encontraron grupos.</div>
     {% endif %}
 
 </body>
