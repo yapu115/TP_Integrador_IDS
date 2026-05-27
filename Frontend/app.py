@@ -13,6 +13,7 @@ from routes.home import home_bp
 from routes.evaluaciones import evaluaciones_bp
 from routes.asistencia import asistencia_bp
 from routes.grupos import grupos_bp
+from routes.notas import notas_bp
 
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
@@ -22,6 +23,7 @@ app.register_blueprint(home_bp)
 app.register_blueprint(evaluaciones_bp)
 app.register_blueprint(asistencia_bp)
 app.register_blueprint(grupos_bp)
+app.register_blueprint(notas_bp)
 
 
 if __name__ == "__main__":
