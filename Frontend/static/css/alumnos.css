@@ -1,0 +1,97 @@
+/* --- Estilos base y contenedores principales --- */
+.main-container {
+    padding: 30px;
+    display: flex;
+    justify-content: center;
+}
+
+.content-card {
+    background: #fdfdfd; /* Fondo casi blanco de la tarjeta */
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); /* Sombra para efecto flotante */
+    width: 100%;
+    max-width: 1000px; /* Ancho máximo para que no se extienda demasiado */
+}
+
+/* --- Títulos e información del encabezado --- */
+.header-info {
+    margin-bottom: 30px;
+}
+
+.header-info h1 {
+    color: #2c3e50;
+    margin-bottom: 8px;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.header-info p {
+    color: #7f8c8d;
+    font-size: 16px;
+}
+
+/* --- Estilos generales de la tabla --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse; /* Para que las celdas compartan bordes */
+    font-family: 'Inter', sans-serif; /* Usamos una fuente limpia y moderna */
+    margin-top: 15px;
+}
+
+/* --- Estilos de las celdas de encabezado (th) --- */
+.data-table th {
+    background-color: #f7f9fa; /* Fondo gris muy suave del encabezado */
+    color: #4f5f6f; /* Color de texto gris oscuro */
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    border-bottom: 2px solid #e1e8ed; /* Borde inferior más grueso */
+    text-transform: uppercase; /* Encabezados en mayúsculas */
+}
+
+/* --- Estilos de las celdas de datos (td) --- */
+.data-table td {
+    padding: 16px;
+    color: #2c3e50; /* Color de texto principal */
+    font-size: 15px;
+    border-bottom: 1px solid #e1e8ed; /* Borde inferior fino */
+    vertical-align: middle; /* Alineación vertical al centro */
+}
+
+/* --- Efecto hover para las filas --- */
+.data-table tbody tr:hover {
+    background-color: #f1f3f5; /* Fondo gris claro al pasar el mouse */
+}
+
+/* --- Estilos para la columna de acciones --- */
+.data-table td a {
+    color: #007bff; /* Color azul para los enlaces */
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease; /* Transición suave al pasar el mouse */
+}
+
+.data-table td a:hover {
+    color: #0056b3; /* Color azul más oscuro al pasar el mouse */
+}
+
+/* --- Estilos para la columna de estados (Badges) --- */
+/* (Opcional si decides agregar columna de estado luego) */
+.badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.badge-active {
+    background-color: #d1f7d1;
+    color: #0a730a;
+}
+
+.badge-inactive {
+    background-color: #fbd6d6;
+    color: #a71b1b;
+}

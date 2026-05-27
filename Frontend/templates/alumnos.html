@@ -1,10 +1,93 @@
-{% extends "base.html" %}
-{% block title %}Alumnos{% endblock %}
-{% block breadcrumbs %}<span class="breadcrumbs__item">ALUMNOS</span>{% endblock %}
+<!DOCTYPE html>
 
-{% block content %}
-<div class="content-wrapper">
-    <h2>Gestión de Alumnos</h2>
-    <p>En construcción: Aquí irá el ABM de alumnos, importación CSV, etc.</p>
-</div>
-{% endblock %}
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Alumnos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos.css') }}">    
+</head>
+
+<body>
+
+
+
+    <main class="main-container">
+
+        <section class="content-card">
+
+            <div class="header-info">
+
+                <h1>Listado de Alumnos</h1>
+
+                <p>Gestión y administración de alumnos registrados</p>
+
+            </div>
+
+
+
+            <table class="data-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Legajo</th>
+
+                        <th>Nombre</th>
+
+                        <th>Apellido</th>
+
+                        <th>Email</th>
+
+                        <th>Acciones</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for alumno in alumnos %}
+
+                    <tr>
+
+                        <td>{{ alumno.legajo }}</td>
+
+                        <td>{{ alumno.nombre }}</td>
+
+                        <td>{{ alumno.apellido }}</td>
+
+                        <td>{{ alumno.email }}</td>
+
+                        <td>
+
+                            <a href="/alumnos/{{ alumno.id }}">Ver Detalle</a>
+
+                        </td>
+
+                    </tr>
+
+                    {% else %}
+
+                    <tr>
+
+                        <td colspan="5">No hay alumnos registrados.</td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+
+
+</body>
+
+</html>
