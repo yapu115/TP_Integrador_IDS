@@ -1,97 +1,182 @@
-/* --- Estilos base y contenedores principales --- */
+/* ── ALUMNOS PAGE ─────────────────────────────────────────── */
 .main-container {
-    padding: 30px;
-    display: flex;
-    justify-content: center;
+  padding: 0;
+  display: flex;
+  justify-content: center;
 }
 
 .content-card {
-    background: #fdfdfd; /* Fondo casi blanco de la tarjeta */
-    padding: 40px;
-    border-radius: 12px;
-    box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1); /* Sombra para efecto flotante */
-    width: 100%;
-    max-width: 1000px; /* Ancho máximo para que no se extienda demasiado */
+  background: var(--prussian-blue);
+  padding: 36px;
+  border-radius: 18px;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--dusk-blue);
+  width: 100%;
 }
 
-/* --- Títulos e información del encabezado --- */
+/* ── ENCABEZADO ───────────────────────────────────────────── */
 .header-info {
-    margin-bottom: 30px;
+  margin-bottom: 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--dusk-blue);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .header-info h1 {
-    color: #2c3e50;
-    margin-bottom: 8px;
-    font-size: 28px;
-    font-weight: 700;
+  color: var(--alabaster);
+  font-size: 1.8rem;
+  font-family: Georgia, "Times New Roman", serif;
+  margin-bottom: 4px;
 }
 
 .header-info p {
-    color: #7f8c8d;
-    font-size: 16px;
+  color: var(--lavender-grey);
+  font-size: 0.95rem;
 }
 
-/* --- Estilos generales de la tabla --- */
+/* ── ACCIONES (CSV + AGREGAR) ─────────────────────────────── */
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.btn-add-alumno {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    filter 0.2s,
+    transform 0.15s;
+}
+
+.btn-add-alumno:hover {
+  filter: brightness(1.12);
+}
+.btn-add-alumno:active {
+  transform: scale(0.97);
+}
+
+.btn-import {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #059669, var(--accent-green));
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition:
+    filter 0.2s,
+    transform 0.15s;
+}
+
+.btn-import:hover {
+  filter: brightness(1.12);
+}
+.btn-import:active {
+  transform: scale(0.97);
+}
+
+.csv-form {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.csv-form input[type="file"] {
+  background: var(--ink-black);
+  color: var(--lavender-grey);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+/* ── TABLA ────────────────────────────────────────────────── */
 .data-table {
-    width: 100%;
-    border-collapse: collapse; /* Para que las celdas compartan bordes */
-    font-family: 'Inter', sans-serif; /* Usamos una fuente limpia y moderna */
-    margin-top: 15px;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin-top: 8px;
 }
 
-/* --- Estilos de las celdas de encabezado (th) --- */
 .data-table th {
-    background-color: #f7f9fa; /* Fondo gris muy suave del encabezado */
-    color: #4f5f6f; /* Color de texto gris oscuro */
-    padding: 16px;
-    text-align: left;
-    font-weight: 600;
-    font-size: 14px;
-    border-bottom: 2px solid #e1e8ed; /* Borde inferior más grueso */
-    text-transform: uppercase; /* Encabezados en mayúsculas */
+  background: var(--ink-black);
+  color: var(--lavender-grey);
+  padding: 14px 16px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  border-bottom: 2px solid var(--dusk-blue);
 }
 
-/* --- Estilos de las celdas de datos (td) --- */
 .data-table td {
-    padding: 16px;
-    color: #2c3e50; /* Color de texto principal */
-    font-size: 15px;
-    border-bottom: 1px solid #e1e8ed; /* Borde inferior fino */
-    vertical-align: middle; /* Alineación vertical al centro */
+  padding: 14px 16px;
+  color: var(--alabaster);
+  font-size: 0.92rem;
+  border-bottom: 1px solid var(--prussian-blue);
+  vertical-align: middle;
 }
 
-/* --- Efecto hover para las filas --- */
+.data-table tbody tr {
+  transition: background 0.2s;
+}
+
 .data-table tbody tr:hover {
-    background-color: #f1f3f5; /* Fondo gris claro al pasar el mouse */
+  background: rgba(65, 90, 119, 0.35);
 }
 
-/* --- Estilos para la columna de acciones --- */
+/* ── ENLACE ACCIÓN ────────────────────────────────────────── */
 .data-table td a {
-    color: #007bff; /* Color azul para los enlaces */
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease; /* Transición suave al pasar el mouse */
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--accent);
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 
 .data-table td a:hover {
-    color: #0056b3; /* Color azul más oscuro al pasar el mouse */
+  background: var(--accent);
+  color: #fff;
 }
 
-/* --- Estilos para la columna de estados (Badges) --- */
-/* (Opcional si decides agregar columna de estado luego) */
+/* ── BADGES ESTADO ────────────────────────────────────────── */
 .badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 600;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
 .badge-active {
-    background-color: #d1f7d1;
-    color: #0a730a;
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+  border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
 .badge-inactive {
-    background-color: #fbd6d6;
-    color: #a71b1b;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.4);
 }

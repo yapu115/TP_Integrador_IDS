@@ -1,23 +1,53 @@
-{%extends "base.html"%}
-{%block title%}INICIO{%endblock%}
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
 {% block breadcrumbs %}<span class="breadcrumbs__item">INICIO</span>{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">{% endblock %}
-{%block content%}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
+{% block content %}
 <div class="home-container">
+
     <header class="home-header">
-        <div class="home-texto">
-            <h1>Bienvenidos a introduccion al desarrollo de software</h1>
-            <text class="home-descripcion">Descripcion
-            </text>
-        </div>
+        <h1>Bienvenido a Introducción al Desarrollo de Software</h1>
+        <span class="home-descripcion">
+            Sistema de gestión académica para el seguimiento de alumnos, evaluaciones, asistencia y equipos de trabajo.
+        </span>
     </header>
 
-    <section class="home-body">
-        <div class="home-body__text">Si aun no iniciaste sesion hazlo!!</div>
-        <a href="{{ url_for('auth.login') }}" class="home__link">
-            <p>Inciar sesión</p>
+    <div class="home-grid">
+        <a href="{{ url_for('alumnos.alumnos') }}" class="home-card">
+            <span class="home-card__icon">&#128100;</span>
+            <span class="home-card__title">Alumnos</span>
+            <span class="home-card__desc">Gestión y administración del listado de alumnos.</span>
         </a>
-    </section>
+        <a href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}" class="home-card">
+            <span class="home-card__icon">&#128197;</span>
+            <span class="home-card__title">Evaluaciones</span>
+            <span class="home-card__desc">Parciales y trabajos prácticos del curso.</span>
+        </a>
+        <a href="{{ url_for('notas.mostrar_notas') }}" class="home-card">
+            <span class="home-card__icon">&#128203;</span>
+            <span class="home-card__title">Notas</span>
+            <span class="home-card__desc">Carga y consulta de calificaciones.</span>
+        </a>
+        <a href="{{ url_for('grupos.grupos') }}" class="home-card">
+            <span class="home-card__icon">&#128101;</span>
+            <span class="home-card__title">Grupos</span>
+            <span class="home-card__desc">Conformación y detalle de equipos de trabajo.</span>
+        </a>
+        <a href="{{ url_for('asistencia.asistencia') }}" class="home-card">
+            <span class="home-card__icon">&#128196;</span>
+            <span class="home-card__title">Asistencia</span>
+            <span class="home-card__desc">Control de presencia mediante código QR.</span>
+        </a>
+        <a href="{{ url_for('dashboard.dashboard') }}" class="home-card">
+            <span class="home-card__icon">&#128202;</span>
+            <span class="home-card__title">Dashboard</span>
+            <span class="home-card__desc">Informes y reportes en formato PDF.</span>
+        </a>
+    </div>
 
 </div>
 {% endblock %}

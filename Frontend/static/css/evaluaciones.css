@@ -1,71 +1,130 @@
 .evaluaciones-container {
-    gap: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
 }
 
+/* ── HEADER ───────────────────────────────────────────────── */
 .evaluaciones-header {
     display: grid;
-    grid-template-columns: 1fr 200px; 
+    grid-template-columns: 1fr auto;
+    align-items: start;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--dusk-blue);
 }
 
 .evaluaciones-banner h2 {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: normal;
+    color: var(--alabaster);
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.evaluaciones-banner p {
+    color: var(--lavender-grey);
+    margin-top: 4px;
+    font-size: 0.9rem;
 }
 
 .evaluaciones-actions {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding-top: 10px;
+    gap: 10px;
+    padding-top: 4px;
 }
 
+/* ── BOTONES ──────────────────────────────────────────────── */
 .btn {
-    padding: 8px;
+    padding: 10px 18px;
     border: none;
-    border-radius: 12px;
-    font-size: 0.8rem;
+    border-radius: 999px;
+    font-size: 0.88rem;
+    font-weight: 600;
     cursor: pointer;
-    background-color: #d9d9d9;
-    transition: background-color 0.2s, transform 0.1s;
+    transition: filter 0.2s ease, transform 0.15s ease;
+    color: #fff;
 }
 
-.btn.btn--add:hover {
-    background-color: #abec9c;
-}
-.btn.btn--delete:hover {
-    background-color: #ec9c9c;
+.btn.btn--add {
+    background: linear-gradient(90deg, #059669, var(--accent-green));
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
 
+.btn.btn--add:hover { filter: brightness(1.12); }
+
+.btn.btn--delete {
+    background: linear-gradient(90deg, #b91c1c, var(--accent-danger));
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn.btn--delete:hover { filter: brightness(1.12); }
+.btn:active { transform: scale(0.97); }
+
+/* ── LISTA ────────────────────────────────────────────────── */
 .evaluaciones-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    max-width: 700px;
+    gap: 16px;
 }
 
+/* ── TARJETA EVALUACION ───────────────────────────────────── */
 .evaluacion-card {
-    background-color: #e6e6e6;
-    border-radius: 8px;       
+    background: var(--prussian-blue);
+    border-radius: 14px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    border: 1px solid var(--dusk-blue);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.evaluacion-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 32px rgba(0,0,0,0.4);
 }
 
 .evaluacion-card__header {
-    background-color: #cccbcb;
-    padding: 10px 25px;
+    background: var(--ink-black);
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--dusk-blue);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .evaluacion-card__header h3 {
-    font-size: 1rem;
-    font-weight: normal;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 0;
+}
+
+.evaluacion-card__body {
+    padding: 18px 24px;
 }
 
 .evaluacion-card__meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;                
-    font-size: 0.90rem;
+    gap: 20px;
+    font-size: 0.9rem;
+    color: var(--alabaster);
+    margin-bottom: 12px;
 }
 
+.evaluacion-card__meta strong {
+    color: var(--lavender-grey);
+    font-weight: 600;
+}
 
+.evaluacion-card__details p {
+    color: var(--lavender-grey);
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+.evaluacion-card__details strong {
+    color: var(--lavender-grey);
+}

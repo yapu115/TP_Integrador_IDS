@@ -1,78 +1,236 @@
+/* ============================================================
+   PALETA DE COLORES GLOBAL
+   ~Ink Black:      #0D1B2A  (fondo más profundo)
+   ~Prussian Blue:  #1B263B  (fondo secundario, cards)
+   ~Dusk Blue:      #415A77  (sidebar, topbar, elementos UI)
+   ~Lavender Grey:  #778DA9  (textos secundarios, bordes)
+   ~Alabaster Grey: #E0E1DD  (texto principal, iconos)
+   ~Accent Purple:  #8b5cf6  (acento principal, CTAs)
+   ~Accent Purple2: #7c3aed  (hover de acento)
+   ============================================================ */
+
+:root {
+  --ink-black: #0d1b2a;
+  --prussian-blue: #1b263b;
+  --dusk-blue: #415a77;
+  --lavender-grey: #778da9;
+  --alabaster: #e0e1dd;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --accent-green: #10b981;
+  --accent-danger: #ef4444;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--ink-black);
+  color: var(--alabaster);
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ───────────────────────────────────────────────── */
 .app-layout {
-    display: block;
+  display: block;
 }
+
 .app-container {
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: transform 0.3s ease;
 }
+
 .app-layout:has(.sidebar--active) .app-container {
-    transform: translateX(120px);
+  transform: translateX(80px);
 }
+
+/* ── SIDEBAR ──────────────────────────────────────────────── */
 .sidebar {
-    background-color: #bdbdbd; 
-    width: 80px;              
-    position: fixed;           
-    left: -120px;              
-    height: calc(100vh - 60px);         
-    padding: 30px 20px;        
-    transition: left 0.3s ease; 
+  background: var(--prussian-blue);
+  width: 80px;
+  position: fixed;
+  left: -90px;
+  top: 0;
+  height: 100vh;
+  padding: 20px 10px;
+  transition: left 0.3s ease;
+  box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  border-right: 1px solid var(--dusk-blue);
 }
+
 .sidebar.sidebar--active {
-    left: 0;
+  left: 0;
 }
+
 .sidebar__nav {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  align-items: center;
 }
 
+.sidebar__link {
+  text-decoration: none;
+  display: flex;
+  justify-content: center;
+}
+
+/* Íconos siempre coloreados, nunca grises */
 .sidebar__box {
-    width: 40px;
-    height: 40px;
-    background-color: #818181;
-    border-radius: 12;
-    transition: background-color 0.4s;
-    font-size: 1.4rem;
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    filter: grayscale(100%);
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: none; /* sin grayscale */
+  background: var(--dusk-blue);
+  color: var(--alabaster);
+  transition:
+    background 0.25s,
+    transform 0.15s,
+    box-shadow 0.25s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
-.sidebar__link{
-    text-decoration: none;
-}
+
 .sidebar__box:hover {
-    background-color: #4b4b4b;
+  background: var(--accent);
+  transform: scale(1.1);
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.5);
 }
 
+/* ── TOPBAR ───────────────────────────────────────────────── */
 .topbar {
-    background-color: #e0e0e0;
-    padding: 15px 20px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    border-bottom: 1px solid #cccccc;
+  background: var(--prussian-blue);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-bottom: 1px solid var(--dusk-blue);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
+
 .topbar__menu-btn {
-    background: none;
-    border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    padding: 5px;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  color: var(--alabaster);
+  border-radius: 8px;
+  transition: background 0.2s;
 }
 
-.main-content {
-    padding: 30px;
+.topbar__menu-btn:hover {
+  background: var(--dusk-blue);
 }
 
-.footer {
-    background-color: #e0e0e0;
-    text-align: center;
-    padding: 15px;
-    font-size: 0.9rem;
-}
-
+/* ── BREADCRUMBS ──────────────────────────────────────────── */
 .breadcrumbs {
-    letter-spacing: 1px;
+  letter-spacing: 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--lavender-grey);
+}
+
+.breadcrumbs__item {
+  color: var(--lavender-grey);
+}
+
+/* ── MAIN CONTENT ─────────────────────────────────────────── */
+.main-content {
+  padding: 30px;
+  flex: 1;
+}
+
+/* ── FOOTER ───────────────────────────────────────────────── */
+.footer {
+  background: var(--prussian-blue);
+  text-align: center;
+  padding: 14px;
+  font-size: 0.85rem;
+  color: var(--lavender-grey);
+  border-top: 1px solid var(--dusk-blue);
+}
+
+/* ── TIPOGRAFÍA ───────────────────────────────────────────── */
+h1,
+h2,
+h3 {
+  font-family: Georgia, "Times New Roman", serif;
+  color: var(--alabaster);
+}
+
+/* ── BOTÓN GLOBAL ─────────────────────────────────────────── */
+.btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+}
+
+.btn:hover {
+  filter: brightness(1.12);
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+/* ── LOGOUT BUTTON STYLE ──────────────────────────────────── */
+.topbar__actions {
+  margin-left: auto;
+}
+
+.btn-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--dusk-blue);
+  color: var(--alabaster);
+  border-radius: 50%;
+  text-decoration: none;
+  font-size: 1.2rem;
+  transition:
+    background 0.3s,
+    transform 0.2s,
+    box-shadow 0.3s;
+  border: 1px solid var(--dusk-blue);
+}
+
+.btn-logout:hover {
+  background: var(--accent-danger);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
 }

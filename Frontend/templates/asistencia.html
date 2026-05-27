@@ -1,76 +1,89 @@
-<DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=devide-width, initial-scale=1.0">
-    <title>Gestión de Asistencia - FIUBA</title>
+{% extends "base.html" %}
+{% block title %}Control de Asistencia{% endblock %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename= 'css/asistencia.css') }}">
-</head>
+{% block breadcrumbs %}<span class="breadcrumbs__item">ASISTENCIA</span>{% endblock %}
 
-<body>
-    <main class="asistencia-pagina">
-        <section class="asistencia-card">
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/asistencia.css') }}">
+{% endblock %}
 
-            <header class="asistencia-header">
-                <h1>Control de Asistencia</h1>
-                <p>Introducción al Desarrollo de Software</p>
-            </header>
+{% block content %}
+<div class="asistencia-pagina">
+    <section class="asistencia-card">
 
-            <section class="asistencia-panel">
-                <div class="asistencia-info">
-                    <h2>Asistencia de la jornada</h2>
-                    <p><strong>Fecha actual:</strong> {{ fecha_hoy | default('26 de Mayo, 2026') }}</p>
-                    <p>Gestione el código QR dinámico para el registro de los alumnos.</p>
+        <header class="asistencia-header">
+            <div class="asistencia-header__icon">&#128196;</div>
+            <h1>Control de Asistencia</h1>
+            <p>Introducción al Desarrollo de Software</p>
+        </header>
 
-                    <button type="button" class="btn">
-                        Generar y enviar QR por correo electrónico
-                    </button>
+        <section class="asistencia-panel">
+            <div class="asistencia-info">
+                <h2>Asistencia de la jornada</h2>
+                <p><strong>Fecha actual:</strong> {{ fecha_hoy | default('26 de Mayo, 2026') }}</p>
+                <p>Gestione el código QR dinámico para el registro de los alumnos.</p>
+
+                <button type="button" class="btn-qr">
+                    &#128231; &nbsp;Generar y enviar QR por correo electrónico
+                </button>
+            </div>
+
+            <div class="qr-box">
+                <h3>Código QR dinámico</h3>
+                <p>Válido únicamente para la clase de hoy</p>
+                <div class="qr-placeholder">
+                    <span class="qr-icon">&#128247;</span>
+                    <span>QR</span>
                 </div>
-
-                <div class="qr-box">
-                    <h3>Código QR dinámico</h3>
-                    <p>Válido únicamente para la clase de hoy</p>
-                    <div class="qr-placeholder">QR</div>
-                </div>
-            </section>
-
-            <section class="tabla-section">
-                <h2>Listado de alumnos (En vivo)</h2>
-                <p>Los registros se actualizan conforme los alumnos escaneen el código enviado a sus correos.</p>
-
-                <div class="tabla-contenedor">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Padrón</th>
-                                <th>Nombre y Apellido</th>
-                                <th>Email</th>
-                                <th>Estado de Asistencia</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            <tr>
-                                <td>1892344</td>
-                                <td>Gomez, Pedro</td>
-                                <td>lgomez@fi.uba.ar</td>
-                                <td><span class="estado presente">Presente</span></td>
-                            </tr>
-
-                            <tr>
-                                <td>2345689</td>
-                                <td>Perez, Leandro</td>
-                                <td>lperez@fi.uba.ar</td>
-                                <td><span class="estado pendiente">Pendiente</span></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
+            </div>
         </section>
-    </main>
-</body>
 
-</html>
+        <section class="tabla-section">
+            <div class="tabla-section__header">
+                <h2>Listado de alumnos <span class="live-badge">&#128994; EN VIVO</span></h2>
+                <p>Los registros se actualizan conforme los alumnos escaneen el código enviado a sus correos.</p>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Padrón</th>
+                            <th>Nombre y Apellido</th>
+                            <th>Email</th>
+                            <th>Estado de Asistencia</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% if asistencia_list %}
+                            {% for registro in asistencia_list %}
+                            <tr>
+                                <td>{{ registro.padron }}</td>
+                                <td>{{ registro.nombre }}</td>
+                                <td>{{ registro.email }}</td>
+                                <td><span class="estado {{ registro.estado | lower }}">{{ registro.estado }}</span></td>
+                            </tr>
+                            {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td>1892344</td>
+                            <td>Gomez, Pedro</td>
+                            <td>lgomez@fi.uba.ar</td>
+                            <td><span class="estado presente">Presente</span></td>
+                        </tr>
+                        <tr>
+                            <td>2345689</td>
+                            <td>Perez, Leandro</td>
+                            <td>lperez@fi.uba.ar</td>
+                            <td><span class="estado pendiente">Pendiente</span></td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </section>
+</div>
+{% endblock %}

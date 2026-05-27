@@ -1,20 +1,39 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
-</head>
-<body>
-    <header class="topbar">
-        <span class="welcome">Bienvenido, {{ nombre }}</span>
-        <a href="{{ url_for('auth.login') }}" class="logout">Salir</a>
-    </header>
+{% extends "base.html" %}
+{% block title %}Dashboard e Informes{% endblock %}
+{% block breadcrumbs %}<span class="breadcrumbs__item">DASHBOARD</span>{% endblock %}
 
-    <main class="dashboard">
-        <a href="{{ url_for('alumnos') }}" class="dash-btn">Alumnos</a>
-        <a href="{{ url_for('grupos.grupos') }}" class="dash-btn">Grupos</a>
-        <a href="{{ url_for('asistencia.asistencia') }}" class="dash-btn">Asistencia</a>
-    </main>
-</body>
-</html>
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div>
+    <div class="dashboard-header">
+        <h2>Panel de Informes</h2>
+        <p>Genere y descargue los informes en formato PDF requeridos por el sistema.</p>
+    </div>
+
+    <div class="dashboard-grid">
+        <!-- Informe de Alumnos -->
+        <div class="report-card">
+            <h3>&#128100; Listado de Alumnos</h3>
+            <p>Genera un PDF con el listado completo de alumnos y su estado actual en la materia.</p>
+            <a href="/dashboard/informe_alumnos" class="dash-btn dash-btn--alumnos">Generar PDF de Alumnos</a>
+        </div>
+
+        <!-- Estadísticas de Aprobación -->
+        <div class="report-card">
+            <h3>&#128202; Estadísticas de Aprobación</h3>
+            <p>Genera un PDF con los gráficos y métricas de notas y aprobación de los alumnos.</p>
+            <a href="/dashboard/informe_estadisticas" class="dash-btn dash-btn--estadisticas">Generar PDF de Estadísticas</a>
+        </div>
+
+        <!-- Listado de Equipos -->
+        <div class="report-card">
+            <h3>&#128101; Listado de Equipos</h3>
+            <p>Genera un PDF con la conformación completa de todos los equipos del curso.</p>
+            <a href="/dashboard/informe_equipos" class="dash-btn dash-btn--equipos">Generar PDF de Equipos</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

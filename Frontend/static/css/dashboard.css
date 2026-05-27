@@ -1,67 +1,86 @@
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
+/* ── DASHBOARD ────────────────────────────────────────────── */
+.dashboard-header {
+    margin-bottom: 28px;
 }
 
-body {
-    min-height: 100vh;
-    background: #1e1e1e;
+.dashboard-header h2 {
+    font-size: 1.8rem;
+    font-family: Georgia, "Times New Roman", serif;
+    color: var(--alabaster);
+    margin-bottom: 6px;
 }
 
-.topbar {
+.dashboard-header p {
+    color: var(--lavender-grey);
+    font-size: 0.95rem;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+}
+
+/* ── TARJETA REPORTE ──────────────────────────────────────── */
+.report-card {
+    background: var(--prussian-blue);
+    padding: 28px;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.35);
+    border: 1px solid var(--dusk-blue);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #263642;
-    padding: 16px 30px;
-    color: white;
+    flex-direction: column;
+    gap: 12px;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.welcome {
-    font-size: 18px;
+.report-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.45);
 }
 
-.logout {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-    padding: 8px 18px;
-    border-radius: 6px;
-    background: #8e44ff;
-    transition: background 0.2s;
+.report-card h3 {
+    color: var(--alabaster);
+    font-size: 1.25rem;
+    font-family: Georgia, "Times New Roman", serif;
 }
 
-.logout:hover {
-    background: #7a35df;
+.report-card p {
+    color: var(--lavender-grey);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    flex: 1;
 }
 
-.dashboard {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 30px;
-    min-height: calc(100vh - 60px);
-    padding: 20px;
-}
-
+/* ── BOTONES PDF ──────────────────────────────────────────── */
 .dash-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 220px;
-    height: 160px;
-    background: #2f4350;
-    color: white;
-    font-size: 20px;
-    font-weight: bold;
+    display: inline-block;
+    text-align: center;
+    padding: 11px 20px;
+    border: none;
+    border-radius: 999px;
+    color: #ffffff;
+    font-size: 0.9rem;
+    font-weight: 600;
     text-decoration: none;
-    border-radius: 12px;
-    transition: background 0.2s, transform 0.2s;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.15s ease;
 }
 
-.dash-btn:hover {
-    background: #344955;
-    transform: translateY(-4px);
+.dash-btn:hover { filter: brightness(1.12); }
+.dash-btn:active { transform: scale(0.97); }
+
+.dash-btn--alumnos {
+    background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.35);
+}
+
+.dash-btn--estadisticas {
+    background: linear-gradient(90deg, #059669, var(--accent-green));
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+.dash-btn--equipos {
+    background: linear-gradient(90deg, #c2410c, #f97316);
+    box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
 }

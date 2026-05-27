@@ -1,93 +1,99 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+{% block title %}Gestión de Alumnos{% endblock %}
+{% block breadcrumbs %}<span class="breadcrumbs__item">ALUMNOS</span>{% endblock %}
 
-<html lang="es">
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos.css') }}">    
+{% endblock %}
 
-<head>
-    <meta charset="UTF-8">
-    <title>Gestión de Alumnos</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos.css') }}">    
-</head>
+{% block content %}
+<main class="main-container">
 
-<body>
+    <section class="content-card">
 
+        <div class="header-info">
 
+            <h1>Listado de Alumnos</h1>
 
-    <main class="main-container">
-
-        <section class="content-card">
-
-            <div class="header-info">
-
-                <h1>Listado de Alumnos</h1>
-
-                <p>Gestión y administración de alumnos registrados</p>
-
+            <p>Gestión y administración de alumnos registrados</p>
+            
+            <div style="margin-top: 15px; display: flex; gap: 10px;">
+                <button class="btn btn--add" style="padding: 8px 12px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Agregar Alumno</button>
+                <form action="/alumnos/importar" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
+                    <input type="file" name="file_csv" accept=".csv" required style="font-size: 0.9rem;">
+                    <button type="submit" class="btn btn--import" style="padding: 8px 12px; background: #388e3c; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Importar CSV</button>
+                </form>
             </div>
 
+        </div>
 
+        <table class="data-table">
 
-            <table class="data-table">
+            <thead>
 
-                <thead>
+                <tr>
 
-                    <tr>
+                    <th>Legajo</th>
 
-                        <th>Legajo</th>
+                    <th>Nombre</th>
 
-                        <th>Nombre</th>
+                    <th>Apellido</th>
 
-                        <th>Apellido</th>
+                    <th>Email</th>
+                    
+                    <th>Estado</th>
 
-                        <th>Email</th>
+                    <th>Acciones</th>
 
-                        <th>Acciones</th>
+                </tr>
 
-                    </tr>
+            </thead>
 
-                </thead>
+            <tbody>
 
-                <tbody>
+                {% for alumno in alumnos %}
 
-                    {% for alumno in alumnos %}
+                <tr>
 
-                    <tr>
+                    <td>{{ alumno.legajo }}</td>
 
-                        <td>{{ alumno.legajo }}</td>
+                    <td>{{ alumno.nombre }}</td>
 
-                        <td>{{ alumno.nombre }}</td>
+                    <td>{{ alumno.apellido }}</td>
 
-                        <td>{{ alumno.apellido }}</td>
+                    <td>{{ alumno.email }}</td>
+                    
+                    <td>
+                        {% if alumno.abandono %}
+                            <span style="color: red; font-weight: bold;">Abandonó</span>
+                        {% else %}
+                            <span style="color: green; font-weight: bold;">Activo</span>
+                        {% endif %}
+                    </td>
 
-                        <td>{{ alumno.email }}</td>
+                    <td>
 
-                        <td>
+                        <a href="/alumnos/{{ alumno.id }}">Ver Detalle</a>
 
-                            <a href="/alumnos/{{ alumno.id }}">Ver Detalle</a>
+                    </td>
 
-                        </td>
+                </tr>
 
-                    </tr>
+                {% else %}
 
-                    {% else %}
+                <tr>
 
-                    <tr>
+                    <td colspan="6">No hay alumnos registrados.</td>
 
-                        <td colspan="5">No hay alumnos registrados.</td>
+                </tr>
 
-                    </tr>
+                {% endfor %}
 
-                    {% endfor %}
+            </tbody>
 
-                </tbody>
+        </table>
 
-            </table>
+    </section>
 
-        </section>
-
-    </main>
-
-
-
-</body>
-
-</html>
+</main>
+{% endblock %}
