@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request
 
 grupos_bp = Blueprint('grupos', __name__)
 
-@app.route("/grupos", methods=["GET", "POST"])
+@grupos_bp.route("/grupos", methods=["GET", "POST"])
 def grupos():
     #Guardar grupos en un diccionario y pasarlos al template
     if request.method == "POST":

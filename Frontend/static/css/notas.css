@@ -1,0 +1,346 @@
+.notas-shell {
+    min-height: calc(100vh - 150px);
+    padding: 18px;
+    color: #17171f;
+    background:
+        linear-gradient(90deg, rgba(255,255,255,0.88) 0 6.25%, rgba(235,235,235,0.88) 6.25% 12.5%),
+        #f3f3f3;
+    background-size: 128px 100%;
+    border: 18px solid #1b0000;
+    font-family: Georgia, "Times New Roman", serif;
+}
+
+.notas-titlebar {
+    min-height: 76px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    color: #ffffff;
+    background: rgba(79, 99, 111, 0.78);
+}
+
+.notas-titlebar h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 500;
+    letter-spacing: 0;
+}
+
+.notas-workspace {
+    display: grid;
+    grid-template-columns: 54px minmax(0, 1fr);
+    gap: 18px;
+}
+
+.notas-rail {
+    padding-top: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 13px;
+    background: rgba(245, 245, 245, 0.9);
+}
+
+.rail-line,
+.rail-dot {
+    width: 32px;
+    border: 0;
+    background: #020202;
+}
+
+.rail-line {
+    height: 6px;
+}
+
+.rail-dot {
+    height: 32px;
+    cursor: pointer;
+}
+
+.rail-dot--active {
+    background: #d81414;
+}
+
+.notas-board {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(440px, 1fr) 300px;
+    gap: 22px;
+    padding: 18px 18px 26px;
+    background:
+        linear-gradient(rgba(43, 151, 180, 0.46), rgba(43, 151, 180, 0.46)),
+        url("../img/facultad-login.png") center bottom / cover no-repeat;
+    border: 18px solid #4d6370;
+    border-radius: 0 0 28px 28px;
+}
+
+.notas-board::before {
+    content: "";
+    position: absolute;
+    left: 16px;
+    right: 16px;
+    bottom: -20px;
+    height: 42px;
+    border-radius: 28px;
+    background: rgba(51, 155, 188, 0.52);
+}
+
+.panel {
+    position: relative;
+    z-index: 1;
+    background: #d9d9d9;
+}
+
+.panel--grades {
+    padding: 58px 32px 28px;
+}
+
+.panel--upload {
+    padding: 28px 26px;
+}
+
+.panel-pin {
+    position: absolute;
+    top: 18px;
+    left: 34px;
+    width: 84px;
+    height: 16px;
+    background: #d9d9d9;
+    transform: rotate(-7deg);
+}
+
+.panel-pin--right {
+    left: auto;
+    right: 22px;
+    top: -28px;
+    width: 58px;
+    height: 38px;
+    border-radius: 20px;
+    background: #140000;
+    transform: none;
+}
+
+.panel-toolbar {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    left: 170px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.panel-toolbar span {
+    width: 150px;
+    height: 16px;
+    background: #d9d9d9;
+}
+
+.pill-button,
+.small-action,
+.grades-actions button,
+.submit-work {
+    border: 0;
+    color: #ffffff;
+    background: #4d6370;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.pill-button {
+    min-width: 120px;
+    padding: 10px 16px;
+    border-radius: 18px;
+}
+
+.grades-card {
+    overflow: hidden;
+}
+
+.grades-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 16px;
+}
+
+.grades-heading h2,
+.panel--upload h2 {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    font-size: 1.15rem;
+}
+
+.eyebrow {
+    margin: 0 0 6px;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+    color: #282834;
+}
+
+.small-action {
+    align-self: start;
+    padding: 9px 14px;
+    border-radius: 8px;
+}
+
+.grades-table-wrap {
+    overflow: auto;
+    max-height: 330px;
+    border: 2px solid #2e3640;
+    background: white;
+}
+
+.grades-table {
+    width: 100%;
+    min-width: 680px;
+    border-collapse: collapse;
+    font-family: Arial, sans-serif;
+    font-size: 0.86rem;
+}
+
+.grades-table th {
+    padding: 11px 9px;
+    text-align: left;
+    color: #ffffff;
+    background: #4d6370;
+    border: 2px solid #2e3640;
+}
+
+.grades-table small {
+    color: #d8e0e4;
+}
+
+.grades-table td {
+    padding: 8px;
+    border: 2px solid #2e3640;
+    background: #ffffff;
+}
+
+.grades-table input {
+    width: 100%;
+    min-width: 48px;
+    border: 0;
+    background: transparent;
+    font: inherit;
+}
+
+.status {
+    font-weight: 700;
+}
+
+.status--danger {
+    background: #dc7b68 !important;
+}
+
+.status--warning {
+    background: #e8cb67 !important;
+}
+
+.grades-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
+.grades-actions button,
+.submit-work {
+    padding: 10px 14px;
+    border-radius: 8px;
+}
+
+.upload-form {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-top: 12px;
+    font-family: Arial, sans-serif;
+    font-weight: 700;
+}
+
+.upload-form label {
+    display: grid;
+    gap: 8px;
+}
+
+.upload-form input,
+.upload-form textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 2px solid #6d7e89;
+    border-radius: 8px;
+    padding: 11px;
+    background: #fbfbfb;
+    font: inherit;
+    font-weight: 400;
+}
+
+.criteria-box {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding: 10px;
+    border: 1px solid #777;
+}
+
+.criteria-box input {
+    border-radius: 20px;
+}
+
+.drop-zone {
+    min-height: 130px;
+    place-items: center;
+    text-align: center;
+    color: #687987;
+    border: 3px solid #526a79;
+    border-radius: 10px;
+    background: #fbfbfb;
+    cursor: pointer;
+}
+
+.drop-zone input {
+    display: none;
+}
+
+.upload-icon {
+    font-size: 2.8rem;
+    line-height: 1;
+}
+
+.submit-work {
+    justify-self: end;
+}
+
+@media (max-width: 960px) {
+    .notas-board {
+        grid-template-columns: 1fr;
+    }
+
+    .notas-titlebar h1 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 620px) {
+    .notas-shell {
+        padding: 10px;
+        border-width: 10px;
+    }
+
+    .notas-workspace {
+        grid-template-columns: 42px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .notas-board {
+        padding: 12px;
+        border-width: 10px;
+    }
+
+    .panel--grades,
+    .panel--upload {
+        padding: 44px 16px 18px;
+    }
+}
