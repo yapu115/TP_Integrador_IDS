@@ -27,23 +27,6 @@ from flask import render_template
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
-@alumnos_bp.route('/alumnos', methods=['GET'])
-#@token_required
-def get_alumnos():
-
-    # Pasar por el validador
-    error_validacion = validar_get_alumnos()
-    if error_validacion:
-        return jsonify(error_validacion[0]), error_validacion[1]
-
-    # Si pasa la validación, va al servicio
-    resultado, status_code = obtener_todos_los_alumnos()
-    
-    # --- AQUÍ ESTÁ EL CAMBIO ---
-    # Si la petición viene de un navegador (para ver la página), devolvemos el HTML
-    return render_template('alumnos.html', alumnos=resultado)
-
-"""
 # 1. GET /alumnos (Con paginación y filtros)
 @alumnos_bp.route('/alumnos', methods=['GET'])
 #@token_required
@@ -59,7 +42,7 @@ def get_alumnos():
     if status_code == 204:
         return '', 204
     return jsonify(resultado), status_code
-"""
+
 
 # 2. GET /alumnos/{id} (Detalle de un alumno)
 @alumnos_bp.route('/alumnos/<int:id>', methods=['GET'])
