@@ -1,0 +1,71 @@
+.evaluaciones-container {
+    gap: 25px;
+}
+
+.evaluaciones-header {
+    display: grid;
+    grid-template-columns: 1fr 200px; 
+}
+
+.evaluaciones-banner h2 {
+    font-size: 2rem;
+    font-weight: normal;
+}
+
+.evaluaciones-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding-top: 10px;
+}
+
+.btn {
+    padding: 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    background-color: #d9d9d9;
+    transition: background-color 0.2s, transform 0.1s;
+}
+
+.btn.btn--add:hover {
+    background-color: #abec9c;
+}
+.btn.btn--delete:hover {
+    background-color: #ec9c9c;
+}
+
+.evaluaciones-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 700px;
+}
+
+.evaluacion-card {
+    background-color: #e6e6e6;
+    border-radius: 8px;       
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.evaluacion-card__header {
+    background-color: #cccbcb;
+    padding: 10px 25px;
+}
+
+.evaluacion-card__header h3 {
+    font-size: 1rem;
+    font-weight: normal;
+}
+
+.evaluacion-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;                
+    font-size: 0.90rem;
+}
+
+
