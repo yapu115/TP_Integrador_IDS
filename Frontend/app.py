@@ -1,6 +1,5 @@
 import sys
 from pathlib import Path
-
 from flask import Flask
 
 ROOT = Path(__file__).resolve().parent

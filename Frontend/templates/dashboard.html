@@ -1,10 +1,20 @@
-{% extends "base.html" %}
-{% block title %}Dashboard / Informes{% endblock %}
-{% block breadcrumbs %}<span class="breadcrumbs__item">DASHBOARD</span>{% endblock %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <span class="welcome">Bienvenido, {{ nombre }}</span>
+        <a href="{{ url_for('auth.login') }}" class="logout">Salir</a>
+    </header>
 
-{% block content %}
-<div class="content-wrapper">
-    <h2>Dashboard e Informes</h2>
-    <p>En construcción: Aquí irán los informes y generación de PDFs.</p>
-</div>
-{% endblock %}
+    <main class="dashboard">
+        <a href="{{ url_for('alumnos') }}" class="dash-btn">Alumnos</a>
+        <a href="{{ url_for('grupos.grupos') }}" class="dash-btn">Grupos</a>
+        <a href="{{ url_for('asistencia.asistencia') }}" class="dash-btn">Asistencia</a>
+    </main>
+</body>
+</html>
