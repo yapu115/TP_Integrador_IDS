@@ -1,0 +1,23 @@
+{%extends "base.html"%}
+{%block title%}INICIO{%endblock%}
+{% block breadcrumbs %}<span class="breadcrumbs__item">INICIO</span>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">{% endblock %}
+{%block content%}
+<div class="home-container">
+    <header class="home-header">
+        <div class="home-texto">
+            <h1>Bienvenidos a introduccion al desarrollo de software</h1>
+            <text class="home-descripcion">Descripcion
+            </text>
+        </div>
+    </header>
+
+    <section class="home-body">
+        <div class="home-body__text">Si aun no iniciaste sesion hazlo!!</div>
+        <a href="{{ url_for('auth.login') }}" class="home__link">
+            <p>Inciar sesión</p>
+        </a>
+    </section>
+
+</div>
+{% endblock %}

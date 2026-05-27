@@ -1,6 +1,6 @@
 {%extends "base.html"%}
 {%block title%}Evaluaciones{%endblock%}
-
+{% block breadcrumbs %}<span class="breadcrumbs__item">Evaluaciones</span>{% endblock %}
 {%block content%}
 <div class="evaluaciones-container">
 
@@ -14,7 +14,7 @@
             <button class="btn btn--delete">Eliminar actividad</button>
         </div>
     </header>
-
+    
     <section class="evaluaciones-list">
         
         <article class="evaluacion-card">
@@ -48,6 +48,6 @@
             </div>
         </article>
 
-        </section>
+        </section>   
 </div>
 {% endblock %}

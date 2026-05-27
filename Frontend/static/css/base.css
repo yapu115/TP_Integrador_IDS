@@ -1,4 +1,26 @@
-
+.app-layout {
+    display: block;
+}
+.app-container {
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s ease;
+}
+.app-layout:has(.sidebar--active) .app-container {
+    transform: translateX(120px);
+}
+.sidebar {
+    background-color: #bdbdbd; 
+    width: 80px;              
+    position: fixed;           
+    left: -120px;              
+    height: calc(100vh - 60px);         
+    padding: 30px 20px;        
+    transition: left 0.3s ease; 
+}
+.sidebar.sidebar--active {
+    left: 0;
+}
 .sidebar__nav {
     display: flex;
     flex-direction: column;
@@ -8,13 +30,13 @@
 .sidebar__box {
     width: 40px;
     height: 40px;
-    background-color: #2200e0;
-    border-radius: 5;
-    transition: background-color 0.2s;
+    background-color: #818181;
+    border-radius: 12;
+    transition: background-color 0.4s;
 }
 
 .sidebar__box:hover {
-    background-color: #6271ff;
+    background-color: #4b4b4b;
 }
 
 .topbar {

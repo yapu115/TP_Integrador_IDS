@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Inicio{% endblock %}</title>
+    <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -11,10 +11,10 @@
 <body>
 
     <div class="app-layout">
-    <!--
+    
         <aside class="sidebar">
             <nav class="sidebar__nav">
-                <a href="{{ url_for('home.index') }}" class="sidebar__link" title="Inicio">
+                <a href="{{ url_for('home.home') }}" class="sidebar__link" title="Inicio">
                     <div class="sidebar__box"></div>
                 </a>
                 <a href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}" class="sidebar__link" title="Evaluaciones">
@@ -22,7 +22,7 @@
                 </a>
             </nav>
         </aside>
-    -->
+    
         <div class="app-container">
             
             <header class="topbar">
@@ -32,7 +32,6 @@
                 
                 <nav class="breadcrumbs" aria-label="Breadcrumb">
                     {% block breadcrumbs %}
-                    <span class="breadcrumbs__item">INICIO</span>
                     {% endblock %}
                 </nav>
             </header>
@@ -48,6 +47,6 @@
         </div>
     </div>
 
-    {% block extra_js %}{% endblock %}
+    {% block extra_js %}<script src="{{ url_for('static', filename='js/base.js') }}"></script>{% endblock %}
 </body>
 </html>
