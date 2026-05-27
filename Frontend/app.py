@@ -1,48 +1,31 @@
-from flask import Flask, render_template, request, redirect
+import sys
+from pathlib import Path
+from flask import Flask
+
+ROOT = Path(__file__).resolve().parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from config import SECRET_KEY
+from routes.auth import auth_bp
+from routes.home import home_bp
+from routes.evaluaciones import evaluaciones_bp
+from routes.asistencia import asistencia_bp
+from routes.grupos import grupos_bp
+from routes.notas import notas_bp
+from routes.dashboard import dashboard_bp
 
 app = Flask(__name__)
+app.secret_key = SECRET_KEY
 
-#por mientras para probar el frontend
-
-@app.route("/login", methods=["GET", "POST"])
-def login():
-
-    if request.method == "POST":
-
-        usuario = request.form["usuario"]
-        password = request.form["password"]
-
-        if usuario == "jeanca" and password == "1234":
-            return redirect("/dashboard")
-
-        else:
-            return "Usuario o contraseña incorrectos"
-
-    return render_template("login.html")
-
-@app.route("/dashboard")
-def dashboard():
-    return render_template("dashboard.html", nombre="Jeanca")
-
-@app.route("/alumnos")
-def alumnos():
-    return render_template("alumnos.html")
-
-@app.route("/grupos")
-def grupos():
-    return render_template("grupos.html")
-
-@app.route("/asistencia")
-def asistencia():
-    return render_template("asistencia.html")
-
-@app.route("/registrar", methods=["GET", "POST"])
-def registrar():
-    if request.method == "POST":
-        # Procesar los datos del formulario de registro
-        pass
-    return render_template("registrar.html")
+app.register_blueprint(auth_bp)
+app.register_blueprint(home_bp)
+app.register_blueprint(evaluaciones_bp)
+app.register_blueprint(asistencia_bp)
+app.register_blueprint(grupos_bp)
+app.register_blueprint(notas_bp)
+app.register_blueprint(dashboard_bp)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)

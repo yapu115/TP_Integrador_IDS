@@ -8,13 +8,13 @@
 <body>
     <header class="topbar">
         <span class="welcome">Bienvenido, {{ nombre }}</span>
-        <a href="{{ url_for('login') }}" class="logout">Salir</a>
+        <a href="{{ url_for('auth.login') }}" class="logout">Salir</a>
     </header>
 
     <main class="dashboard">
         <a href="{{ url_for('alumnos') }}" class="dash-btn">Alumnos</a>
-        <a href="{{ url_for('grupos') }}" class="dash-btn">Grupos</a>
-        <a href="{{ url_for('asistencia') }}" class="dash-btn">Asistencia</a>
+        <a href="{{ url_for('grupos.grupos') }}" class="dash-btn">Grupos</a>
+        <a href="{{ url_for('asistencia.asistencia') }}" class="dash-btn">Asistencia</a>
     </main>
 </body>
 </html>
