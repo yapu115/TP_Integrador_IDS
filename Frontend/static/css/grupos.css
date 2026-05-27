@@ -13,3 +13,22 @@
   padding: 10px;
   box-sizing: border-box;
 }
+
+.contenedor-grupos {
+  width: 600px; 
+  float: left;
+}
+
+.contenedor-alumnos {
+  margin-left: 620px;
+}
+
+.info-alumno-grupo {
+  width: 30%;
+}
+
+.modal--open {
+    display: flex;
+    animation: fadeIn 0.2s ease;
+}
+
