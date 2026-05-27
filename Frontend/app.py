@@ -13,8 +13,9 @@ from routes.evaluaciones import evaluaciones_bp
 from routes.asistencia import asistencia_bp
 from routes.grupos import grupos_bp
 from routes.notas import notas_bp
+from routes.alumnos import alumnos_bp
 from routes.dashboard import dashboard_bp
-
+from routes.materiales import materiales_bp
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
@@ -24,7 +25,9 @@ app.register_blueprint(evaluaciones_bp)
 app.register_blueprint(asistencia_bp)
 app.register_blueprint(grupos_bp)
 app.register_blueprint(notas_bp)
+app.register_blueprint(alumnos_bp)
 app.register_blueprint(dashboard_bp)
+app.register_blueprint(materiales_bp)
 
 
 if __name__ == "__main__":

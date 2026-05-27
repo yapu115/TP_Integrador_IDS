@@ -1,6 +1,7 @@
 # Módulos estándar
 import csv
 import io
+import os
 
 # Módulos de terceros (Flask)
 from flask import Blueprint, jsonify, request
@@ -22,13 +23,13 @@ from curso.services.alumnos import (
     eliminar_alumno,
 )
 from curso.services.notas import devolver_notas
+from flask import render_template
 
 alumnos_bp = Blueprint('alumnos', __name__)
 
-
 # 1. GET /alumnos (Con paginación y filtros)
 @alumnos_bp.route('/alumnos', methods=['GET'])
-@token_required
+#@token_required
 def get_alumnos():
 
     # Pasar por el validador
@@ -45,7 +46,7 @@ def get_alumnos():
 
 # 2. GET /alumnos/{id} (Detalle de un alumno)
 @alumnos_bp.route('/alumnos/<int:id>', methods=['GET'])
-@token_required
+#@token_required
 def get_alumno_por_id(id):
     alumno = obtener_alumno_por_id(id)
 
@@ -57,7 +58,7 @@ def get_alumno_por_id(id):
 
 # 3. GET /alumnos/{id}/notas (Notas del alumno)
 @alumnos_bp.route('/alumnos/<int:id>/notas', methods=['GET'])
-@token_required
+#@token_required
 def get_notas_alumno(id):
 
     if not obtener_alumno_por_id(id):
@@ -69,7 +70,7 @@ def get_notas_alumno(id):
 
 # 1. POST /alumnos
 @alumnos_bp.route('/alumnos', methods=['POST'])
-@token_required
+#@token_required
 def crear_alumno():
     data = request.get_json()
 
@@ -92,7 +93,7 @@ def crear_alumno():
 
 # 2. POST /alumnos/importar
 @alumnos_bp.route('/alumnos/importar', methods=['POST'])
-@token_required
+#@token_required
 def importar_alumnos():
     if 'file' not in request.files:
         return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "No se envió archivo", "level": "error"}]}), 400
@@ -120,7 +121,7 @@ def importar_alumnos():
 
 # 1. PATCH /alumnos/{id}
 @alumnos_bp.route('/alumnos/<int:id>', methods=['PATCH'])
-@token_required
+#@token_required
 def marcar_abandono(id):
     data = request.get_json()
 
@@ -143,7 +144,7 @@ def marcar_abandono(id):
 
 # 1. DELETE /alumnos/{id}
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
-@token_required
+#@token_required
 def borrar_alumno(id):
     resultado = eliminar_alumno(id)
     if resultado:
