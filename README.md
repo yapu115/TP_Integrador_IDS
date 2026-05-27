@@ -7,7 +7,7 @@ Sistema web integral para gestionar en forma completa el ciclo de vida de un cur
 - Jeanc Carlos / 114122
 - Federico Andrada de Palomera / 115549
 - Franco Miniaci/114868
-- Felipe Ricardo Cravero / 115407
+- Felipe Ricardo Cravero / 114507
 
 ## Características Principales
 

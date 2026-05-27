@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 
 app = Flask(__name__)
 
@@ -13,12 +13,28 @@ def login():
         password = request.form["password"]
 
         if usuario == "jeanca" and password == "1234":
-            return "Inicio de sesión exitoso"
+            return redirect("/dashboard")
 
         else:
             return "Usuario o contraseña incorrectos"
 
     return render_template("login.html")
+
+@app.route("/dashboard")
+def dashboard():
+    return render_template("dashboard.html", nombre="Jeanca")
+
+@app.route("/alumnos")
+def alumnos():
+    return render_template("alumnos.html")
+
+@app.route("/grupos")
+def grupos():
+    return render_template("grupos.html")
+
+@app.route("/asistencia")
+def asistencia():
+    return render_template("asistencia.html")
 
 @app.route("/registrar", methods=["GET", "POST"])
 def registrar():
