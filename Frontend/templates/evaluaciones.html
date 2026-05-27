@@ -1,6 +1,7 @@
 {%extends "base.html"%}
 {%block title%}Evaluaciones{%endblock%}
 {% block breadcrumbs %}<span class="breadcrumbs__item">Evaluaciones</span>{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/evaluaciones.css') }}">{% endblock %}
 {%block content%}
 <div class="evaluaciones-container">
 
@@ -44,6 +45,26 @@
                     <span><strong>Hora:</strong> 23:59</span>
                     <span><strong>Estado:</strong> Pendiente</span>
                     <span><strong>Nota:</strong> Pendiente</span>
+                </div>
+                <div class="evaluacion-card__details">
+                    <p><strong>Temas a evaluar:</strong> Contenidos</p>
+                </div>
+            </div>
+        </article>
+
+          <article class="evaluacion-card">
+            <div class="evaluacion-card__header">
+                <h3>Segundo parcial</h3>
+            </div>
+            <div class="evaluacion-card__body">
+                <div class="evaluacion-card__meta">
+                    <span><strong>Fecha:</strong> 13/08/2026</span>
+                    <span><strong>Hora:</strong> 21:00</span>
+                    <span><strong>Estado:</strong> Realizado</span>
+                    <span><strong>Nota:</strong> Pendiente</span>
+                </div>
+                <div class="evaluacion-card__details">
+                    <p><strong>Temas a evaluar:</strong> Contenidos</p>
                 </div>
             </div>
         </article>
