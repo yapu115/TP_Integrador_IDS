@@ -66,7 +66,17 @@ def _normalizar_alumno(alumno):
         resultado['legajo'] = str(resultado['legajo'])
     return resultado
 
+# Esto lo pones dentro de curso/services/alumnos.py
+def obtener_todos_los_alumnos():
+    # Retornamos datos falsos para ver el diseño en el navegador
+    datos_fake = [
+        {"legajo": "1001", "nombre": "Juan", "apellido": "Perez", "email": "juan@perez.com"},
+        {"legajo": "1002", "nombre": "Maria", "apellido": "Garcia", "email": "maria@garcia.com"}
+    ]
+    # Retornamos los datos y un código 200 (OK)
+    return datos_fake, 200
 
+"""
 # PRE: Cliente realizó un GET a /alumnos. Módulo 'db.execute' disponible.
 # POST: Retorna (respuesta_dict, 200) o (None, 204) si la base de datos está vacía.
 def obtener_todos_los_alumnos():
@@ -95,7 +105,7 @@ def obtener_todos_los_alumnos():
     }
 
     return respuesta, 200
-
+"""
 
 def obtener_alumno_por_id(id_alumno):
     query = "SELECT id, legajo, nombre, apellido, email, abandono FROM alumnos WHERE id = %s"
