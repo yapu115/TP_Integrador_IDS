@@ -8,8 +8,9 @@
     {% block extra_css %}{% endblock %}
 </head>
 
-<body>
+<body{% block body_attr %}{% endblock %}>
 
+{% block page %}
     <div class="app-layout">
     
         <aside class="sidebar">
@@ -46,6 +47,7 @@
 
         </div>
     </div>
+{% endblock %}
 
     {% block extra_js %}<script src="{{ url_for('static', filename='js/base.js') }}"></script>{% endblock %}
 </body>

@@ -9,31 +9,49 @@
 <body>
     <!-- Falta pasar el inicio del html a una template de jinja -->
     {% if grupos %}
-    <div>
-        <form action="" method="post">
-            <div style="width: 600px; float: left;">
-                <div class="scrollableWrapper">
-                    <div class="scrollableContent">
-                        {% for id_grupo in grupos_dict %}
-                            <input type="radio"  name="boton-info-grupo" id="{{ grupos_dict[id_grupo].id }}" value="{{ grupos_dict[id_grupo].id }}">
-                            <label for="{{ grupos_dict[id_grupo].id }}">{{ grupos_dict[id_grupo].nombre }}</label>
-                        {% endfor %}
+        <div>
+            <form action="/grupos" method="post">
+                <div class="contenedor-grupos">
+                    <div class="scrollableWrapper">
+                        <div class="scrollableContent">
+                            {% for id_grupo in grupos_dict %}
+                                <input type="radio"  name="boton-info-grupo" id="{{ grupos_dict[id_grupo].id }}" value="{{ grupos_dict[id_grupo].id }}">
+                                <label for="{{ grupos_dict[id_grupo].id }}">{{ grupos_dict[id_grupo].nombre }}</label>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
+            </form>
+
+            <div class="contenedor-alumnos"> 
+                {% if alumnos %}
+                    {% for alumno in alumnos %}
+                    <div class="info-alumno-grupo">
+                        <button id="{{ alumno.id_alumno }}" onclick="mostrarInfoAlumnos('{{ alumno.nombre }}', '{{ alumno.legajo }}', '{{ alumno.dni }}', '{{ alumno.email }}')"> {{ alumno.nombre }} </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
             </div>
-        </form>
-        <!-- Falta mantener 3 alumnos por fila, igual que en el mockup -->
-        <div style="margin-left: 620px;"> 
-            {% if alumnos %}
-                {% for alumno in alumnos %}
-                <div class="info-alumno-grupo" aria-hidden="true">
-                    Info de los alumnos
-                </div>
-                {% endfor %}
-            {% endif %}
+            
         </div>
-        
-    </div>
+        <div id="modalAlumnos" class="modal" aria-hidden="true">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="close">&times;</span>
+                    <h2>Informacion del alumno:</h2>
+                </div>
+                <div class="modal-body">
+                    <span>Nombre:</span>
+                    <span id="detalleAlumnoNombre"></span>
+                    <span >Legajo:</span>
+                    <span id="detalleAlumnoLegajo"></span>
+                    <span>DNI:</span>
+                    <span id="detalleAlumnoDNI"></span>
+                    <span>Email:</span>
+                    <span id="detalleAlumnoEmail"></span>
+                </div>
+            </div>
+        </div>
     {% else %}
         <div>No se encontraron grupos.</div>
     {% endif %}

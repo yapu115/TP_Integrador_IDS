@@ -1,11 +1,28 @@
-function mostrarInfoAlumnos(){
-    const infoAlumnos = document.getElementById("info-alumno-grupo");
+function mostrarModalAlumnos(id){
+    const modal = document.getElementById(id);
 
-    infoAlumnos.setAttribute('aria-hidden', 'false');
+    modal.classList.add('modal--open');
+    modal.setAttribute('aria-hidden', 'false');
 }
 
-function ocultarInfoAlumnos(){
-    const infoAlumnos = document.getElementById("info-alumno-grupo");
+function ocultarModalAlumnos(id){
+    const modal = document.getElementById(id);
 
-    infoAlumnos.setAttribute('aria-hidden', 'true');
+    modal.classList.remove('modal--open');
+    modal.setAttribute('aria-hidden', 'true');
 }
+
+function mostrarInfoAlumnos(nombre, legajo, dni, email){
+    document.getElementById('detalleAlumnoNombre').textContent = nombre;
+    document.getElementById('detalleAlumnoLegajo').textContent = legajo;
+    document.getElementById('detalleAlumnoDNI').textContent = dni;
+    document.getElementById('detalleAlumnoEmail').textContent = email;
+
+    abrirModal('modalAlumnos');
+}
+
+window.addEventListener('click', function (event) {
+    document.querySelectorAll('.modal--open').forEach(m => {
+        if (event.target === m) ocultarModalAlumnos(m.id);
+    });
+});

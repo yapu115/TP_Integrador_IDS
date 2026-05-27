@@ -5,7 +5,7 @@ from services.api_client import post_json
 auth_bp = Blueprint("auth", __name__)
 
 
-def _primer_mensaje_error(data):
+def primer_mensaje_error(data):
     errores = data.get("errors", [])
     if errores:
         return errores[0].get("message", "Ocurrió un error.")
@@ -26,14 +26,15 @@ def login():
         if status == 200 and "token" in data:
             session["token"] = data["token"]
             session["username"] = username
-            return redirect(url_for("home.index"))
+            return redirect(url_for("home.index", _external=True))
 
         return render_template(
             "login.html",
-            error=_primer_mensaje_error(data),
+            error=primer_mensaje_error(data),
         )
 
-    return render_template("login.html")
+    exito = session.pop("registro_exito", None)
+    return render_template("login.html", exito=exito)
 
 
 @auth_bp.route("/registrar", methods=["GET", "POST"])
@@ -69,10 +70,10 @@ def registrar():
         }, token=token)
 
         if status == 201:
-            return render_template(
-                "registrar.html",
-                exito="Usuario registrado correctamente. Ya puede iniciar sesión.",
+            session["registro_exito"] = (
+                "Usuario registrado correctamente. Ya puede iniciar sesión."
             )
+            return redirect(url_for("auth.login", _external=True))
 
         if status in (401, 403) or not token:
             return render_template(
@@ -82,7 +83,7 @@ def registrar():
 
         return render_template(
             "registrar.html",
-            error=_primer_mensaje_error(data),
+            error=primer_mensaje_error(data),
         )
 
     return render_template("registrar.html")
@@ -91,4 +92,4 @@ def registrar():
 @auth_bp.route("/logout", methods=["POST"])
 def logout():
     session.clear()
-    return redirect(url_for("auth.login"))
+    return redirect(url_for("auth.login", _external=True))

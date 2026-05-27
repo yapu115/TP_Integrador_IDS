@@ -1,3 +1,9 @@
+/* 
+12141d
+212534
+8c52ff
+*/
+
 *,
 *::before,
 *::after {
@@ -71,12 +77,10 @@ body.auth-page {
 }
 
 .auth-panel-image--login {
-  background-image: url("../img/facultad-login.png");
   background-color: #3d5a80;
 }
 
 .auth-panel-image--register {
-  background-image: url("../img/facultad-registro.png");
   background-color: #4a6fa5;
 }
 
