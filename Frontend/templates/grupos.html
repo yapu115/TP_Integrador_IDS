@@ -1,12 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/grupos.css') }}">
-    <title>Grupos</title>
-</head>
-<body>
+{% extends "base.html" %} 
+
+{% block title %}Grupos{% endblock %} 
+
+{% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/grupos.css', _external=True) }}"
+/>
+{% endblock %}
+
+{% block page %}
     {% if grupos %}
         <div>
             <form action="/grupos" method="post">
@@ -18,6 +21,9 @@
                                 <label for="{{ grupos_dict[id_grupo].id }}">{{ grupos_dict[id_grupo].nombre }}</label>
                             {% endfor %}
                         </div>
+                    </div>
+                    <div>
+                        <button type="submit" value="grupo-elegido">Ver integrantes del grupo</button>
                     </div>
                 </div>
             </form>
@@ -55,5 +61,8 @@
         <div>No se encontraron grupos.</div>
     {% endif %}
 
-</body>
-</html>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/grupos.js') }}"></script>
+{% endblock %}
