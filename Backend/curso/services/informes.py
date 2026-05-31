@@ -218,17 +218,16 @@ def informe_equipos():
             SELECT
                 g.id AS id_grupo,
                 g.nombre_grupo,
-                te.nombre AS nombre_evaluacion,
+                g.curso_id,
                 a.id AS id_alumno,
                 a.legajo,
                 a.nombre,
-                a.apellido
+                a.apellido,
+                a.email
             FROM grupos g
-            LEFT JOIN grupo_evaluaciones ge ON g.id = ge.id_grupo
-            LEFT JOIN tipos_evaluacion te ON ge.id_evaluacion = te.id
             LEFT JOIN grupo_integrantes gi ON g.id = gi.id_grupo
             LEFT JOIN alumnos a ON gi.id_alumno = a.id
-            ORDER BY g.nombre_grupo, a.apellido, a.nombre
+            ORDER BY g.curso_id, g.nombre_grupo, a.apellido, a.nombre
         """
         cursor.execute(query)
         results = cursor.fetchall()
@@ -236,30 +235,28 @@ def informe_equipos():
         cursor.close()
         connection.close()
 
-    equipos_dict = {}
+    grupos_dict = {}
     for row in results:
         grupo_id = row["id_grupo"]
-        if grupo_id not in equipos_dict:
-            equipos_dict[grupo_id] = {
-                "nombre": row["nombre_grupo"],
-                "tps": set(),
+        if grupo_id not in grupos_dict:
+            grupos_dict[grupo_id] = {
+                "nombre":      row["nombre_grupo"],
+                "curso_id":    row["curso_id"],
                 "integrantes": [],
             }
-        if row["nombre_evaluacion"]:
-            equipos_dict[grupo_id]["tps"].add(row["nombre_evaluacion"])
         if row["id_alumno"]:
-            integrante = f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
-            if integrante not in equipos_dict[grupo_id]["integrantes"]:
-                equipos_dict[grupo_id]["integrantes"].append(integrante)
+            grupos_dict[grupo_id]["integrantes"].append(
+                f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
+            )
 
-    headers = ["Equipo", "TPs asociados", "Integrantes"]
+    headers = ["Grupo", "Curso ID", "Integrantes"]
     rows = [
         [
             data["nombre"],
-            ", ".join(sorted(data["tps"])) if data["tps"] else "Sin TPs asignados",
-            "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes",
+            str(data["curso_id"]),
+            "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes"
         ]
-        for data in equipos_dict.values()
+        for data in grupos_dict.values()
     ]
 
-    return _build_pdf_response("Informe de Equipos", headers, rows, landscape_mode=True)
+    return _build_pdf_response("Informe de Grupos", headers, rows, landscape_mode=True)
