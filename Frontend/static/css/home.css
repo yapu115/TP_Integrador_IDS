@@ -23,21 +23,25 @@
 /* ── TARJETAS DE ACCESO RÁPIDO ────────────────────────────── */
 .home-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-    margin-top: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-auto-rows: minmax(180px, 1fr);
+    gap: 30px;
+    margin-top: 20px;
+    padding-bottom: 40px;
 }
 
 .home-card {
     background: var(--prussian-blue);
     border: 1px solid var(--dusk-blue);
     border-radius: 14px;
-    padding: 24px;
+    padding: 30px;
     text-decoration: none;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 15px;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     box-shadow: 0 6px 18px rgba(0,0,0,0.3);
 }

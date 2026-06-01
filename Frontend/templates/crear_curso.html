@@ -1,0 +1,93 @@
+{% extends "base.html" %} {% block title %}Crear Curso{% endblock %} {% block
+extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/crear_cursos.css') }}"
+/>
+{% endblock %} {% block body_attr %} class="curso-create-page"{% endblock %} {%
+block page %}
+<div class="curso-create-container">
+  <section class="curso-create-card">
+    <form
+      class="curso-create-form"
+      method="post"
+      action="{{ url_for('cursos.crear_curso') }}"
+    >
+      <h1 class="curso-create-title">Crear Nuevo Curso</h1>
+
+      {% if error %}
+      <div class="curso-create-message curso-create-message--error">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <div class="curso-create-field">
+        <label for="nombre" class="curso-create-label">
+          Nombre del curso (*)
+        </label>
+
+        <input
+          type="text"
+          id="nombre"
+          name="nombre"
+          required
+          class="curso-create-input"
+        />
+      </div>
+
+      <div class="curso-create-field">
+        <label for="descripcion" class="curso-create-label">
+          Descripción
+        </label>
+
+        <textarea
+          id="descripcion"
+          name="descripcion"
+          rows="3"
+          placeholder="Breve descripción del curso..."
+          class="curso-create-textarea"
+        ></textarea>
+      </div>
+
+      <div class="curso-create-row">
+        <div class="curso-create-field">
+          <label for="fecha_inicio" class="curso-create-label">
+            Fecha de inicio
+          </label>
+
+          <input
+            type="date"
+            id="fecha_inicio"
+            name="fecha_inicio"
+            class="curso-create-input"
+          />
+        </div>
+
+        <div class="curso-create-field">
+          <label for="fecha_fin" class="curso-create-label">
+            Fecha de fin
+          </label>
+
+          <input
+            type="date"
+            id="fecha_fin"
+            name="fecha_fin"
+            class="curso-create-input"
+          />
+        </div>
+      </div>
+
+      <button type="submit" class="curso-create-submit">Crear curso</button>
+
+      <div class="curso-create-footer">
+        <a
+          href="{{ url_for('cursos.seleccionar_curso') }}"
+          class="curso-create-back-link"
+        >
+          ← Volver a la selección
+        </a>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

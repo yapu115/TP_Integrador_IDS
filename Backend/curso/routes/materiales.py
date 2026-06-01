@@ -39,9 +39,12 @@ def post_materiales():
     if error:
         return error
 
+    if not request.is_json:
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Se requiere JSON."}]}), 400
+
     data = {
-        "titulo": request.form.get("titulo"),
-        "file":   request.files.get("file")
+        "titulo": request.json.get("titulo"),
+        "url_archivo": request.json.get("url_archivo")
     }
 
     errores, datos_validados = validar_subida_material(data)
@@ -49,7 +52,7 @@ def post_materiales():
     if errores:
         retorno = jsonify({"errors": errores}), 400
     else:
-        resultado = guardar_material(datos_validados["titulo"], datos_validados["file"], curso_id)
+        resultado = guardar_material(datos_validados["titulo"], datos_validados["url_archivo"], curso_id)
         if "error" in resultado:
             retorno = jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), 500
         else:

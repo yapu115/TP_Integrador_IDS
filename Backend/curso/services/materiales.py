@@ -34,21 +34,9 @@ def listar_materiales(curso_id):
     return retorno
 
 
-def guardar_material(titulo, archivo, curso_id):
+def guardar_material(titulo, url_archivo, curso_id):
     retorno = None
     try:
-        filename    = secure_filename(archivo.filename)
-        base_dir    = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        upload_folder = os.path.join(base_dir, "static", "materiales")
-
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder, exist_ok=True)
-
-        file_path   = os.path.join(upload_folder, filename)
-        archivo.save(file_path)
-
-        url_archivo = f"/static/materiales/{filename}"
-
         connection = get_connection()
         cursor     = connection.cursor(dictionary=True)
 
@@ -84,16 +72,6 @@ def eliminar_material(id_material):
         connection.commit()
         cursor.close()
         connection.close()
-
-        filename  = url_archivo.split("/")[-1]
-        base_dir  = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        file_path = os.path.join(base_dir, "static", "materiales", filename)
-
-        if os.path.exists(file_path):
-            try:
-                os.remove(file_path)
-            except Exception:
-                pass
 
         retorno = {"mensaje": "Material eliminado exitosamente."}
 
