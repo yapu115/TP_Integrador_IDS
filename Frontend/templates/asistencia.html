@@ -23,9 +23,11 @@
                 <p><strong>Fecha actual:</strong> {{ fecha_hoy | default('26 de Mayo, 2026') }}</p>
                 <p>Gestione el código QR dinámico para el registro de los alumnos.</p>
 
-                <button type="button" class="btn-qr">
+                <button type="button" class="btn-qr" id="btn-generar-qr">
                     &#128231; &nbsp;Generar y enviar QR por correo electrónico
                 </button>
+
+                <p id="mensaje-qr"></p>
             </div>
 
             <div class="qr-box">
@@ -86,4 +88,54 @@
 
     </section>
 </div>
+
+<script>
+    document.getElementById("btn-generar-qr").addEventListener("click", async function () {
+        const boton = document.getElementById("btn-generar-qr");
+        const mensaje = document.getElementById("mensaje-qr");
+    
+        boton.disabled = true;
+        boton.textContent = "Generando y enviando QR...";
+        mensaje.textContent = "";
+    
+        try {
+            const respuesta = await fetch("http://127.0.0.1:5000/asistencia/qr/enviar", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    id_alumno: 1,
+                    fecha: "2026-05-26"
+                })
+            });
+    
+            const datos = await respuesta.json();
+    
+            if (!respuesta.ok || datos.error || datos.errors) {
+                mensaje.textContent = datos.mensaje || 
+                                      datos.mensaje ||
+                                      datos.message ||
+                                      datos.errors?.[0]?.message ||
+                                      "Ocurrio un error al generar el QR"
+                mensaje.style.color = "#ff6b6b";
+            } else {
+                mensaje.textContent = datos.mensaje || "QR generado y enviado correctamente.";
+                mensaje.style.color = "#2ecc71";
+            }
+    
+        } catch (error) {
+            mensaje.textContent = "No se pudo conectar con el backend.";
+            mensaje.style.color = "#ff6b6b";
+            console.error(error);
+        }
+    
+        boton.disabled = false;
+        boton.innerHTML = "&#128231; &nbsp;Generar y enviar QR por correo electrónico";
+    });
+</script>
+
+
 {% endblock %}
+
+

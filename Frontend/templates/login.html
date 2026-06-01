@@ -24,9 +24,16 @@ page %}
       <h1>Iniciar Sesión</h1>
 
       {% if error %}
-      <p class="auth-message auth-message--error">{{ error }}</p>
-      {% endif %} {% if exito %}
-      <p class="auth-message auth-message--success">{{ exito }}</p>
+      <div class="auth-message auth-message--error" style="display:flex; align-items:flex-start; gap:12px; font-size: 0.95rem; text-align: left;">
+          <span style="font-size: 1.2rem; line-height: 1;">⚠️</span>
+          <span style="line-height: 1.4;">{{ error }}</span>
+      </div>
+      {% endif %} 
+      {% if exito %}
+      <div class="auth-message auth-message--success" style="display:flex; align-items:flex-start; gap:12px; font-size: 0.95rem; text-align: left;">
+          <span style="font-size: 1.2rem; line-height: 1;">✅</span>
+          <span style="line-height: 1.4;">{{ exito }}</span>
+      </div>
       {% endif %}
 
       <div class="form-group">

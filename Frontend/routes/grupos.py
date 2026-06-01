@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request
-import requests
+from flask import Blueprint, render_template, request, session, jsonify
+from utils.auth import login_required
 
 grupos_bp = Blueprint('grupos', __name__)
 
@@ -30,6 +30,7 @@ def obtener_alumnos_grupo(id_grupo)->dict:
     return 
 
 @grupos_bp.route("/grupos", methods=["GET", "POST"])
+@login_required
 def grupos():
     #Guardar grupos en un diccionario y pasarlos al template
     grupos = obtener_grupos()

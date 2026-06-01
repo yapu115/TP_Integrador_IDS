@@ -3,6 +3,7 @@ from io import BytesIO
 
 from curso.utils.security import token_required
 from curso.validators.informes import validar_abandono_informe
+from curso.services.cursos import curso_existe
 from curso.services.informes import (
     informe_alumnos,
     informe_estadisticas,
@@ -23,15 +24,32 @@ def _respuesta_error_interno(detalle):
     }), 500
 
 
+def _get_curso_id():
+    raw = request.args.get("curso_id")
+    if not raw:
+        return None, (jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Se requiere el parámetro 'curso_id'."}]}), 400)
+    try:
+        cid = int(raw)
+    except ValueError:
+        return None, (jsonify({"errors": [{"code": "BAD_REQUEST", "message": "El parámetro 'curso_id' debe ser un entero."}]}), 400)
+    if not curso_existe(cid):
+        return None, (jsonify({"errors": [{"code": "NOT_FOUND", "message": f"No existe un curso con id={cid}."}]}), 404)
+    return cid, None
+
+
 @informes_bp.route("/informes/alumnos", methods=["GET"])
 @token_required
 def descargar_informe_alumnos():
+    curso_id, error = _get_curso_id()
+    if error:
+        return error
+
     abandono, error_validacion = validar_abandono_informe()
     if error_validacion:
         return jsonify(error_validacion[0]), error_validacion[1]
 
     try:
-        pdf_bytes = informe_alumnos(abandono)
+        pdf_bytes = informe_alumnos(curso_id, abandono)
     except Exception as e:
         return _respuesta_error_interno(str(e))
 
@@ -46,8 +64,12 @@ def descargar_informe_alumnos():
 @informes_bp.route("/informes/estadisticas", methods=["GET"])
 @token_required
 def descargar_informe_estadisticas():
+    curso_id, error = _get_curso_id()
+    if error:
+        return error
+
     try:
-        pdf_bytes = informe_estadisticas()
+        pdf_bytes = informe_estadisticas(curso_id)
     except Exception as e:
         return _respuesta_error_interno(str(e))
 
@@ -62,8 +84,12 @@ def descargar_informe_estadisticas():
 @informes_bp.route("/informes/equipos", methods=["GET"])
 @token_required
 def descargar_informe_equipos():
+    curso_id, error = _get_curso_id()
+    if error:
+        return error
+
     try:
-        pdf_bytes = informe_equipos()
+        pdf_bytes = informe_equipos(curso_id)
     except Exception as e:
         return _respuesta_error_interno(str(e))
 

@@ -1,0 +1,172 @@
+/* ── CONTENEDOR ─────────────────────────────────────────── */
+
+.curso-create-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+
+  display: flex;
+  justify-content: center;
+}
+
+/* ── TARJETA PRINCIPAL ──────────────────────────────────── */
+
+.curso-create-card {
+  width: 100%;
+  max-width: 550px;
+}
+
+.curso-create-form {
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+
+  border-radius: 16px;
+
+  padding: 40px;
+
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ── TÍTULO ─────────────────────────────────────────────── */
+
+.curso-create-title {
+  text-align: center;
+
+  margin: 0 0 30px;
+
+  color: var(--alabaster);
+
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.9rem;
+}
+
+/* ── MENSAJES ───────────────────────────────────────────── */
+
+.curso-create-message {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.curso-create-message--error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* ── CAMPOS ─────────────────────────────────────────────── */
+
+.curso-create-field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.curso-create-label {
+  margin-bottom: 8px;
+
+  color: var(--alabaster);
+
+  font-weight: 600;
+}
+
+/* ── INPUTS ─────────────────────────────────────────────── */
+
+.curso-create-input,
+.curso-create-textarea {
+  width: 100%;
+
+  padding: 10px 12px;
+
+  border-radius: 8px;
+  border: 1px solid var(--dusk-blue);
+
+  background: rgba(255, 255, 255, 0.05);
+
+  color: var(--alabaster);
+
+  font-size: 0.95rem;
+  font-family: inherit;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.curso-create-input:focus,
+.curso-create-textarea:focus {
+  outline: none;
+
+  border-color: var(--accent);
+
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+.curso-create-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+/* ── FECHAS ─────────────────────────────────────────────── */
+
+.curso-create-row {
+  display: flex;
+  gap: 15px;
+}
+
+.curso-create-row .curso-create-field {
+  flex: 1;
+}
+
+/* ── BOTÓN ──────────────────────────────────────────────── */
+
+.curso-create-submit {
+  width: 100%;
+
+  margin-top: 10px;
+
+  padding: 12px 20px;
+
+  border: none;
+  border-radius: 999px;
+
+  cursor: pointer;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  color: white;
+
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
+}
+
+.curso-create-submit:hover {
+  filter: brightness(1.12);
+}
+
+.curso-create-submit:active {
+  transform: scale(0.97);
+}
+
+/* ── FOOTER ─────────────────────────────────────────────── */
+
+.curso-create-footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.curso-create-back-link {
+  color: var(--accent);
+
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.curso-create-back-link:hover {
+  text-decoration: underline;
+}
