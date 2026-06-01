@@ -8,6 +8,7 @@ Sistema web integral para gestionar en forma completa el ciclo de vida de un cur
 - Federico Andrada de Palomera / 115549
 - Franco Miniaci/114868
 - Felipe Ricardo Cravero / 114507
+- Zlatna Vallejos / 114909
 
 ## Características Principales
 
