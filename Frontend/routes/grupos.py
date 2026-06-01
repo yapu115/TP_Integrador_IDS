@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, session, jsonify
 from utils.auth import login_required
 
+
 grupos_bp = Blueprint('grupos', __name__)
 
 #Falta mover funciones a otro .py
