@@ -1,9 +1,10 @@
 import os
 import smtplib
+import qrcode
 from email.message import EmailMessage
 
 from curso.db import get_connection
-
+from io import BytesIO
 
 # Genera un codigo QR simulado para pruebas del sistema.
 # Actualmente no crea imagenes QR reales.
@@ -55,12 +56,12 @@ def enviar_mail_asistencia(destinatario, nombre_alumno, fecha, codigo_qr):
     smtp_use_tls = os.environ.get("SMTP_USE_TLS", "true").lower() == "true"
 
     if not smtp_host or not smtp_user or not smtp_password or not smtp_from:
-        return {
+        return{
             "error": "SMTP_NOT_CONFIGURED",
             "mensaje": (
-                "Faltan variables de entorno SMTP_HOST, SMTP_USER, "
-                "SMTP_PASSWORD y/o SMTP_FROM para enviar el correo."
-            )
+                "Faltan variables de entorno SMTP_HOST, SMTP_USER,"
+                "SMTP_PASSWORD o SMTP_FROM para enviar el correo"
+            ) 
         }
 
     mensaje = EmailMessage()
@@ -68,74 +69,145 @@ def enviar_mail_asistencia(destinatario, nombre_alumno, fecha, codigo_qr):
     mensaje["From"] = smtp_from
     mensaje["To"] = destinatario
 
+    url_registro = f"http://127.0.0.1:5000/asistencia/registrar?codigo_qr={codigo_qr}"
+
     texto = (
-        f"Hola {nombre_alumno},\n\n"
-        "Este es tu codigo dinamico para registrar asistencia:\n\n"
-        f"{codigo_qr}\n\n"
-        "Escanealo o ingresalo en la plataforma para confirmar tu presencia.\n"
+        f"Hola {nombre_alumno}, \n\n"
+        f"Este es tu código QR para registrar tu asistencia en el dia de hoy {fecha}. \n\n"
+        f"Codigo: {codigo_qr}, \n\n"
+        f"También podes ingresar desde este enlace:\n"
+        f"{url_registro}\n\n"
+        f"Escanealo o ingresa al enlace para confirmar tu presencia.\n"
     )
 
     html = f"""
     <html>
-      <body>
-        <p>Hola {nombre_alumno},</p>
-        <p>Este es tu codigo dinamico para registrar asistencia:</p>
-        <p><strong>{codigo_qr}</strong></p>
-        <p>Escanealo o ingresalo en la plataforma para confirmar tu presencia.</p>
+      <body style="font-family: Arial, sans-serif; background-color:#f4f4f4; padding: 20px;" >
+           <div style="max-width: 600px; margin: auto; background-color: white; padding: 25px; border.radius: 10px;> 
+               <h2 style="color: #263642; ">Registro de asistencia</h2>
+               <p>Hola <strong>{nombre_alumno}</strong>,</p>
+               <p>  
+                  Este es tu codigo QR para registrar la asistencia correspondiente al dia <strong>{fecha}</strong>
+               </p>
+
+        <p style="text-align: center;">
+           <img src="cid:qr_asistencia" alt="QR de asistencia" style="width: 220px; height: 220px;">
+        </p>
+
+        <p>
+            <a href="{url_registro}">Registrar asistencia</a>
+        </p>
+
+        <p style="font-size: 13px; color: #666;">
+           Código: {codigo_qr} 
+        </p> 
+       </div>
       </body>
     </html>
     """
+ 
+    qr_bytes = generar_imagen_qr(url_registro)
 
     mensaje.set_content(texto)
     mensaje.add_alternative(html, subtype="html")
 
-    # Falta funcion para adjuntar o embeber la imagen QR real cuando este implementada.
+    mensaje_html = mensaje.get_payload()[1]
+    mensaje_html.add_related(
+        qr_bytes,
+        maintype="image",
+        subtype="png",
+        cid="<qr_asistencia>"
+    )
+
     with smtplib.SMTP(smtp_host, smtp_port, timeout=20) as smtp:
         if smtp_use_tls:
             smtp.starttls()
+
         smtp.login(smtp_user, smtp_password)
         smtp.send_message(mensaje)
 
-    return {"mensaje": "Email enviado exitosamente"}
+    return {"mensaje": "Se ha enviado correctamente el email"}
 
 
-def generar_qr_asistencia(fecha):
-    codigo_qr = generar_codigo_qr(None, fecha)
+#Genera la imagen del qr, en memoria
+def generar_imagen_qr(texto):
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=10,
+        border=4
+        ) 
 
-    # Falta agregar el QR verdadero.
-    qr_code_url = f"https://api.app.com/static/qrs/clase_{fecha.replace('-', '')}.png"
+    qr.add_data(texto)
+    qr.make(fit=True)
+    
+    imagen = qr.make_image(fill_color="black", back_color="white")
+
+    buffer = BytesIO()
+    imagen.save(buffer, format="PNG")
+
+    return buffer.getvalue()
+
+def generar_qr_asistencia(id_alumno, fecha):
+
+    if not alumno_existe(id_alumno):
+        return {
+            "error": "NOT_FOUND", 
+            "mensaje": "No existe un alumno con ese id."
+            }
+
+    codigo_qr = generar_codigo_qr(id_alumno, fecha)
+    url_registro = f"http://127.0.0.1:5000/asistencia/registrar?codigo_qr={codigo_qr}" 
 
     return {
-        "qr_code_url": qr_code_url,
-        "codigo_qr": codigo_qr
+        "mensaje":"Se ha generado correctamente el QR",
+        "id_alumno": id_alumno,
+        "fecha": fecha,
+        "codigo_qr": codigo_qr,
+        "url_registrado": url_registro
     }
 
-
 def enviar_qr_asistencia(id_alumno, fecha):
-    retorno = None
+    
+   #Busco al alumno, genera el qr y envia un mail con el qr
     alumno = obtener_alumno_contacto(id_alumno)
+      
     if not alumno:
-        retorno = {"error": "NOT_FOUND", "mensaje": "No existe un alumno con ese id."}
-    else:
-        codigo_qr = generar_codigo_qr(id_alumno, fecha)
-        nombre_alumno = f"{alumno['nombre']} {alumno['apellido']}"
-        try:
-            retorno = enviar_mail_asistencia(
-                alumno["email"],
-                nombre_alumno,
-                fecha,
-                codigo_qr
-            )
-            if "error" not in retorno:
-                retorno["destinatario"] = alumno["email"]
-                retorno["codigo_qr"] = codigo_qr
-        except Exception as exc:
-            retorno = {
-                "error": "EMAIL_SEND_ERROR",
-                "mensaje": f"No se pudo enviar el correo: {exc}"
-            }
-    return retorno
+        return {
+            "error": "NOT FOUND",
+            "mensaje":"No existe un alumno con ese id"
+        }
 
+    codigo_qr = generar_codigo_qr(id_alumno, fecha)
+    nombre_alumno = f"{alumno['nombre']} {alumno['apellido']}"
+
+        
+    try:
+        retorno = enviar_mail_asistencia(
+            alumno["email"],
+            nombre_alumno,
+            fecha,
+            codigo_qr
+        )
+
+        if retorno is None:
+            return {
+                "error": "EMAIL_SEND_ERROR",
+                "mensaje": "La función enviar_mail_asistencia no devolvió ninguna respuesta."
+            }
+
+        if "error" in retorno:
+            return retorno
+
+        retorno["destinatario"] = alumno["email"]
+        retorno["codigo_qr"] = codigo_qr
+
+        return retorno
+
+    except Exception as exc:
+        return {
+            "error": "EMAIL_SEND_ERROR",
+            "mensaje": f"No se pudo enviar el correo: {exc}"
+        }
 
 def registrar_asistencia(codigo_qr):
     retorno = None
@@ -170,7 +242,12 @@ def registrar_asistencia(codigo_qr):
                 cursor.close()
                 connection.close()
 
-                retorno = {"mensaje": "Asistencia registrada correctamente."}
+                retorno = {
+                    "mensaje": "Asistencia registrada correctamente.",
+                    "id_alumno": id_alumno,
+                    "fecha": fecha
+                }
+
         except ValueError:
             retorno = {"error": "BAD_REQUEST", "mensaje": "El codigo QR contiene datos corruptos."}
 

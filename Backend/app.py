@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 
 from curso.routes.asistencia import asistencia_bp
 from curso.routes.evaluaciones import evaluacion_bp
@@ -10,9 +11,13 @@ from curso.routes.logs import logs_bp
 from curso.routes.alumnos import alumnos_bp
 from curso.routes.notas import notas_bp
 from curso.routes.cursos import cursos_bp
-
+from flask_cors import CORS
 
 app = Flask(__name__, static_folder='curso/static')
+
+
+CORS(app)
+
 
 app.register_blueprint(cursos_bp)      
 app.register_blueprint(asistencia_bp)
