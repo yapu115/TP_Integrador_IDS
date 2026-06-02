@@ -16,8 +16,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 
 -- TABLA CURSOS
-
---------------------------------------------------------------
+-- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS cursos (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     nombre           VARCHAR(100) NOT NULL,
@@ -28,7 +27,7 @@ CREATE TABLE IF NOT EXISTS cursos (
     fecha_creacion   TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
---------------------------------------------------------------
+-- -----------------------------------------------------------
 
 CREATE TABLE IF NOT EXISTS alumnos (
     id               INT AUTO_INCREMENT PRIMARY KEY,
