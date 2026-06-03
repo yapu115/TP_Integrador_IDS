@@ -1,58 +1,63 @@
-{%extends "base.html"%}
-{%block title%}Evaluaciones{%endblock%}
-{% block breadcrumbs %}<span class="breadcrumbs__item">Evaluaciones</span>{% endblock %}
-{% block extra_css %}<link rel="stylesheet" href="{{ url_for('static', filename='css/evaluaciones.css') }}">{% endblock %}
-{%block content%}
+{%extends "base.html"%} {%block title%}Evaluaciones{%endblock%} {% block
+breadcrumbs %}<span class="breadcrumbs__item">Evaluaciones</span>{% endblock %}
+{% block extra_css %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/evaluaciones.css') }}"
+/>{% endblock %} {%block content%}
 <div class="evaluaciones-container">
+  <header class="evaluaciones-header">
+    <div class="evaluaciones-banner">
+      <h2>Parciales y trabajos practicos</h2>
+    </div>
 
-    <header class="evaluaciones-header">
-        <div class="evaluaciones-banner">
-            <h2>Parciales y trabajos practicos</h2>
+    <div class="evaluaciones-actions">
+      <a href="{{ url_for('evaluaciones.crear_actividad') }}">
+        <button class="btn btn--add">Agregar actividad</button>
+      </a>
+
+      <button class="btn btn--delete">Eliminar actividad</button>
+
+      <button class="btn btn--edit">Modificar actividad</button>
+    </div>
+  </header>
+
+  <section class="evaluaciones-list">
+    {% if lista_evaluaciones %} {% for actividad in lista_evaluaciones %}
+    <article class="evaluacion-card">
+      <div class="evaluacion-card__header">
+        <h3>{{actividad.nombre}}</h3>
+
+        <form
+          class="form-delete"
+          action="{{ url_for('evaluaciones.eliminar_actividad', id_actividad=actividad.id) }}"
+          method="POST"
+          onsubmit="return confirm('Estas seguro eliminar esta actividad?');"
+        >
+          <button type="submit" class="btn--delete-cruz">❌</button>
+        </form>
+
+        <a
+          class="link-edit"
+          href="{{ url_for('evaluaciones.modificar_actividad', id_actividad=actividad.id) }}"
+        >
+          <span class="btn--edit-lapiz">✏️</span>
+        </a>
+      </div>
+
+      <div class="evaluacion-card__body">
+        <div class="evaluacion-card__meta">
+          <span><strong>Fecha:</strong> {{ actividad.fecha }}</span>
+          <span><strong>Hora:</strong> {{ actividad.hora }}</span>
         </div>
-        
-        <div class="evaluaciones-actions">
-            <a href="{{ url_for('evaluaciones.crear_actividad') }}"> 
-                <button class="btn btn--add">Agregar actividad</button>
-            </a>
-
-            <button class="btn btn--delete">Eliminar actividad</button>
-
-            <button class="btn btn--edit">Modificar actividad</button>
+        <div class="evaluacion-card__details">
+          <p><strong>Temas a evaluar: </strong>{{ actividad.descripcion }}</p>
         </div>
-    </header>
-    
-    <section class="evaluaciones-list">
-        {% if lista_evaluaciones %}
-            {% for actividad in lista_evaluaciones %}
-            <article class="evaluacion-card">
-                <div class="evaluacion-card__header">
-                    <h3>{{actividad.nombre}}</h3>
-                    
-                    <form class="form-delete" action="{{ url_for('evaluaciones.eliminar_actividad', id_actividad=actividad.id) }}" method="POST" onsubmit="return confirm('Estas seguro eliminar esta actividad?');">
-                        <button type="submit" class="btn--delete-cruz">❌</button>
-                    </form>
-
-                    <a class="link-edit" href="{{ url_for('evaluaciones.modificar_actividad', id_actividad=actividad.id) }}">
-                        <span class="btn--edit-lapiz">✏️</span>
-                    </a>
-                </div>
-            
-                <div class="evaluacion-card__body">
-                    <div class="evaluacion-card__meta">
-                        <span><strong>Fecha:</strong> {{ actividad.fecha }}</span>
-                        <span><strong>Hora:</strong> {{ actividad.hora }}</span>
-                    </div>
-                    <div class="evaluacion-card__details">
-                        <p><strong>Temas a evaluar:</strong>{{ actividad.descripcion }}</p>
-                    </div>
-                </div>
-                
-            </article>
-            {%endfor%}
-        {% else %}
-            <p> No se encontraron actividades </p>
-        {% endif %}
-        </section>   
+      </div>
+    </article>
+    {%endfor%} {% else %}
+    <p>No se encontraron actividades</p>
+    {% endif %}
+  </section>
 </div>
 <script src="{{ url_for('static', filename='js/evaluaciones.js') }}"></script>
 {% endblock %}

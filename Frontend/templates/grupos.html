@@ -9,8 +9,7 @@ block extra_css %}
 <div class="grupos-page">
   {% if error %}
   <p>{{ error }}</p>
-  {% endif %}
-  {% if grupos %}
+  {% endif %} {% if grupos %}
   <div class="grupos-layout">
     <form action="/grupos" method="post" class="form-grupos">
       <div class="contenedor-grupos">

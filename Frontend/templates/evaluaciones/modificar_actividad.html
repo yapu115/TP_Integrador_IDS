@@ -1,46 +1,79 @@
-{% extends "base.html" %}
-{% block title %}Modificar Actividad{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/evaluaciones.css') }}">
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Modificar Actividad{% endblock %} {%
+block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/evaluaciones.css') }}"
+/>
+{% endblock %} {% block content %}
 <div class="evaluaciones-container">
-    
-    <header class="evaluaciones-header">
-        <div class="evaluaciones-banner">
-            <h2>Modificar Actividad</h2>
-    </header>
+  <header class="evaluaciones-header">
+    <div class="evaluaciones-banner">
+      <h2>Modificar Actividad</h2>
+    </div>
+  </header>
 
-    <form action="{{ url_for('evaluaciones.modificar_actividad', id_actividad=actividad.id) }}" method="POST" class="evaluacion-form">
-        
-        <div class="form-group">
-            <label for="nombre">Nombre de la actividad:</label>
-            <input type="text" id="nombre" name="nombre" value="{{ actividad.nombre }}" required>
-        </div>
+  {% if actividad %}
+  <form
+    action="{{ url_for('evaluaciones.modificar_actividad', id_actividad=actividad.id) }}"
+    method="POST"
+    class="evaluacion-form"
+  >
+    <div class="form-group">
+      <label for="nombre">Nombre de la actividad:</label>
+      <input
+        type="text"
+        id="nombre"
+        name="nombre"
+        value="{{ actividad.nombre }}"
+        required
+      />
+    </div>
 
-        <div class="form-row">
-            <div class="form-group">
-                <label for="fecha">Fecha:</label>
-                <input type="date" id="fecha" name="fecha" value="{{ actividad.fecha }}" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="hora">Hora:</label>
-                <input type="time" id="hora" name="hora" value="{{ actividad.hora }}" required>
-            </div>
-        </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input
+          type="date"
+          id="fecha"
+          name="fecha"
+          value="{{ actividad.fecha }}"
+          required
+        />
+      </div>
 
-        <div class="form-group">
-            <label for="descripcion">Temas a evaluar:</label>
-            <textarea id="descripcion" name="descripcion" rows="5" required>{{ actividad.descripcion }}</textarea>
-        </div>
+      <div class="form-group">
+        <label for="hora">Hora:</label>
+        <input
+          type="time"
+          id="hora"
+          name="hora"
+          value="{{ actividad.hora }}"
+          required
+        />
+      </div>
+    </div>
 
-        <div class="form-actions">
-            <button type="submit" class="btn btn--edit">Guardar Cambios</button>
-            <a href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}" class="btn btn--cancel">Cancelar</a>
-        </div>
-    </form>
+    <div class="form-group">
+      <label for="descripcion">Temas a evaluar: </label>
+      <textarea id="descripcion" name="descripcion" rows="5" required>
+{{ actividad.descripcion }}</textarea
+      >
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--edit">Guardar Cambios</button>
+      <a
+        href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}"
+        class="btn btn--cancel"
+        >Cancelar</a
+      >
+    </div>
+  </form>
+  {% else %}
+  <p>
+    No se encontró la actividad solicitada.
+    <a href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}">Volver</a>
+  </p>
+  {% endif %}
 </div>
 {% endblock %}
