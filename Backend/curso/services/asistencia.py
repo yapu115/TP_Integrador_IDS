@@ -34,7 +34,7 @@ def obtener_alumno_contacto(id_alumno):
     cursor = connection.cursor(dictionary=True)
 
     query = """
-        SELECT id, nombre, apellido, email
+        SELECT id, curso_id, nombre, apellido, email
         FROM alumnos
         WHERE id = %s
     """
@@ -45,6 +45,109 @@ def obtener_alumno_contacto(id_alumno):
     connection.close()
 
     return alumno
+
+
+def obtener_alumnos_activos_curso(curso_id):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        SELECT id, nombre, apellido, email
+        FROM alumnos
+        WHERE curso_id = %s AND abandono = FALSE
+        ORDER BY apellido, nombre
+    """
+    cursor.execute(query, (curso_id,))
+    alumnos = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return alumnos
+
+
+def registrar_envio_qr(id_alumno, curso_id, fecha, codigo_qr, destinatario):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        INSERT INTO asistencia_qr_envios (id_alumno, curso_id, fecha, codigo_qr, destinatario)
+        VALUES (%s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE
+            codigo_qr = VALUES(codigo_qr),
+            destinatario = VALUES(destinatario),
+            enviado_en = CURRENT_TIMESTAMP
+    """
+    cursor.execute(query, (id_alumno, curso_id, fecha, codigo_qr, destinatario))
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+
+
+def obtener_envios_qr_curso(curso_id, fecha):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        SELECT id_alumno, fecha, destinatario, enviado_en
+        FROM asistencia_qr_envios
+        WHERE curso_id = %s AND fecha = %s
+    """
+    cursor.execute(query, (curso_id, fecha))
+    envios_db = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    envios = []
+    for envio in envios_db:
+        fecha_str = envio["fecha"].strftime("%Y-%m-%d") if hasattr(envio["fecha"], "strftime") else str(envio["fecha"])
+        enviado_en = envio["enviado_en"].strftime("%Y-%m-%d %H:%M:%S") if hasattr(envio["enviado_en"], "strftime") else str(envio["enviado_en"])
+        envios.append({
+            "id_alumno": envio["id_alumno"],
+            "fecha": fecha_str,
+            "destinatario": envio["destinatario"],
+            "enviado_en": enviado_en
+        })
+
+    return envios
+
+
+def obtener_historial_qr_curso(curso_id):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query = """
+        SELECT
+            e.fecha,
+            COUNT(*) AS qr_enviados,
+            SUM(CASE WHEN a.id_asistencia IS NULL THEN 0 ELSE 1 END) AS presentes
+        FROM asistencia_qr_envios e
+        LEFT JOIN asistencias a
+            ON a.id_alumno = e.id_alumno
+            AND a.fecha = e.fecha
+            AND a.estado = 'presente'
+        WHERE e.curso_id = %s
+        GROUP BY e.fecha
+        ORDER BY e.fecha DESC
+    """
+    cursor.execute(query, (curso_id,))
+    historial_db = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    historial = []
+    for item in historial_db:
+        fecha_str = item["fecha"].strftime("%Y-%m-%d") if hasattr(item["fecha"], "strftime") else str(item["fecha"])
+        historial.append({
+            "fecha": fecha_str,
+            "qr_enviados": int(item["qr_enviados"] or 0),
+            "presentes": int(item["presentes"] or 0)
+        })
+
+    return historial
 
 
 def enviar_mail_asistencia(destinatario, nombre_alumno, fecha, codigo_qr):
@@ -83,7 +186,7 @@ def enviar_mail_asistencia(destinatario, nombre_alumno, fecha, codigo_qr):
     html = f"""
     <html>
       <body style="font-family: Arial, sans-serif; background-color:#f4f4f4; padding: 20px;" >
-           <div style="max-width: 600px; margin: auto; background-color: white; padding: 25px; border.radius: 10px;> 
+           <div style="max-width: 600px; margin: auto; background-color: white; padding: 25px; border-radius: 10px;"> 
                <h2 style="color: #263642; ">Registro de asistencia</h2>
                <p>Hola <strong>{nombre_alumno}</strong>,</p>
                <p>  
@@ -173,7 +276,7 @@ def enviar_qr_asistencia(id_alumno, fecha):
       
     if not alumno:
         return {
-            "error": "NOT FOUND",
+            "error": "NOT_FOUND",
             "mensaje":"No existe un alumno con ese id"
         }
 
@@ -198,6 +301,14 @@ def enviar_qr_asistencia(id_alumno, fecha):
         if "error" in retorno:
             return retorno
 
+        registrar_envio_qr(
+            alumno["id"],
+            alumno["curso_id"],
+            fecha,
+            codigo_qr,
+            alumno["email"]
+        )
+
         retorno["destinatario"] = alumno["email"]
         retorno["codigo_qr"] = codigo_qr
 
@@ -208,6 +319,49 @@ def enviar_qr_asistencia(id_alumno, fecha):
             "error": "EMAIL_SEND_ERROR",
             "mensaje": f"No se pudo enviar el correo: {exc}"
         }
+
+
+def enviar_qr_asistencia_curso(curso_id, fecha):
+    alumnos = obtener_alumnos_activos_curso(curso_id)
+
+    if not alumnos:
+        return {
+            "error": "NOT_FOUND",
+            "mensaje": "No hay alumnos activos en este curso."
+        }
+
+    enviados = []
+    fallidos = []
+
+    for alumno in alumnos:
+        resultado = enviar_qr_asistencia(alumno["id"], fecha)
+        if "error" in resultado:
+            fallidos.append({
+                "id_alumno": alumno["id"],
+                "email": alumno["email"],
+                "error": resultado.get("error"),
+                "mensaje": resultado.get("mensaje")
+            })
+        else:
+            enviados.append({
+                "id_alumno": alumno["id"],
+                "email": alumno["email"]
+            })
+
+    if not enviados:
+        return {
+            "error": "EMAIL_SEND_ERROR",
+            "mensaje": "No se pudo enviar ningun correo a los alumnos activos.",
+            "total_activos": len(alumnos),
+            "fallidos": fallidos
+        }
+
+    return {
+        "mensaje": f"Envio finalizado: {len(enviados)} enviados, {len(fallidos)} con error.",
+        "total_activos": len(alumnos),
+        "enviados": enviados,
+        "fallidos": fallidos
+    }
 
 def registrar_asistencia(codigo_qr):
     retorno = None

@@ -14,25 +14,54 @@
         <header class="asistencia-header">
             <div class="asistencia-header__icon">&#128196;</div>
             <h1>Control de Asistencia</h1>
-            <p>Introducción al Desarrollo de Software</p>
+            <p>Introduccion al Desarrollo de Software</p>
         </header>
+
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="asistencia-alert {% if categoria == 'success' %}asistencia-alert--success{% else %}asistencia-alert--error{% endif %}">
+                    {{ mensaje }}
+                </div>
+            {% endfor %}
+        {% endwith %}
 
         <section class="asistencia-panel">
             <div class="asistencia-info">
                 <h2>Asistencia de la jornada</h2>
-                <p><strong>Fecha actual:</strong> {{ fecha_hoy | default('26 de Mayo, 2026') }}</p>
-                <p>Gestione el código QR dinámico para el registro de los alumnos.</p>
+                <p><strong>Fecha seleccionada:</strong> {{ fecha_hoy }}</p>
+                <p>Seleccione un alumno y envie el codigo QR dinamico a su correo registrado.</p>
 
-                <button type="button" class="btn-qr" id="btn-generar-qr">
-                    &#128231; &nbsp;Generar y enviar QR por correo electrónico
-                </button>
+                <form class="asistencia-form" method="post" action="{{ url_for('asistencia.asistencia') }}">
+                    <label>
+                        Fecha
+                        <input type="date" name="fecha" value="{{ fecha_hoy }}" required>
+                    </label>
 
-                <p id="mensaje-qr"></p>
+                    <label>
+                        Alumno
+                        <select name="id_alumno" required>
+                            <option value="">Seleccione un alumno</option>
+                            {% for alumno in alumnos %}
+                                <option value="{{ alumno.id }}">
+                                    {{ alumno.legajo }} - {{ alumno.apellido }}, {{ alumno.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+
+                    <button type="submit" class="btn-qr">
+                        &#128231; &nbsp;Enviar QR por correo electronico
+                    </button>
+
+                    <button type="submit" name="accion" value="todos" class="btn-qr btn-qr--secondary" formnovalidate>
+                        Enviar QR a todos los activos
+                    </button>
+                </form>
             </div>
 
             <div class="qr-box">
-                <h3>Código QR dinámico</h3>
-                <p>Válido únicamente para la clase de hoy</p>
+                <h3>Codigo QR dinamico</h3>
+                <p>Valido para el alumno y la fecha seleccionada</p>
                 <div class="qr-placeholder">
                     <span class="qr-icon">&#128247;</span>
                     <span>QR</span>
@@ -43,14 +72,14 @@
         <section class="tabla-section">
             <div class="tabla-section__header">
                 <h2>Listado de alumnos <span class="live-badge">&#128994; EN VIVO</span></h2>
-                <p>Los registros se actualizan conforme los alumnos escaneen el código enviado a sus correos.</p>
+                <p>Los registros se actualizan conforme se envien los QR y los alumnos confirmen asistencia.</p>
             </div>
 
             <div class="tabla-contenedor">
                 <table>
                     <thead>
                         <tr>
-                            <th>Padrón</th>
+                            <th>Legajo</th>
                             <th>Nombre y Apellido</th>
                             <th>Email</th>
                             <th>Estado de Asistencia</th>
@@ -58,29 +87,57 @@
                     </thead>
 
                     <tbody>
-                        {% if asistencia_list %}
-                            {% for registro in asistencia_list %}
-                            <tr>
-                                <td>{{ registro.padron }}</td>
-                                <td>{{ registro.nombre }}</td>
-                                <td>{{ registro.email }}</td>
-                                <td><span class="estado {{ registro.estado | lower }}">{{ registro.estado }}</span></td>
-                            </tr>
-                            {% endfor %}
+                        {% for alumno in alumnos %}
+                        <tr>
+                            <td>{{ alumno.legajo }}</td>
+                            <td>{{ alumno.apellido }}, {{ alumno.nombre }}</td>
+                            <td>{{ alumno.email }}</td>
+                            <td>
+                                <span class="estado {{ alumno.estado_asistencia | lower | replace(' ', '-') }}">
+                                    {{ alumno.estado_asistencia }}
+                                </span>
+                            </td>
+                        </tr>
                         {% else %}
                         <tr>
-                            <td>1892344</td>
-                            <td>Gomez, Pedro</td>
-                            <td>lgomez@fi.uba.ar</td>
-                            <td><span class="estado presente">Presente</span></td>
+                            <td colspan="4">No hay alumnos registrados para este curso.</td>
                         </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="tabla-section historial-section">
+            <div class="tabla-section__header">
+                <h2>Historial de asistencia</h2>
+                <p>Solo se muestran fechas en las que se envio al menos un QR de asistencia.</p>
+            </div>
+
+            <div class="tabla-contenedor">
+                <table>
+                    <thead>
                         <tr>
-                            <td>2345689</td>
-                            <td>Perez, Leandro</td>
-                            <td>lperez@fi.uba.ar</td>
-                            <td><span class="estado pendiente">Pendiente</span></td>
+                            <th>Fecha</th>
+                            <th>QR enviados</th>
+                            <th>Presentes</th>
+                            <th>Pendientes</th>
                         </tr>
-                        {% endif %}
+                    </thead>
+
+                    <tbody>
+                        {% for item in historial %}
+                        <tr>
+                            <td>{{ item.fecha }}</td>
+                            <td>{{ item.qr_enviados }}</td>
+                            <td>{{ item.presentes }}</td>
+                            <td>{{ item.qr_enviados - item.presentes }}</td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4">Aun no se asignaron fechas con asistencia.</td>
+                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -88,54 +145,4 @@
 
     </section>
 </div>
-
-<script>
-    document.getElementById("btn-generar-qr").addEventListener("click", async function () {
-        const boton = document.getElementById("btn-generar-qr");
-        const mensaje = document.getElementById("mensaje-qr");
-    
-        boton.disabled = true;
-        boton.textContent = "Generando y enviando QR...";
-        mensaje.textContent = "";
-    
-        try {
-            const respuesta = await fetch("http://127.0.0.1:5000/asistencia/qr/enviar", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    id_alumno: 1,
-                    fecha: "2026-05-26"
-                })
-            });
-    
-            const datos = await respuesta.json();
-    
-            if (!respuesta.ok || datos.error || datos.errors) {
-                mensaje.textContent = datos.mensaje || 
-                                      datos.mensaje ||
-                                      datos.message ||
-                                      datos.errors?.[0]?.message ||
-                                      "Ocurrio un error al generar el QR"
-                mensaje.style.color = "#ff6b6b";
-            } else {
-                mensaje.textContent = datos.mensaje || "QR generado y enviado correctamente.";
-                mensaje.style.color = "#2ecc71";
-            }
-    
-        } catch (error) {
-            mensaje.textContent = "No se pudo conectar con el backend.";
-            mensaje.style.color = "#ff6b6b";
-            console.error(error);
-        }
-    
-        boton.disabled = false;
-        boton.innerHTML = "&#128231; &nbsp;Generar y enviar QR por correo electrónico";
-    });
-</script>
-
-
 {% endblock %}
-
-
