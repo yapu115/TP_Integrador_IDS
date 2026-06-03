@@ -1,0 +1,60 @@
+{% extends "base.html" %} {% block title %}Nueva Actividad{% endblock %} {%
+block extra_css %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/evaluaciones.css') }}"
+/>{% endblock %} {% block content %}
+<div class="evaluaciones-container">
+  <header class="evaluaciones-header">
+    <div class="evaluaciones-banner">
+      <h2>Agregar Nueva Actividad</h2>
+    </div>
+  </header>
+
+  <form
+    action="{{ url_for('evaluaciones.crear_actividad') }}"
+    method="POST"
+    class="evaluacion-form"
+  >
+    {% if error %}
+    <div class="auth-message auth-message--error">{{ error }}</div>
+    {% endif %}
+
+    <div class="form-group">
+      <label for="nombre">Título de la actividad:</label>
+      <input type="text" id="nombre" name="nombre" required />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="fecha">Fecha:</label>
+        <input type="date" id="fecha" name="fecha" required />
+      </div>
+
+      <div class="form-group">
+        <label for="hora">Hora:</label>
+        <input type="time" id="hora" name="hora" required />
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="descripcion">Temas a evaluar / Detalles:</label>
+      <textarea
+        id="descripcion"
+        name="descripcion"
+        placeholder="Contenidos mínimos..."
+        rows="5"
+        required
+      ></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn--add">Guardar Actividad</button>
+      <a
+        href="{{ url_for('evaluaciones.mostrar_evaluaciones') }}"
+        class="btn btn--cancel"
+        >Cancelar</a
+      >
+    </div>
+  </form>
+</div>
+{% endblock %}

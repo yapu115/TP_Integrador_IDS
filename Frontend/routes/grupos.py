@@ -5,31 +5,29 @@ from utils.auth import login_required
 grupos_bp = Blueprint('grupos', __name__)
 
 #Falta mover funciones a otro .py
-def obtener_grupos()-> dict:
-    #Falta la constante de la URL base de la API
-    grupos = {}
+def obtener_grupos()-> list:
+    API_BASE_URL = "http://localhost:5000"
+    grupos = []
 
     try:
         response = requests.get(f'{API_BASE_URL}/grupos')
         if response.status_code == 200:
             grupos = response.json()
-        
     except Exception as e:
-        #Falta pasar a libreria "logging"
-        print("Error al obtener grupos.")
+        #Grupos.html muestra un mensaje de error si no se obtienen los grupos
+        grupos=None
     return grupos
 
 def obtener_alumnos_grupo(id_grupo)->dict:
-    alumnos_grupo = {}
-    try:
-        response = requests.get(f'{API_BASE_URL}/grupos/{id_grupo}')
-        if response.status_code == 200:
-            alumnos_grupo = response.json()    
-    except Exception as e:
-        #Falta pasar a libreria "logging"
-        print("Error al obtener los alumnos del grupo.")
-    return 
+    grupos = obtener_grupos()
+    alumnos_grupo = None
+    if grupos:
+        for grupo in grupos:
+            if grupo["id_grupo"] == id_grupo:
+                alumnos_grupo = grupo["integrantes"]       
+    return alumnos_grupo
 
+    
 @grupos_bp.route("/grupos", methods=["GET", "POST"])
 @login_required
 def grupos():
@@ -41,5 +39,7 @@ def grupos():
         id_grupo = request.form['boton-info-grupo']
 
         alumnos_grupo = obtener_alumnos_grupo(id_grupo)
+        if not alumnos_grupo:
+            return render_template("grupos.html",grupos_dict=grupos,error="No se pudieron obtener los alumnos del grupo seleccionado.")
         return render_template("grupos.html", grupos_dict=grupos, alumnos_grupo=alumnos_grupo)
     return render_template("grupos.html", grupos_dict=grupos)

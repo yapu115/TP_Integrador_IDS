@@ -1,99 +1,136 @@
 {% extends "base.html" %}
-{% block title %}Gestión de Alumnos{% endblock %}
+
+{% block title %}Gestion de Alumnos{% endblock %}
 {% block breadcrumbs %}<span class="breadcrumbs__item">ALUMNOS</span>{% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos.css') }}">    
+<link rel="stylesheet" href="{{ url_for('static', filename='css/alumnos.css') }}">
 {% endblock %}
 
 {% block content %}
 <main class="main-container">
-
     <section class="content-card">
-
         <div class="header-info">
-
-            <h1>Listado de Alumnos</h1>
-
-            <p>Gestión y administración de alumnos registrados</p>
-            
-            <div style="margin-top: 15px; display: flex; gap: 10px;">
-                <button class="btn btn--add" style="padding: 8px 12px; background: #1976d2; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Agregar Alumno</button>
-                <form action="/alumnos/importar" method="post" enctype="multipart/form-data" style="display: flex; gap: 10px; align-items: center;">
-                    <input type="file" name="file_csv" accept=".csv" required style="font-size: 0.9rem;">
-                    <button type="submit" class="btn btn--import" style="padding: 8px 12px; background: #388e3c; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Importar CSV</button>
-                </form>
+            <div>
+                <h1>Listado de Alumnos</h1>
+                <p>Gestion y administracion de alumnos registrados</p>
             </div>
+        </div>
 
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% for categoria, mensaje in mensajes %}
+                <div class="alumnos-alert {% if categoria == 'success' %}alumnos-alert--success{% else %}alumnos-alert--error{% endif %}">
+                    {{ mensaje }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        {% if error %}
+            <div class="alumnos-alert alumnos-alert--error">{{ error }}</div>
+        {% endif %}
+
+        {% if exito %}
+            <div class="alumnos-alert alumnos-alert--success">{{ exito }}</div>
+        {% endif %}
+
+        <form class="alumno-form" method="post" action="{{ url_for('alumnos.alumnos') }}">
+            <input type="hidden" name="accion" value="crear">
+            <input type="text" name="legajo" placeholder="Legajo" required>
+            <input type="text" name="nombre" placeholder="Nombre" required>
+            <input type="text" name="apellido" placeholder="Apellido" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <button type="submit" class="btn-add-alumno">Agregar alumno</button>
+        </form>
+
+        <div class="alumnos-toolbar">
+            <details class="filter-menu">
+                <summary class="btn-filter">Filtrar</summary>
+                <form class="filter-form" method="get" action="{{ url_for('alumnos.alumnos') }}">
+                    <input type="text" name="nombre" placeholder="Nombre" value="{{ filtros.nombre if filtros else '' }}">
+                    <input type="text" name="apellido" placeholder="Apellido" value="{{ filtros.apellido if filtros else '' }}">
+                    <input type="text" name="legajo" placeholder="Legajo" value="{{ filtros.legajo if filtros else '' }}">
+                    <select name="estado">
+                        <option value="" {% if not filtros or not filtros.estado %}selected{% endif %}>Todos</option>
+                        <option value="activo" {% if filtros and filtros.estado == 'activo' %}selected{% endif %}>Activo</option>
+                        <option value="abandono" {% if filtros and filtros.estado == 'abandono' %}selected{% endif %}>Abandono</option>
+                    </select>
+                    <button type="submit">Aplicar</button>
+                    <a href="{{ url_for('alumnos.alumnos') }}">Limpiar</a>
+                </form>
+            </details>
+
+            <form class="csv-form" method="post" action="{{ url_for('alumnos.importar_alumnos') }}" enctype="multipart/form-data">
+                <input type="file" name="file" accept=".csv" required>
+                <button type="submit" class="btn-import">Importar CSV</button>
+                <a href="{{ url_for('alumnos.exportar_alumnos', nombre=filtros.nombre if filtros else '', apellido=filtros.apellido if filtros else '', legajo=filtros.legajo if filtros else '', estado=filtros.estado if filtros else '') }}" class="btn-export">Exportar CSV</a>
+            </form>
         </div>
 
         <table class="data-table">
-
             <thead>
-
                 <tr>
-
                     <th>Legajo</th>
-
                     <th>Nombre</th>
-
                     <th>Apellido</th>
-
                     <th>Email</th>
-                    
                     <th>Estado</th>
-
                     <th>Acciones</th>
-
                 </tr>
-
             </thead>
 
             <tbody>
-
                 {% for alumno in alumnos %}
-
                 <tr>
-
                     <td>{{ alumno.legajo }}</td>
-
                     <td>{{ alumno.nombre }}</td>
-
                     <td>{{ alumno.apellido }}</td>
-
                     <td>{{ alumno.email }}</td>
-                    
                     <td>
                         {% if alumno.abandono %}
-                            <span style="color: red; font-weight: bold;">Abandonó</span>
+                            <span class="badge badge-inactive">Abandono</span>
                         {% else %}
-                            <span style="color: green; font-weight: bold;">Activo</span>
+                            <span class="badge badge-active">Activo</span>
                         {% endif %}
                     </td>
-
                     <td>
+                        <details class="row-actions">
+                            <summary>Acciones</summary>
+                            <form class="edit-form" method="post" action="{{ url_for('alumnos.alumnos') }}">
+                                <input type="hidden" name="accion" value="editar">
+                                <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+                                <input type="text" name="nombre" value="{{ alumno.nombre }}" required>
+                                <input type="text" name="apellido" value="{{ alumno.apellido }}" required>
+                                <input type="email" name="email" value="{{ alumno.email }}" required>
+                                <button type="submit">Guardar</button>
+                            </form>
 
-                        <a href="/alumnos/{{ alumno.id }}">Ver Detalle</a>
+                            <form method="post" action="{{ url_for('alumnos.alumnos') }}">
+                                <input type="hidden" name="accion" value="estado">
+                                <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+                                {% if alumno.abandono %}
+                                    <input type="hidden" name="abandono" value="false">
+                                    <button type="submit">Reactivar</button>
+                                {% else %}
+                                    <input type="hidden" name="abandono" value="true">
+                                    <button type="submit">Marcar abandono</button>
+                                {% endif %}
+                            </form>
 
+                            <form method="post" action="{{ url_for('alumnos.alumnos') }}">
+                                <input type="hidden" name="accion" value="eliminar">
+                                <input type="hidden" name="alumno_id" value="{{ alumno.id }}">
+                                <button type="submit" class="danger-action">Eliminar</button>
+                            </form>
+                        </details>
                     </td>
-
                 </tr>
-
                 {% else %}
-
                 <tr>
-
-                    <td colspan="6">No hay alumnos registrados.</td>
-
+                    <td colspan="6">No hay alumnos registrados para este curso.</td>
                 </tr>
-
                 {% endfor %}
-
             </tbody>
-
         </table>
-
     </section>
-
 </main>
 {% endblock %}
