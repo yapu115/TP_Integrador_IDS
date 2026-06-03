@@ -75,6 +75,34 @@ def post_json(path, body, token=None):
         return 0, _connection_error()
 
 
+def put_json(path, body, token=None):
+    """
+    Llama al backend con PUT y JSON desde el servidor Flask.
+    """
+    headers = {"Content-Type": "application/json"}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"{BACKEND_URL.rstrip('/')}{path}"
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(body).encode("utf-8"),
+        headers=headers,
+        method="PUT",
+    )
+
+    try:
+        with urllib.request.urlopen(request, timeout=15) as response:
+            raw = response.read().decode("utf-8")
+            data = json.loads(raw) if raw else {}
+            return response.status, data
+    except urllib.error.HTTPError as error:
+        raw = error.read().decode("utf-8")
+        return error.code, _json_error_response(raw)
+    except urllib.error.URLError:
+        return 0, _connection_error()
+
+
 def patch_json(path, body, token=None):
     """
     Llama al backend con PATCH y JSON desde el servidor Flask.
