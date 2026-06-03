@@ -42,10 +42,15 @@
             <span class="home-card__title">Asistencia</span>
             <span class="home-card__desc">Control de presencia mediante código QR.</span>
         </a>
+        <a href="{{ url_for('materiales.materiales') }}" class="home-card">
+            <span class="home-card__icon">&#128218;</span>
+            <span class="home-card__title">Materiales</span>
+            <span class="home-card__desc">Material de estudio y enlaces externos.</span>
+        </a>
         <a href="{{ url_for('dashboard.dashboard') }}" class="home-card">
             <span class="home-card__icon">&#128202;</span>
             <span class="home-card__title">Dashboard</span>
-            <span class="home-card__desc">Informes y reportes en formato PDF.</span>
+            <span class="home-card__desc">Informes y estadísticas del curso.</span>
         </a>
     </div>
 

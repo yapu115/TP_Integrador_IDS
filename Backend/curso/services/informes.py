@@ -104,30 +104,30 @@ def _build_estadisticas_pdf(summary_headers, summary_rows, detail_headers, detai
     return pdf_bytes
 
 
-def informe_alumnos(abandono=None):
+def informe_alumnos(curso_id, abandono=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
-    try:
-        if abandono is not None:
-            query = """
-                SELECT legajo, nombre, apellido, email, abandono
-                FROM alumnos
-                WHERE abandono = %s
-                ORDER BY apellido, nombre
-            """
-            cursor.execute(query, (abandono,))
-        else:
-            query = """
-                SELECT legajo, nombre, apellido, email, abandono
-                FROM alumnos
-                ORDER BY apellido, nombre
-            """
-            cursor.execute(query)
 
-        alumnos = cursor.fetchall()
-    finally:
-        cursor.close()
-        connection.close()
+    if abandono is not None:
+        query = """
+            SELECT legajo, nombre, apellido, email, abandono
+            FROM alumnos
+            WHERE curso_id = %s AND abandono = %s
+            ORDER BY apellido, nombre
+        """
+        cursor.execute(query, (curso_id, abandono))
+    else:
+        query = """
+            SELECT legajo, nombre, apellido, email, abandono
+            FROM alumnos
+            WHERE curso_id = %s
+            ORDER BY apellido, nombre
+        """
+        cursor.execute(query, (curso_id,))
+
+    alumnos = cursor.fetchall()
+    cursor.close()
+    connection.close()
 
     headers = ["Legajo", "Nombre", "Apellido", "Email", "Abandono"]
     rows = [
@@ -144,18 +144,18 @@ def informe_alumnos(abandono=None):
     return _build_pdf_response("Informe de Alumnos", headers, rows)
 
 
-def informe_estadisticas():
+def informe_estadisticas(curso_id):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT COUNT(*) AS total FROM alumnos")
+        cursor.execute("SELECT COUNT(*) AS total FROM alumnos WHERE curso_id = %s", (curso_id,))
         total_alumnos = cursor.fetchone()["total"]
 
-        cursor.execute("SELECT COUNT(*) AS total FROM alumnos WHERE abandono = TRUE")
+        cursor.execute("SELECT COUNT(*) AS total FROM alumnos WHERE abandono = TRUE AND curso_id = %s", (curso_id,))
         total_abandonos = cursor.fetchone()["total"]
 
         cursor.execute(
-            "SELECT COUNT(*) AS total FROM alumnos WHERE abandono = FALSE"
+            "SELECT COUNT(*) AS total FROM alumnos WHERE abandono = FALSE AND curso_id = %s", (curso_id,)
         )
         total_activos = cursor.fetchone()["total"]
 
@@ -173,9 +173,9 @@ def informe_estadisticas():
                     SUM(CASE WHEN n.nota < %s THEN 1 ELSE 0 END) AS desaprobados
                 FROM notas n
                 INNER JOIN alumnos a ON n.id_alumno = a.id
-                WHERE n.id_evaluacion = %s AND a.abandono = FALSE
+                WHERE n.id_evaluacion = %s AND a.abandono = FALSE AND a.curso_id = %s
                 """,
-                (NOTA_MINIMA_APROBACION, NOTA_MINIMA_APROBACION, ev["id"]),
+                (NOTA_MINIMA_APROBACION, NOTA_MINIMA_APROBACION, ev["id"], curso_id),
             )
             row = cursor.fetchone()
             total_notas = row["total_notas"] or 0
@@ -210,56 +210,53 @@ def informe_estadisticas():
     )
 
 
-def informe_equipos():
+def informe_equipos(curso_id):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
-    try:
-        query = """
-            SELECT
-                g.id AS id_grupo,
-                g.nombre_grupo,
-                te.nombre AS nombre_evaluacion,
-                a.id AS id_alumno,
-                a.legajo,
-                a.nombre,
-                a.apellido
-            FROM grupos g
-            LEFT JOIN grupo_evaluaciones ge ON g.id = ge.id_grupo
-            LEFT JOIN tipos_evaluacion te ON ge.id_evaluacion = te.id
-            LEFT JOIN grupo_integrantes gi ON g.id = gi.id_grupo
-            LEFT JOIN alumnos a ON gi.id_alumno = a.id
-            ORDER BY g.nombre_grupo, a.apellido, a.nombre
-        """
-        cursor.execute(query)
-        results = cursor.fetchall()
-    finally:
-        cursor.close()
-        connection.close()
 
-    equipos_dict = {}
+    query = """
+        SELECT
+            g.id AS id_grupo,
+            g.nombre_grupo,
+            g.curso_id,
+            a.id AS id_alumno,
+            a.legajo,
+            a.nombre,
+            a.apellido,
+            a.email
+        FROM grupos g
+        LEFT JOIN grupo_integrantes gi ON g.id = gi.id_grupo
+        LEFT JOIN alumnos a ON gi.id_alumno = a.id
+        WHERE g.curso_id = %s
+        ORDER BY g.curso_id, g.nombre_grupo, a.apellido, a.nombre
+    """
+    cursor.execute(query, (curso_id,))
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+
+    grupos_dict = {}
     for row in results:
         grupo_id = row["id_grupo"]
-        if grupo_id not in equipos_dict:
-            equipos_dict[grupo_id] = {
-                "nombre": row["nombre_grupo"],
-                "tps": set(),
+        if grupo_id not in grupos_dict:
+            grupos_dict[grupo_id] = {
+                "nombre":      row["nombre_grupo"],
+                "curso_id":    row["curso_id"],
                 "integrantes": [],
             }
-        if row["nombre_evaluacion"]:
-            equipos_dict[grupo_id]["tps"].add(row["nombre_evaluacion"])
         if row["id_alumno"]:
-            integrante = f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
-            if integrante not in equipos_dict[grupo_id]["integrantes"]:
-                equipos_dict[grupo_id]["integrantes"].append(integrante)
+            grupos_dict[grupo_id]["integrantes"].append(
+                f'{row["legajo"]} - {row["apellido"]}, {row["nombre"]}'
+            )
 
-    headers = ["Equipo", "TPs asociados", "Integrantes"]
+    headers = ["Grupo", "Curso ID", "Integrantes"]
     rows = [
         [
             data["nombre"],
-            ", ".join(sorted(data["tps"])) if data["tps"] else "Sin TPs asignados",
-            "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes",
+            str(data["curso_id"]),
+            "\n".join(data["integrantes"]) if data["integrantes"] else "Sin integrantes"
         ]
-        for data in equipos_dict.values()
+        for data in grupos_dict.values()
     ]
 
-    return _build_pdf_response("Informe de Equipos", headers, rows, landscape_mode=True)
+    return _build_pdf_response("Informe de Grupos", headers, rows, landscape_mode=True)

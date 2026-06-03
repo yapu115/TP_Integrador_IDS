@@ -7,13 +7,16 @@ def listar_evaluaciones_service():
     try:
         conexion = get_connection()
         cursor = conexion.cursor(dictionary=True)
-        query = "SELECT id, nombre, descripcion FROM tipos_evaluacion;"
+        query = "SELECT * FROM tipos_evaluacion;"
         cursor.execute(query)
         resultado = cursor.fetchall()
     
         if len(resultado) < 1:
             retorno = []
         else:
+            for evaluacion in resultado:
+                evaluacion["hora"] = str(evaluacion["hora"])
+                evaluacion["fecha"] = str(evaluacion["fecha"])
             retorno = resultado
     except Exception as e:
         print(f"Error al traer evaluaciones: {e}")
@@ -33,11 +36,13 @@ def crear_evaluacion_servicio(data):
     cursor = None
     nombre = data.get("nombre")
     descripcion = data.get("descripcion")
+    fecha=data.get("fecha")
+    hora=data.get("hora")
     try:
         conexion = get_connection()
         cursor = conexion.cursor(dictionary=True)
-        query = "INSERT INTO tipos_evaluacion (nombre, descripcion) VALUES (%s, %s);"
-        cursor.execute(query, (nombre, descripcion))
+        query = "INSERT INTO tipos_evaluacion (nombre, descripcion, fecha, hora) VALUES (%s, %s, %s, %s);"
+        cursor.execute(query, (nombre, descripcion, fecha, hora))
         conexion.commit()
         retorno = cursor.rowcount
     except Exception as e:
@@ -58,11 +63,13 @@ def modificar_evaluacion_service(id_evaluacion, data):
     cursor = None
     nombre = data.get("nombre")
     descripcion = data.get("descripcion")
+    fecha=data.get("fecha")
+    hora=data.get("hora")
     try:
         conexion = get_connection()
         cursor = conexion.cursor(dictionary=True)
-        query = "UPDATE tipos_evaluacion SET nombre=%s, descripcion=%s WHERE id=%s;"
-        cursor.execute(query, (nombre, descripcion, id_evaluacion))
+        query = "UPDATE tipos_evaluacion SET nombre=%s, descripcion=%s, fecha=%s, hora=%s WHERE id=%s;"
+        cursor.execute(query, (nombre, descripcion, fecha, hora, id_evaluacion))
         conexion.commit()
         retorno = cursor.rowcount
     except Exception as e:

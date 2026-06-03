@@ -48,18 +48,73 @@
 
 .btn.btn--add {
     background: linear-gradient(90deg, #059669, var(--accent-green));
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
 }
-
 .btn.btn--add:hover { filter: brightness(1.12); }
 
 .btn.btn--delete {
     background: linear-gradient(90deg, #b91c1c, var(--accent-danger));
-    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
-
 .btn.btn--delete:hover { filter: brightness(1.12); }
 .btn:active { transform: scale(0.97); }
+
+.btn--delete-cruz {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+}
+.btn--delete-cruz:hover {
+    background-color: rgba(255, 0, 0, 0.15);
+}
+
+.form-delete {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: all 0.3s ease-in-out;
+    margin-left: 10px;
+}
+
+.form-delete.is-active {
+    display: inline-block;
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.btn.btn--edit {
+    background: linear-gradient(90deg, #f57913);
+}
+.btn.btn--edit:hover { filter: brightness(1.12); }
+
+.link-edit {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+    transition: all 0.3s ease-in-out;
+}
+
+.link-edit.is-active {
+    display: inline-block; 
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1);
+}
+
+.btn--edit-lapiz {
+    cursor: pointer;
+    font-size: 1.1rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: background-color 0.2s ease;
+    display: inline-block;
+    text-decoration: none;
+}
 
 /* ── LISTA ────────────────────────────────────────────────── */
 .evaluaciones-list {
@@ -95,9 +150,8 @@
 }
 
 .evaluacion-card__header h3 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--accent);
+    font-size: 1.1rem;
+    color:#e4e4e4;
     margin: 0;
 }
 
@@ -127,4 +181,94 @@
 
 .evaluacion-card__details strong {
     color: var(--lavender-grey);
+}
+
+/* ── FORMULARIOS (AGREGAR Y MODIFICAR ACTIVIDAD) ────────── */
+
+.evaluaciones-container .evaluacion-form {
+    max-width: 600px;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: var(--prussian-blue);
+    padding: 30px;
+    border-radius: 14px;
+    border: 1px solid var(--dusk-blue);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+
+.evaluacion-form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.evaluacion-form .form-group label {
+    color: var(--alabaster);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+
+.evaluacion-form .form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.evaluacion-form .form-row .form-group {
+    flex: 1;
+}
+
+
+.evaluacion-form input[type="text"],
+.evaluacion-form input[type="date"],
+.evaluacion-form input[type="time"],
+.evaluacion-form textarea {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--dusk-blue);
+    background-color: var(--ink-black);
+    color: #ffffff;
+    font-size: 1rem;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.evaluacion-form input:focus,
+.evaluacion-form textarea:focus {
+    outline: none;
+    border-color: rgba(245, 121, 19, 0.6); 
+    box-shadow: 0 0 0 3px rgba(245, 121, 19, 0.15);
+}
+
+
+.evaluacion-form textarea {
+    resize: vertical;
+    font-family: inherit;
+}
+
+.evaluacion-form .form-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+
+.evaluacion-form .btn--cancel {
+    background: var(--dusk-blue);
+}
+
+.evaluacion-form .btn--cancel:hover {
+    filter: brightness(1.2);
+}
+
+.evaluacion-form .form-actions .btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
 }

@@ -1,4 +1,32 @@
-venv/
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Entornos virtuales
+venv/
+.venv/
+Backend/venv/
+Backend/.venv/
+
+# Variables de entorno / contraseñas
 .env
+Backend/.env
+Frontend/.env
+
+# Node / Frontend
+node_modules/
+Frontend/node_modules/
+dist/
+Frontend/dist/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema / editor
+.DS_Store
+.vscode/
+

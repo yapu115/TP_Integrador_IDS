@@ -1,46 +1,75 @@
-{% extends "base.html" %}
-{% block title %}Material de Estudio{% endblock %}
-{% block breadcrumbs %}<span class="breadcrumbs__item">MATERIAL PÚBLICO</span>{% endblock %}
-
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/materiales.css') }}">
-{% endblock %}
-
-{% block content %}
+{% extends "base.html" %} {% block title %}Material de Estudio{% endblock %} {%
+block breadcrumbs %}
+<span class="breadcrumbs__item">MATERIAL PÚBLICO</span>
+{% endblock %} {% block extra_css %}
+<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/materiales.css') }}"
+/>
+{% endblock %} {% block content %}
 <div class="materiales-container">
-    <header class="materiales-header">
-        <h2>Material de Estudio Público</h2>
-        <p>Recursos y apuntes disponibles para todos los alumnos del curso</p>
-    </header>
+  <header class="materiales-header">
+    <h2>Material de Estudio Público</h2>
+    <p>Recursos y apuntes disponibles para todos los alumnos del curso</p>
+  </header>
 
-    <div class="material-list">
-        <!-- Tarjeta de ejemplo 1 -->
-        <article class="material-card">
-            <h3>Apunte: Introducción a Python</h3>
-            <p>Conceptos básicos, variables, tipos de datos y estructuras de control.</p>
-            <a href="#" class="material-card__btn">Descargar PDF</a>
-        </article>
+  {% if error %}
+  <div class="materiales-error">{{ error }}</div>
+  {% endif %} {% if exito %}
+  <div class="materiales-exito">{{ exito }}</div>
+  {% endif %}
 
-        <!-- Tarjeta de ejemplo 2 -->
-        <article class="material-card">
-            <h3>Guía de Ejercicios Prácticos 1</h3>
-            <p>Ejercicios introductorios para practicar la lógica de programación.</p>
-            <a href="#" class="material-card__btn">Ver documento</a>
-        </article>
+  <div class="materiales-form-container">
+    <h3 class="materiales-form-title">Agregar nuevo material</h3>
 
-        <!-- Tarjeta de ejemplo 3 -->
-        <article class="material-card">
-            <h3>Diapositivas: Flask y Jinja2</h3>
-            <p>Presentación vista en la clase 4 sobre el uso de templates y ruteo básico.</p>
-            <a href="#" class="material-card__btn">Descargar PPTX</a>
-        </article>
-        
-        <!-- Tarjeta de ejemplo 4 -->
-        <article class="material-card">
-            <h3>Video: Configuración del Entorno</h3>
-            <p>Grabación de la clase de soporte técnico sobre cómo instalar Docker y Python.</p>
-            <a href="#" class="material-card__btn">Ver Video</a>
-        </article>
-    </div>
+    <form
+      method="post"
+      action="{{ url_for('materiales.materiales') }}"
+      class="materiales-form"
+    >
+      <div class="materiales-field materiales-field--small">
+        <label for="titulo" class="materiales-label"> Título </label>
+
+        <input
+          type="text"
+          id="titulo"
+          name="titulo"
+          required
+          class="materiales-input"
+        />
+      </div>
+
+      <div class="materiales-field materiales-field--large">
+        <label for="url_archivo" class="materiales-label"> Enlace (URL) </label>
+
+        <input
+          type="url"
+          id="url_archivo"
+          name="url_archivo"
+          required
+          placeholder="https://..."
+          class="materiales-input"
+        />
+      </div>
+
+      <button type="submit" class="materiales-submit-btn">Agregar</button>
+    </form>
+  </div>
+
+  <div class="material-list">
+    {% if materiales %} {% for m in materiales %}
+    <article class="material-card">
+      <h3>{{ m.titulo }}</h3>
+
+      <p class="material-card__date">Subido: {{ m.fecha_subida[:10] }}</p>
+
+      <a href="{{ m.url_archivo }}" target="_blank" class="material-card__btn">
+        Ver Enlace
+      </a>
+    </article>
+    {% endfor %} {% else %}
+    <p class="materiales-empty">No hay materiales subidos en este curso aún.</p>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

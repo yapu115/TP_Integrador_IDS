@@ -26,7 +26,7 @@ def login():
         if status == 200 and "token" in data:
             session["token"] = data["token"]
             session["username"] = username
-            return redirect(url_for("home.home", _external=True))
+            return redirect(url_for("cursos.seleccionar_curso", _external=True))
 
         return render_template(
             "login.html",
