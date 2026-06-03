@@ -5,19 +5,29 @@ import urllib.request
 from config import BACKEND_URL
 
 
-def _json_error_response(raw):
+def get_pdf(path, token=None):
+    """
+    Llama al backend con GET y devuelve bytes PDF.
+    """
+    headers = {}
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+
+    url = f"{BACKEND_URL.rstrip('/')}{path}"
+    request = urllib.request.Request(url, headers=headers, method="GET")
+
     try:
-        return json.loads(raw) if raw else {}
-    except json.JSONDecodeError:
-        return {"errors": [{"message": raw or "Error del servidor"}]}
-
-
-def _connection_error():
-    return {
-        "errors": [{
-            "message": "No se pudo conectar con el backend. Esta corriendo en el puerto 5000?",
-        }]
-    }
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return response.status, response.read()
+    except urllib.error.HTTPError as error:
+        raw = error.read()
+        try:
+            data = json.loads(raw.decode("utf-8")) if raw else {}
+        except json.JSONDecodeError:
+            data = {"errors": [{"message": raw.decode("utf-8", errors="replace") or "Error del servidor"}]}
+        return error.code, data
+    except urllib.error.URLError:
+        return 0, {"errors": [{"message": "No se pudo conectar con el backend. ¿Está corriendo en el puerto 5000?"}]}
 
 
 def get_json(path, token=None):
