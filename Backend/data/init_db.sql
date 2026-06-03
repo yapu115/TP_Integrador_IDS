@@ -47,7 +47,9 @@ CREATE TABLE IF NOT EXISTS alumnos (
 CREATE TABLE IF NOT EXISTS tipos_evaluacion (
     id               INT AUTO_INCREMENT PRIMARY KEY,
     nombre           VARCHAR(50) NOT NULL,
-    descripcion      TEXT
+    descripcion      TEXT,
+    fecha            DATE,
+    hora             TIME
 );
 
 
