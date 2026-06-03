@@ -7,6 +7,9 @@ block extra_css %}
 />
 {% endblock %} {% block content %}
 <div class="grupos-page">
+  {% if error %}
+  <p>{{ error }}</p>
+  {% endif %}
   {% if grupos %}
   <div class="grupos-layout">
     <form action="/grupos" method="post" class="form-grupos">
@@ -14,16 +17,16 @@ block extra_css %}
         <h2 class="grupos-title">Equipos del curso</h2>
         <div class="scrollableWrapper">
           <div class="scrollableContent">
-            {% for id_grupo in grupos_dict %}
+            {% for grupo in grupos %}
             <div class="grupo-item">
               <input
                 type="radio"
                 name="boton-info-grupo"
-                id="{{ grupos_dict[id_grupo].id }}"
-                value="{{ grupos_dict[id_grupo].id }}"
+                id="{{ grupos[grupo].id_grupo }}"
+                value="{{ grupos[grupo].id_grupo }}"
               />
-              <label for="{{ grupos_dict[id_grupo].id }}" class="grupo-label">
-                {{ grupos_dict[id_grupo].nombre }}
+              <label for="{{ grupos[grupo].id_grupo }}" class="grupo-label">
+                {{ grupos[grupo].nombre }}
               </label>
             </div>
             {% endfor %}

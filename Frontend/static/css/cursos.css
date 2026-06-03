@@ -1,0 +1,184 @@
+/* ── CONTENEDOR GENERAL ─────────────────────────────────── */
+
+.courses-shell {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+/* ── PANEL PRINCIPAL ────────────────────────────────────── */
+
+.course-card {
+  width: 100%;
+  max-width: 600px;
+}
+
+.course-panel-form {
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+/* ── CABECERA ───────────────────────────────────────────── */
+
+.course-panel-form h1 {
+  text-align: center;
+  color: var(--alabaster);
+  font-family: Georgia, "Times New Roman", serif;
+  margin-bottom: 10px;
+}
+
+.course-subtitle {
+  text-align: center;
+  color: var(--lavender-grey);
+  margin-bottom: 30px;
+  line-height: 1.6;
+}
+
+/* ── MENSAJES ───────────────────────────────────────────── */
+
+.course-message {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.course-message--error {
+  background: #ffebee;
+  color: #c62828;
+}
+
+/* ── LISTA DE CURSOS ────────────────────────────────────── */
+
+.course-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.course-form {
+  margin: 0;
+}
+
+/* ── TARJETA CURSO ──────────────────────────────────────── */
+
+.course-item {
+  width: 100%;
+  text-align: left;
+
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 14px;
+
+  padding: 22px;
+
+  cursor: pointer;
+
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.course-item:hover {
+  transform: translateY(-4px);
+  border-color: var(--accent);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.course-item h3 {
+  margin: 0 0 8px 0;
+  color: var(--accent);
+  font-size: 1.1rem;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.course-item p {
+  margin: 0;
+  color: var(--lavender-grey);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
+/* ── SIN CURSOS ─────────────────────────────────────────── */
+
+.no-courses {
+  text-align: center;
+  padding: 20px;
+}
+
+.no-courses p {
+  color: var(--lavender-grey);
+  margin-bottom: 20px;
+}
+
+/* ── BOTÓN CERRAR SESIÓN ────────────────────────────────── */
+
+.auth-submit {
+  border: none;
+  cursor: pointer;
+
+  padding: 10px 20px;
+
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+
+  color: white;
+  font-weight: 600;
+
+  border-radius: 999px;
+
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
+}
+
+.auth-submit:hover,
+.course-submit:hover {
+  filter: brightness(1.12);
+}
+
+.auth-submit:active,
+.course-submit:active {
+  transform: scale(0.97);
+}
+
+/* ── ALTA CURSO ─────────────────────────────────────────── */
+
+.alta-curso {
+  margin-top: 35px;
+  padding-top: 25px;
+  border-top: 1px solid var(--dusk-blue);
+  text-align: center;
+}
+
+.alta-curso p {
+  color: var(--lavender-grey);
+  margin-bottom: 15px;
+}
+
+.course-submit {
+  display: inline-block;
+
+  padding: 10px 22px;
+
+  text-decoration: none;
+
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+
+  color: white;
+  font-weight: 600;
+
+  border-radius: 999px;
+
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
+
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+}
