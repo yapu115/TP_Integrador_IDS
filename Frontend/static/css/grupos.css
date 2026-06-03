@@ -257,3 +257,67 @@
     font-weight: 600;
     min-width: 70px;
 }
+/* -- FORMULARIO CREAR GRUPO --------------------------------- */
+.form-crear-grupo {
+    margin-top: 20px;
+}
+
+.form-group-crear {
+    margin-bottom: 15px;
+}
+
+.input-crear-grupo {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 8px;
+    background: var(--ink-black);
+    border: 1px solid var(--dusk-blue);
+    color: var(--alabaster);
+    font-size: 0.95rem;
+    box-sizing: border-box;
+}
+
+.input-crear-grupo:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+}
+
+.btn-crear-grupo {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #10b981, #059669);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.btn-crear-grupo:hover {
+    filter: brightness(1.12);
+}
+
+.btn-crear-grupo:active {
+    transform: scale(0.97);
+}
+
+.grupo-seleccionado-nombre {
+    color: var(--accent);
+    font-weight: normal;
+    font-size: 1.1rem;
+}
+.form-group-alumnos .scrollableWrapper {
+    height: 150px;
+    margin-bottom: 0;
+}
+.label-alumnos {
+    color: var(--lavender-grey);
+    font-size: 0.9rem;
+    margin: 0 0 8px 0;
+}
+.btn-crear-grupo {
+    margin-top: 15px;
+}

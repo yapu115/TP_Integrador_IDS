@@ -7,13 +7,11 @@ block extra_css %}
 />
 {% endblock %} {% block content %}
 <div class="grupos-page">
-  {% if error %}
-  <p>{{ error }}</p>
-  {% endif %} {% if grupos %}
   <div class="grupos-layout">
-    <form action="/grupos" method="post" class="form-grupos">
-      <div class="contenedor-grupos">
+    <div class="form-grupos">
+      <form action="/grupos" method="post" class="contenedor-grupos">
         <h2 class="grupos-title">Equipos del curso</h2>
+        {% if grupos %}
         <div class="scrollableWrapper">
           <div class="scrollableContent">
             {% for grupo in grupos %}
@@ -21,11 +19,18 @@ block extra_css %}
               <input
                 type="radio"
                 name="boton-info-grupo"
-                id="{{ grupos[grupo].id_grupo }}"
-                value="{{ grupos[grupo].id_grupo }}"
+                id="grupo-{{ grupo.id_grupo }}"
+                value="{{ grupo.id_grupo }}"
+                {%
+                if
+                nombre_grupo_seleccionado=""
+                ="grupo.nombre"
+                %}checked{%
+                endif
+                %}
               />
-              <label for="{{ grupos[grupo].id_grupo }}" class="grupo-label">
-                {{ grupos[grupo].nombre }}
+              <label for="grupo-{{ grupo.id_grupo }}" class="grupo-label">
+                {{ grupo.nombre }}
               </label>
             </div>
             {% endfor %}
@@ -34,22 +39,83 @@ block extra_css %}
         <button type="submit" value="grupo-elegido" class="btn-ver-grupo">
           Ver integrantes del grupo
         </button>
-      </div>
-    </form>
+        {% else %}
+        <p class="grupos-empty-hint">No hay grupos registrados.</p>
+        {% endif %}
+      </form>
+
+      <form
+        action="/grupos/crear"
+        method="post"
+        class="contenedor-grupos form-crear-grupo"
+      >
+        <h2 class="grupos-title">Crear Nuevo Equipo</h2>
+        <div class="form-group-crear">
+          <input
+            type="text"
+            name="nombre"
+            placeholder="Nombre del grupo..."
+            required
+            class="input-crear-grupo"
+          />
+        </div>
+
+        <div class="form-group-crear form-group-alumnos">
+          <p class="label-alumnos">Seleccionar Integrantes:</p>
+          <div class="scrollableWrapper">
+            <div class="scrollableContent">
+              {% for alumno in alumnos_curso %}
+              <div class="grupo-item">
+                <input
+                  type="checkbox"
+                  name="integrantes"
+                  id="alumno-checkbox-{{ alumno.id }}"
+                  value="{{ alumno.id }}"
+                />
+                <label
+                  for="alumno-checkbox-{{ alumno.id }}"
+                  class="grupo-label"
+                >
+                  {{ alumno.nombre }} {{ alumno.apellido }} ({{ alumno.legajo
+                  }})
+                </label>
+              </div>
+              {% endfor %} {% if not alumnos_curso %}
+              <p class="grupos-empty-hint">No hay alumnos en el curso.</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-crear-grupo">Crear Grupo</button>
+      </form>
+    </div>
 
     <div class="contenedor-alumnos">
-      <h2 class="grupos-title">Integrantes</h2>
-      {% if alumnos %} {% for alumno in alumnos %}
+      <h2 class="grupos-title">
+        Integrantes {% if nombre_grupo_seleccionado %}
+        <span class="grupo-seleccionado-nombre"
+          >— {{ nombre_grupo_seleccionado }}</span
+        >
+        {% endif %}
+      </h2>
+
+      {% if integrantes %} {% for alumno in integrantes %}
       <div class="info-alumno-grupo">
         <button
-          id="{{ alumno.id_alumno }}"
+          type="button"
+          id="alumno-{{ alumno.id }}"
           class="btn-alumno"
-          onclick="mostrarInfoAlumnos('{{ alumno.nombre }}', '{{ alumno.legajo }}', '{{ alumno.dni }}', '{{ alumno.email }}')"
+          onclick="mostrarInfoAlumnos('{{ alumno.nombre }} {{ alumno.apellido }}', '{{ alumno.legajo }}', '', '{{ alumno.email }}')"
         >
-          {{ alumno.nombre }}
+          {{ alumno.nombre }} {{ alumno.apellido }}
         </button>
       </div>
-      {% endfor %} {% else %}
+      {% endfor %} {% elif nombre_grupo_seleccionado %}
+      <p class="grupos-empty-hint">
+        Este grupo no tiene integrantes asignados.
+      </p>
+      {% else %}
       <p class="grupos-empty-hint">
         Selecciona un grupo para ver sus integrantes.
       </p>
@@ -74,24 +140,13 @@ block extra_css %}
           <span id="detalleAlumnoLegajo"></span>
         </div>
         <div class="modal-row">
-          <span class="modal-label">DNI:</span>
-          <span id="detalleAlumnoDNI"></span>
-        </div>
-        <div class="modal-row">
           <span class="modal-label">Email:</span>
           <span id="detalleAlumnoEmail"></span>
         </div>
       </div>
     </div>
   </div>
-
-  {% else %}
-  <div class="grupos-empty">
-    <span class="grupos-empty-icon">&#128101;</span>
-    <p>No se encontraron grupos registrados.</p>
-  </div>
-  {% endif %}
 </div>
-{% endblock %} {% block extra_js %}
+{% endblock %} {% block extra_js %} {{ super() }}
 <script src="{{ url_for('static', filename='js/grupos.js') }}"></script>
 {% endblock %}

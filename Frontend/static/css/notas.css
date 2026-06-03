@@ -12,9 +12,7 @@
 
 /* ── LAYOUT ───────────────────────────────────────────────── */
 .notas-board {
-    display: grid;
-    grid-template-columns: minmax(440px, 1fr) 300px;
-    gap: 22px;
+    display: block;
 }
 
 .panel {

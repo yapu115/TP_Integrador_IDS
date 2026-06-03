@@ -4,7 +4,15 @@ import urllib.request
 
 from config import BACKEND_URL
 
+def _json_error_response(raw):
+    try:
+        data = json.loads(raw) if raw else {}
+    except json.JSONDecodeError:
+        data = {"errors": [{"message": raw or "Error del servidor"}]}
+    return data
 
+def _connection_error():
+    return {"errors": [{"message": "No se pudo conectar con el backend."}]}
 def get_pdf(path, token=None):
     """
     Llama al backend con GET y devuelve bytes PDF.
