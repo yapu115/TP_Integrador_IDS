@@ -13,7 +13,6 @@ from curso.services.alumnos import (
     obtener_todos_los_alumnos,
     insertar_alumno,
     importar_desde_csv,
-    actualizar_abandono,
     eliminar_alumno,
 )
 from curso.db import get_connection
@@ -48,7 +47,9 @@ def get_alumnos():
         return jsonify(error_validacion[0]), error_validacion[1]
 
     resultado, status_code = obtener_todos_los_alumnos(curso_id)
-    return jsonify(resultado) if resultado else ("", 204), status_code
+    if status_code == 204:
+        return "", 204
+    return jsonify(resultado), status_code
 
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['GET'])
@@ -155,23 +156,45 @@ def importar_alumnos():
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['PATCH'])
 @token_required
-def marcar_abandono(id):
+def actualizar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
     cursor.execute("SELECT id FROM alumnos WHERE id = %s", (id,))
     existe = cursor.fetchone()
-    cursor.close()
-    conexion.close()
 
     if not existe:
+        cursor.close()
+        conexion.close()
         return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado"}]}), 404
 
     data = request.get_json(silent=True) or {}
-    if 'abandono' not in data:
-        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Falta el campo 'abandono'"}]}), 400
+    campos_permitidos = {
+        "nombre": "nombre",
+        "apellido": "apellido",
+        "email": "email",
+        "abandono": "abandono",
+    }
+    campos_update = []
+    valores = []
 
-    actualizar_abandono(id, data['abandono'])
-    return jsonify({"message": "Estado de abandono actualizado"}), 200
+    for campo_json, campo_sql in campos_permitidos.items():
+        if campo_json in data:
+            campos_update.append(f"{campo_sql} = %s")
+            valores.append(data[campo_json])
+
+    if not campos_update:
+        cursor.close()
+        conexion.close()
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Debe enviar al menos un campo editable."}]}), 400
+
+    valores.append(id)
+    query = f"UPDATE alumnos SET {', '.join(campos_update)} WHERE id = %s"
+    cursor.execute(query, tuple(valores))
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()
+    return jsonify({"message": "Alumno actualizado"}), 200
 
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
