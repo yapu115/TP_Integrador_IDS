@@ -12,13 +12,12 @@ function ocultarModalAlumnos(id){
     modal.setAttribute('aria-hidden', 'true');
 }
 
-function mostrarInfoAlumnos(nombre, legajo, dni, email){
+function mostrarInfoAlumnos(nombre, legajo, email){
     document.getElementById('detalleAlumnoNombre').textContent = nombre;
     document.getElementById('detalleAlumnoLegajo').textContent = legajo;
-    document.getElementById('detalleAlumnoDNI').textContent = dni;
     document.getElementById('detalleAlumnoEmail').textContent = email;
 
-    abrirModal('modalAlumnos');
+    mostrarModalAlumnos('modalAlumnos');
 }
 
 window.addEventListener('click', function (event) {
