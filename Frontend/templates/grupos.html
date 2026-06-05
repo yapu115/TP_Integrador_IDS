@@ -21,13 +21,6 @@ block extra_css %}
                 name="boton-info-grupo"
                 id="grupo-{{ grupo.id_grupo }}"
                 value="{{ grupo.id_grupo }}"
-                {%
-                if
-                nombre_grupo_seleccionado=""
-                ="grupo.nombre"
-                %}checked{%
-                endif
-                %}
               />
               <label for="grupo-{{ grupo.id_grupo }}" class="grupo-label">
                 {{ grupo.nombre }}
