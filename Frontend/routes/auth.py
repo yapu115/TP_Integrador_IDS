@@ -23,7 +23,7 @@ def login():
             "password": password,
         })
 
-        print(data);
+        print(data)
 
         if status == 200 and "token" in data:
             session["token"] = data["token"]

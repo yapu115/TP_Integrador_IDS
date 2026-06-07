@@ -25,6 +25,7 @@ def route_listar_cursos():
 
 @cursos_bp.route("/cursos/<int:curso_id>", methods=["GET"])
 @token_required
+@role_required("admin")
 def route_obtener_curso(curso_id):
     resultado = obtener_curso(curso_id)
     if "error" in resultado:

@@ -14,10 +14,25 @@ from curso.services.alumnos import (
     insertar_alumno,
     importar_desde_csv,
     eliminar_alumno,
+    obtener_portal_alumno_por_padron,
 )
 from curso.db import get_connection
 
 alumnos_bp = Blueprint('alumnos', __name__)
+
+
+@alumnos_bp.route('/alumnos/portal', methods=['GET'])
+def portal_alumno():
+    padron = (request.args.get("padron") or "").strip()
+    if not padron:
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Debe ingresar un numero de padron."}]}), 400
+
+    resultado = obtener_portal_alumno_por_padron(padron)
+    if "error" in resultado:
+        status_code = 404 if resultado["error"] == "NOT_FOUND" else 500
+        return jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), status_code
+
+    return jsonify(resultado), 200
 
 
 
