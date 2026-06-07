@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from curso.validators.usuarios import validar_login, validar_crear_usuario, validar_actualizar_usuario
 from curso.services.usuarios import login_usuario, crear_usuario, listar_usuarios, actualizar_usuario, obtener_usuario, eliminar_usuario
 from curso.utils.security import token_required
@@ -39,7 +39,7 @@ def login():
             }), 401
         else:
             retorno = jsonify(resultado), 200
-            
+    
     return retorno
 
 

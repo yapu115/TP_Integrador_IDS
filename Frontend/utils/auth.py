@@ -12,4 +12,5 @@ def login_required(view):
             return redirect(url_for("cursos.seleccionar_curso"))
             
         return view(*args, **kwargs)
-    return wrapped_view
+    return wrapped_view
+

@@ -6,7 +6,7 @@ import io
 from flask import Blueprint, jsonify, request
 
 # Módulos propios del proyecto
-from curso.utils.security import token_required
+from curso.utils.security import token_required, role_required
 from curso.services.cursos import curso_existe
 from curso.validators.alumnos import validar_get_alumnos
 from curso.services.alumnos import (
@@ -199,6 +199,7 @@ def actualizar_alumno(id):
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
 @token_required
+@role_required
 def borrar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)

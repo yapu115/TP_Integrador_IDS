@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from curso.utils.security import token_required
+from curso.utils.security import token_required, role_required
 from curso.validators.materiales import validar_subida_material
 from curso.services.cursos import curso_existe
 from curso.services.materiales import listar_materiales, guardar_material, eliminar_material
@@ -34,6 +34,7 @@ def get_materiales():
 
 @materiales_bp.route("/materiales", methods=["POST"])
 @token_required
+@role_required("admin")
 def post_materiales():
     curso_id, error = _get_curso_id()
     if error:
@@ -63,7 +64,9 @@ def post_materiales():
 
 @materiales_bp.route("/materiales/<int:id_material>", methods=["DELETE"])
 @token_required
+@role_required("admin")
 def delete_materiales(id_material):
+    
     resultado = eliminar_material(id_material)
 
     if "error" in resultado:
