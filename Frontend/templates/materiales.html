@@ -19,6 +19,7 @@ block breadcrumbs %}
   <div class="materiales-exito">{{ exito }}</div>
   {% endif %}
 
+  {% if session.rol == "admin" %}
   <div class="materiales-form-container">
     <h3 class="materiales-form-title">Agregar nuevo material</h3>
 
@@ -55,6 +56,7 @@ block breadcrumbs %}
       <button type="submit" class="materiales-submit-btn">Agregar</button>
     </form>
   </div>
+  {% endif %}
 
   <div class="material-list">
     {% if materiales %} {% for m in materiales %}

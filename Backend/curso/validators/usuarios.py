@@ -2,19 +2,19 @@ import re
 
 def validar_login(data):
     """
-    Verifica que el usuario haya enviado su username y password
+    Verifica que el usuario haya enviado su email y password
     al intentar iniciar sesión.
     """
     errores = []
     
-    username = data.get("username")
+    email = data.get("email")
     password = data.get("password")
     
-    if not username:
+    if not email:
         errores.append({
             "code": "VALIDATION_ERROR",
-            "message": "Falta el campo usuario.",
-            "description": "El nombre de usuario es requerido para iniciar sesión."
+            "message": "Falta el campo email.",
+            "description": "El email es requerido para iniciar sesión."
         })
 
     if not password:
@@ -25,7 +25,7 @@ def validar_login(data):
         })
         
     return errores, {
-        "username": username,
+        "email": email,
         "password": password
     }
 

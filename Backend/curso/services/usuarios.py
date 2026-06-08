@@ -4,7 +4,7 @@ import jwt
 from datetime import datetime, timezone, timedelta
 from curso.utils.security import SECRET_KEY
 
-def login_usuario(username, password):
+def login_usuario(email, password):
     """
     Se conecta a la base de datos para verificar las credenciales,
     y si son correctas, devuelve un Token JWT.
@@ -13,12 +13,12 @@ def login_usuario(username, password):
     cursor = connection.cursor(dictionary=True)
     retorno = {}
     
-    query = "SELECT id, username, password_hash, rol, activo FROM usuarios WHERE username = %s"
-    cursor.execute(query, (username,))
+    query = "SELECT id, username, password_hash, rol, activo FROM usuarios WHERE email = %s"
+    cursor.execute(query, (email,))
     usuario = cursor.fetchone()
     
     if not usuario or not check_password_hash(usuario['password_hash'], password):
-        retorno = {"error": "UNAUTHORIZED", "mensaje": "Usuario o contraseña incorrectos."}
+        retorno = {"error": "UNAUTHORIZED", "mensaje": "email o contraseña incorrectos."}
         
     elif not usuario['activo']:
         retorno = {"error": "UNAUTHORIZED", "mensaje": "La cuenta se encuentra inactiva."}
@@ -36,7 +36,7 @@ def login_usuario(username, password):
             'exp': expiracion
         }, SECRET_KEY, algorithm="HS256")
         
-        retorno = {"token": token}
+        retorno = {"token": token, "rol": usuario['rol']}
         
     cursor.close()
     connection.close()

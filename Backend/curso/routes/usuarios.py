@@ -28,7 +28,7 @@ def login():
             retorno = jsonify({"errors": errores}), 400
             
     if not retorno:
-        resultado = login_usuario(datos_validados["username"], datos_validados["password"])
+        resultado = login_usuario(datos_validados["email"], datos_validados["password"])
         if "error" in resultado:
             retorno = jsonify({
                 "errors": [{
