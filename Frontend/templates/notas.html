@@ -77,8 +77,8 @@ breadcrumbs %}
                         name="nota-{{ alumno.id }}-{{ evaluacion.id }}"
                         value="{{ notas_por_alumno.get(alumno.id, {}).get(evaluacion.nombre, '') }}"
                         min="0"
-                        max="99.99"
-                        step="0.01"
+                        max="10"
+                        step="1"
                         aria-label="Nota {{ evaluacion.nombre }} {{ alumno.nombre }} {{ alumno.apellido }}"
                       />
                     </td>

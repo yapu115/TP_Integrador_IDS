@@ -4,6 +4,7 @@ import io
 
 # Módulos de terceros (Flask)
 from flask import Blueprint, jsonify, request
+import datetime
 
 # Módulos propios del proyecto
 from curso.utils.security import token_required, role_required
@@ -31,6 +32,12 @@ def portal_alumno():
     if "error" in resultado:
         status_code = 404 if resultado["error"] == "NOT_FOUND" else 500
         return jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), status_code
+
+    for curso in resultado.get('cursos', []):
+        for nota in curso.get('notas', []):
+            if 'hora' in nota and isinstance(nota['hora'], datetime.timedelta):
+                # Convierte '1 day, 2:00:00' a un formato string que JSON acepta
+                nota['hora'] = str(nota['hora']) 
 
     return jsonify(resultado), 200
 
