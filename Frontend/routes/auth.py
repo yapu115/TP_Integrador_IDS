@@ -15,17 +15,19 @@ def primer_mensaje_error(data):
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip()
         password = request.form.get("password", "")
 
         status, data = post_json("/usuarios/login", {
-            "username": username,
+            "email": email,
             "password": password,
         })
 
+        print(data)
+
         if status == 200 and "token" in data:
             session["token"] = data["token"]
-            session["username"] = username
+            session["rol"] = data["rol"]
             return redirect(url_for("cursos.seleccionar_curso", _external=True))
 
         return render_template(
@@ -58,7 +60,7 @@ def registrar():
                 error="Nombre y apellido son obligatorios.",
             )
 
-        username = email.split("@")[0] if "@" in email else email
+        username = nombre + " " + apellido
         token = session.get("token")
 
         status, data = post_json("/usuarios", {

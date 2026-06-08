@@ -84,3 +84,8 @@
     background: linear-gradient(90deg, #c2410c, #f97316);
     box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
 }
+
+.dash-btn--alumnos-todos {
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.35);
+}

@@ -4,9 +4,10 @@ import io
 
 # Módulos de terceros (Flask)
 from flask import Blueprint, jsonify, request
+import datetime
 
 # Módulos propios del proyecto
-from curso.utils.security import token_required
+from curso.utils.security import token_required, role_required
 from curso.services.cursos import curso_existe
 from curso.validators.alumnos import validar_get_alumnos
 from curso.services.alumnos import (
@@ -14,10 +15,31 @@ from curso.services.alumnos import (
     insertar_alumno,
     importar_desde_csv,
     eliminar_alumno,
+    obtener_portal_alumno_por_padron,
 )
 from curso.db import get_connection
 
 alumnos_bp = Blueprint('alumnos', __name__)
+
+
+@alumnos_bp.route('/alumnos/portal', methods=['GET'])
+def portal_alumno():
+    padron = (request.args.get("padron") or "").strip()
+    if not padron:
+        return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "Debe ingresar un numero de padron."}]}), 400
+
+    resultado = obtener_portal_alumno_por_padron(padron)
+    if "error" in resultado:
+        status_code = 404 if resultado["error"] == "NOT_FOUND" else 500
+        return jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), status_code
+
+    for curso in resultado.get('cursos', []):
+        for nota in curso.get('notas', []):
+            if 'hora' in nota and isinstance(nota['hora'], datetime.timedelta):
+                # Convierte '1 day, 2:00:00' a un formato string que JSON acepta
+                nota['hora'] = str(nota['hora']) 
+
+    return jsonify(resultado), 200
 
 
 
@@ -199,6 +221,7 @@ def actualizar_alumno(id):
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
 @token_required
+@role_required
 def borrar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)

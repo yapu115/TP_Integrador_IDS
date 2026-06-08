@@ -229,8 +229,37 @@ h3 {
 }
 
 .btn-logout:hover {
+  cursor: pointer;
   background: var(--accent-danger);
   color: white;
   transform: scale(1.05);
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* ── TOPBAR ACTIONS ─────────────────────────────────────── */
+.topbar__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ── CURRENT COURSE ───────────────────────────────────── */
+.current-course {
+  font-size: 0.9rem;
+  color: #555;
+  background: #e3f2fd;
+  padding: 5px 10px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-course__link {
+  text-decoration: none;
+  color: #1976d2;
+  font-size: 0.8rem;
+  border-left: 1px solid #ccc;
+  padding-left: 8px;
 }

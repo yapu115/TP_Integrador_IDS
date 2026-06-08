@@ -1,10 +1,11 @@
 import os
 import smtplib
 import qrcode
-from email.message import EmailMessage
 
 from curso.db import get_connection
 from io import BytesIO
+from email.message import EmailMessage
+from datetime import date
 
 # Genera un codigo QR simulado para pruebas del sistema.
 # Actualmente no crea imagenes QR reales.
@@ -436,3 +437,142 @@ def obtener_asistencias_por_alumno(id_alumno):
             })
 
     return asistencias
+
+
+def obtener_estado_asistencia_hoy():
+    fecha = date.today().isoformat()
+
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+
+    query= """
+    SELECT 
+      alumnos.id AS padron,
+      alumnos.nombre, 
+      alumnos.apellido,
+      alumnos.email,
+      COALESCE(asistencias.estado, 'pendiente') AS estado
+    
+    FROM alumnos
+    LEFT JOIN asistencias
+       ON alumnos.id = asistencias.id_alumno
+       AND asistencias.fecha = %s
+    ORDER BY alumnos.apellido, alumnos.nombre 
+    """
+
+    cursor.execute(query, (fecha,))
+    alumnos = cursor.fetchall()
+
+    cursor.close()
+    connection.close()
+
+    return{
+        "fecha": fecha,
+        "alumnos": alumnos
+    }
+
+def crear_clase_obligatoria(fecha, nombre_clase):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            INSERT INTO clases_obligatorias (fecha, nombre_clase)
+            VALUES (%s, %s)
+        """, (fecha, nombre_clase))
+
+        connection.commit()
+
+        return {
+            "mensaje": "Clase creada exitosamente."
+        }
+
+    except Exception as e:
+        print("ERROR crear_clase_obligatoria:", e)
+        return {
+            "error": str(e)
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+
+
+def obtener_clases_obligatorias():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        cursor.execute("""
+            SELECT DISTINCT fecha, nombre_clase
+            FROM asistencias
+            WHERE nombre_clase IS NOT NULL
+            AND nombre_clase <> ''
+            ORDER BY fecha DESC
+        """)
+
+        resultados = cursor.fetchall()
+
+        clases = []
+
+        for clase in resultados:
+            clases.append({
+                "fecha": str(clase["fecha"]),
+                "nombre_clase": clase["nombre_clase"]
+            })
+
+        return clases
+
+    except Exception as e:
+        print("ERROR obtener_clases_obligatorias:", e)
+        return {
+            "error": str(e)
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+def reprogramar_clase_obligatoria(fecha_actual, nombre_clase, nueva_fecha):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor()
+
+        cursor.execute("""
+            UPDATE asistencias
+            SET fecha = %s
+            WHERE fecha = %s
+            AND nombre_clase = %s
+        """, (nueva_fecha, fecha_actual, nombre_clase))
+
+        connection.commit()
+
+        if cursor.rowcount == 0:
+            return {"error": "No se encontró la clase para reprogramar."}
+
+        return {"mensaje": "Clase reprogramada correctamente."}
+
+    except Exception as e:
+        return {"error": str(e)}
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()

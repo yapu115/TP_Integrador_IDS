@@ -54,13 +54,16 @@
                     {% endblock %}
                 </nav>
 
-                <form action="{{ url_for('auth.logout') }}" method="POST" class="topbar__actions" style="display: flex; align-items: center; gap: 15px;">
+                <form action="{{ url_for('auth.logout') }}" method="POST" class="topbar__actions">
                     {% if session.curso_nombre %}
-                    <div class="current-course" style="font-size: 0.9rem; color: #555; background: #e3f2fd; padding: 5px 10px; border-radius: 4px; display: flex; align-items: center; gap: 8px;">
+                    <div class="current-course">
                         <span>📚 {{ session.curso_nombre }}</span>
-                        <a href="{{ url_for('cursos.seleccionar_curso') }}" title="Cambiar curso" style="text-decoration: none; color: #1976d2; font-size: 0.8rem; border-left: 1px solid #ccc; padding-left: 8px;">Cambiar</a>
+                        <a href="{{ url_for('cursos.seleccionar_curso') }}" title="Cambiar curso" class="current-course__link">
+                            Cambiar
+                        </a>
                     </div>
                     {% endif %}
+                    
                     <button type="submit" class="btn-logout" title="Cerrar sesión">
                         &#128682;
                     </button>

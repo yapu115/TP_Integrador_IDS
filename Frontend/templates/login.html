@@ -24,27 +24,44 @@ page %}
       <h1>Iniciar Sesión</h1>
 
       {% if error %}
-      <div class="auth-message auth-message--error" style="display:flex; align-items:flex-start; gap:12px; font-size: 0.95rem; text-align: left;">
-          <span style="font-size: 1.2rem; line-height: 1;">⚠️</span>
-          <span style="line-height: 1.4;">{{ error }}</span>
+      <div
+        class="auth-message auth-message--error"
+        style="
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          font-size: 0.95rem;
+          text-align: left;
+        "
+      >
+        <span style="font-size: 1.2rem; line-height: 1">⚠️</span>
+        <span style="line-height: 1.4">{{ error }}</span>
       </div>
-      {% endif %} 
-      {% if exito %}
-      <div class="auth-message auth-message--success" style="display:flex; align-items:flex-start; gap:12px; font-size: 0.95rem; text-align: left;">
-          <span style="font-size: 1.2rem; line-height: 1;">✅</span>
-          <span style="line-height: 1.4;">{{ exito }}</span>
+      {% endif %} {% if exito %}
+      <div
+        class="auth-message auth-message--success"
+        style="
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          font-size: 0.95rem;
+          text-align: left;
+        "
+      >
+        <span style="font-size: 1.2rem; line-height: 1">✅</span>
+        <span style="line-height: 1.4">{{ exito }}</span>
       </div>
       {% endif %}
 
       <div class="form-group">
-        <label for="username">Email o usuario</label>
+        <label for="email">Email</label>
         <input
           type="text"
-          id="username"
-          name="username"
-          placeholder="Usuario"
+          id="email"
+          name="email"
+          placeholder="Email"
           required
-          autocomplete="username"
+          autocomplete="email"
         />
       </div>
 
@@ -66,6 +83,13 @@ page %}
         ¿No tenés cuenta?
         <a href="{{ url_for('auth.registrar', _external=True) }}"
           >Registrate aquí</a
+        >
+      </p>
+
+      <p class="auth-footer-link auth-footer-link--student">
+        Soy alumno
+        <a href="{{ url_for('portal_alumno.portal_alumno', _external=True) }}"
+          >Ingresar con padrón</a
         >
       </p>
     </form>

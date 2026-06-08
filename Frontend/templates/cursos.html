@@ -46,6 +46,7 @@ page %}
         {% endif %}
       </div>
 
+      {% if session.rol == "admin" %}
       <div class="alta-curso">
         <p>¿Necesitás dar de alta otro curso?</p>
 
@@ -53,6 +54,7 @@ page %}
           Crear nuevo curso
         </a>
       </div>
+      {% endif %}
     </div>
   </section>
 </div>

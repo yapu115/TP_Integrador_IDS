@@ -1,7 +1,7 @@
 import jwt
 import os
 from functools import wraps
-from flask import request, jsonify
+from flask import request, jsonify, abort, session
 
 SECRET_KEY = os.environ.get('JWT_SECRET_KEY', '11501284827B383944290E9348723R483E')
 
@@ -61,3 +61,20 @@ def token_required(f):
         return f(*args, **kwargs)
     
     return decorated
+
+
+def role_required(role):
+    def decorator(view):
+        @wraps(view)
+        def wrapped_view(*args, **kwargs):
+            usuario_data = getattr(request, 'usuario_actual', None)
+
+            if not usuario_data:
+                abort(403)
+            
+            if usuario_data.get('rol') != role:
+                abort(403)
+
+            return view(*args, **kwargs)
+        return wrapped_view
+    return decorator
