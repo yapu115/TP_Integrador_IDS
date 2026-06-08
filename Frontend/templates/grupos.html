@@ -29,9 +29,8 @@ block extra_css %}
             {% endfor %}
           </div>
         </div>
-        <button type="submit" value="grupo-elegido" class="btn-ver-grupo">
-          Ver integrantes del grupo
-        </button>
+        <input type="submit" name="action" value="Ver integrantes del grupo" class="btn-ver-grupo">
+        <input type="submit" name="action" value="ELIMINAR GRUPO" class="btn-ver-grupo">
         {% else %}
         <p class="grupos-empty-hint">No hay grupos registrados.</p>
         {% endif %}

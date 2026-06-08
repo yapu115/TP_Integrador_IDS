@@ -25,17 +25,22 @@ def grupos():
     integrantes = None
     nombre_grupo_seleccionado = None
     if id_grupo_seleccionado:
-        status, detalle = get_json(f"/grupos/{id_grupo_seleccionado}", token=token)
-        if status == 200:
-            nombre_grupo_seleccionado = detalle.get("nombre")
-            ids_integrantes = detalle.get("integrantes", [])
+        accion_boton = request.form.get("action") 
+        if accion_boton == "Ver integrantes del grupo":
+            status, detalle = get_json(f"/grupos/{id_grupo_seleccionado}", token=token)
+            if status == 200:
+                nombre_grupo_seleccionado = detalle.get("nombre")
+                ids_integrantes = detalle.get("integrantes", [])
 
-            integrantes = []
-            for id_alumno in ids_integrantes:
-                st, alumno = get_json(f"/alumnos/{id_alumno}", token=token)
-                if st == 200:
-                    integrantes.append(alumno)
-
+                integrantes = []
+                for id_alumno in ids_integrantes:
+                    st, alumno = get_json(f"/alumnos/{id_alumno}", token=token)
+                    if st == 200:
+                        integrantes.append(alumno)
+        elif accion_boton == "ELIMINAR GRUPO":
+            status, detalle = delete_json(f"/grupos/{id_grupo_seleccionado}", token=token)
+            if status == 200:
+                print(f"Status del borrado en la API: {status}")
     # Cargar alumnos y evaluaciones para el formulario de crear/editar grupo
     st_al, data_al = get_json(f"/alumnos?curso_id={curso_id}&_limit=100", token=token)
     lista_alumnos = data_al.get("alumnos", []) if st_al == 200 else []
