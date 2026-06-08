@@ -1,7 +1,10 @@
 {% extends "base.html" %}
+
 {% block title %}Control de Asistencia{% endblock %}
 
-{% block breadcrumbs %}<span class="breadcrumbs__item">ASISTENCIA</span>{% endblock %}
+{% block breadcrumbs %}
+<span class="breadcrumbs__item">ASISTENCIA</span>
+{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/asistencia.css') }}">
@@ -11,68 +14,141 @@
 <div class="asistencia-pagina">
     <section class="asistencia-card">
 
+        <!-- Encabezado -->
         <header class="asistencia-header">
             <div class="asistencia-header__icon">&#128196;</div>
             <h1>Control de Asistencia</h1>
             <p>Introduccion al Desarrollo de Software</p>
         </header>
 
+        <!-- Mensajes flash-->
         {% with mensajes = get_flashed_messages(with_categories=true) %}
-            {% for categoria, mensaje in mensajes %}
-                <div class="asistencia-alert {% if categoria == 'success' %}asistencia-alert--success{% else %}asistencia-alert--error{% endif %}">
-                    {{ mensaje }}
+            {% if mensajes %}
+               <div class="mensaje-flash">
+                {% for categoria, mensaje in mensajes %}
+                    <div class="asistencia-alert asistencia-alert--{{ categoria }}">
+                        <span class="alert-icon">
+                            {% if categoria == "success" %}
+                            ✓
+                            {% else %}
+                                !
+                            {% endif %}
+                        </span>
+
+                        <span>{{ mensaje }}</span>
+                    </div>
+                {% endfor %}
                 </div>
-            {% endfor %}
+            {% endif %}
         {% endwith %}
 
-        <section class="asistencia-panel">
-            <div class="asistencia-info">
-                <h2>Asistencia de la jornada</h2>
-                <p><strong>Fecha seleccionada:</strong> {{ fecha_hoy }}</p>
-                <p>Seleccione un alumno y envie el codigo QR dinamico a su correo registrado.</p>
+        <!-- Clses obligatorias -->
+        <section class="asistencia-panel seccion-clases">
 
-                <form class="asistencia-form" method="post" action="{{ url_for('asistencia.asistencia') }}">
-                    <label>
-                        Fecha
-                        <input type="date" name="fecha" value="{{ fecha_hoy }}" required>
-                    </label>
+            <div class="seccion-encabezado">
+                <h2>Clases Obligatorias</h2>
+                <p>Desde esta sección se crean y gestionan las clases que se tendrán en cuenta para la regularidad.</p>
+            </div>
 
-                    <label>
-                        Alumno
-                        <select name="id_alumno" required>
-                            <option value="">Seleccione un alumno</option>
-                            {% for alumno in alumnos %}
-                                <option value="{{ alumno.id }}">
-                                    {{ alumno.legajo }} - {{ alumno.apellido }}, {{ alumno.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </label>
+            <div class="bloque-interno">
+                <h3>Crear nueva clase</h3>
+
+                <form class="asistencia-form" method="post" action="{{ url_for('asistencia.asistencia_test') }}">
+                    <input type="hidden" name="action" value="crear-clase">
+
+                    <div class="form-grid-2">
+                        <label>
+                            Fecha de la clase
+                            <input type="date" name="fecha_clase" value="{{ fecha_hoy }}" required>
+                        </label>
+
+                        <label>
+                            Nombre de la clase
+                            <input type="text" name="nombre_clase" id = "id_clase" placeholder="Ej: Clase 10 - Patrones de Diseño" required>
+                        </label>
+
+                    </div>
 
                     <button type="submit" class="btn-qr">
-                        &#128231; &nbsp;Enviar QR por correo electronico
-                    </button>
-
-                    <button type="submit" name="accion" value="todos" class="btn-qr btn-qr--secondary" formnovalidate>
-                        Enviar QR a todos los activos
+                        Crear clase
                     </button>
                 </form>
             </div>
 
-            <div class="qr-box">
-                <h3>Codigo QR dinamico</h3>
-                <p>Valido para el alumno y la fecha seleccionada</p>
-                <div class="qr-placeholder">
-                    <span class="qr-icon">&#128247;</span>
-                    <span>QR</span>
-                </div>
-            </div>
+            
+                <div id="gestion-clases-box">
+                    <h3>Gestionar clases existentes</h3>
+                                    
+                            <form method="POST" action="{{ url_for('asistencia.reprogramar_clase') }}" id="form-gestion-clases">
+                        
+                                <select name="id_clase" id="select-clase" required>
+                                    <option value="">Seleccione una clase</option>
+                                
+                                    {% for clase in clases_obligatorias %}
+                                        <option value="{{ clase.id_clase }}">
+                                            {{ clase.nombre_clase }} - {{ clase.fecha }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                        
+                                <button type="button" id="btn-editar-clase">
+                                    Editar datos
+                                </button>
+                        
+                                <button type="submit" id="btn-reprogramar-clase">
+                                    Reprogramar
+                                </button>
+                        
+                            </form>
+                        </div>
+                
         </section>
 
+        <!-- Asistencia de hoy-->
+        <section class="asistencia-panel seccion-asistencia-hoy">
+
+            <div class="asistencia-hoy-info">
+                <h2>Asistencia de la clase de hoy</h2>
+
+                <p>
+                    El sistema toma la fecha actual automáticamente, verifica si hay una clase obligatoria programada
+                    para hoy y envía el QR a todos los alumnos.
+                </p>
+
+                <div class="asistencia-hoy-datos">
+                    <span class="fecha-actual">
+                        Fecha actual: <strong>{{ fecha_hoy }}</strong>
+                    </span>
+
+                    {% if clase_hoy is defined and clase_hoy %}
+                        <span class="clase-encontrada">
+                            Clase encontrada para hoy
+                        </span>
+                    {% else %}
+                        <span class="sin-clase">
+                            No hay clase programada para hoy
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <form class="qr-hoy-form" method="post" action="{{ url_for('asistencia.asistencia') }}">
+                <input type="hidden" name="action" value="enviar_qr_hoy">
+
+                <button type="submit" class="btn-qr btn-qr-grande"
+                    {% if not clase_hoy %}disabled{% endif %}>
+                    Enviar QR a todos los alumnos
+                </button>
+            </form>
+
+        </section>
+
+        <!-- Listado de alumnos -->
         <section class="tabla-section">
+
             <div class="tabla-section__header">
                 <h2>Listado de alumnos <span class="live-badge">&#128994; EN VIVO</span></h2>
-                <p>Los registros se actualizan conforme se envien los QR y los alumnos confirmen asistencia.</p>
+                <p>Los registros se actualizan conforme se envían los QR y los alumnos confirman asistencia.</p>
             </div>
 
             <div class="tabla-contenedor">
@@ -83,64 +159,45 @@
                             <th>Nombre y Apellido</th>
                             <th>Email</th>
                             <th>Estado de Asistencia</th>
+                            <th>Condición</th>
+                            <th>Detalle</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {% for alumno in alumnos %}
+                        {% for alumno in alumnos|default([]) %}
                         <tr>
                             <td>{{ alumno.legajo }}</td>
                             <td>{{ alumno.apellido }}, {{ alumno.nombre }}</td>
                             <td>{{ alumno.email }}</td>
+
                             <td>
-                                <span class="estado {{ alumno.estado_asistencia | lower | replace(' ', '-') }}">
-                                    {{ alumno.estado_asistencia }}
+                                <span class="estado {{ alumno.estado_asistencia | default('sin-clases') | lower | replace(' ', '-') }}">
+                                    {{ alumno.estado_asistencia | default('Sin clases') }}
                                 </span>
+                            </td>
+
+                            <td>
+                                <span class="estado {{ alumno.condicion | default('sin-definir') | lower | replace(' ', '-') }}">
+                                    {{ alumno.condicion | default('Sin definir') }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <button class="btn-detalle" type="button">
+                                    Ver detalle
+                                </button>
                             </td>
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="4">No hay alumnos registrados para este curso.</td>
+                            <td colspan="6">No hay alumnos registrados para este curso.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
-        </section>
 
-        <section class="tabla-section historial-section">
-            <div class="tabla-section__header">
-                <h2>Historial de asistencia</h2>
-                <p>Solo se muestran fechas en las que se envio al menos un QR de asistencia.</p>
-            </div>
-
-            <div class="tabla-contenedor">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>QR enviados</th>
-                            <th>Presentes</th>
-                            <th>Pendientes</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for item in historial %}
-                        <tr>
-                            <td>{{ item.fecha }}</td>
-                            <td>{{ item.qr_enviados }}</td>
-                            <td>{{ item.presentes }}</td>
-                            <td>{{ item.qr_enviados - item.presentes }}</td>
-                        </tr>
-                        {% else %}
-                        <tr>
-                            <td colspan="4">Aun no se asignaron fechas con asistencia.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
         </section>
 
     </section>
