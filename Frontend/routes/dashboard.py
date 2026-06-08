@@ -14,13 +14,14 @@ def dashboard():
     return render_template("dashboard.html", nombre=nombre)
 
 
-def _proxy_pdf(endpoint, filename):
+def _proxy_pdf(endpoint, filename, params=None):
     curso_id = session.get("curso_id")
     if not curso_id:
         return redirect(url_for("cursos.seleccionar_curso"))
 
     token = session.get("token")
-    status, data = get_pdf(f"/informes/{endpoint}?curso_id={curso_id}", token=token)
+    extra = "&" + "&".join(f"{k}={v}" for k, v in params.items()) if params else ""
+    status, data = get_pdf(f"/informes/{endpoint}?curso_id={curso_id}{extra}", token=token)
 
     if status == 200:
         return send_file(
@@ -41,7 +42,12 @@ def _proxy_pdf(endpoint, filename):
 @dashboard_bp.route("/dashboard/informe_alumnos")
 @login_required
 def informe_alumnos():
-    return _proxy_pdf("alumnos", "informe_alumnos.pdf")
+    return _proxy_pdf("alumnos", "informe_alumnos.pdf", params={"abandono": "false"})
+
+@dashboard_bp.route("/dashboard/informe_alumnos_todos")
+@login_required
+def informe_alumnos_todos():
+    return _proxy_pdf("alumnos", "informe_alumnos_todos.pdf")
 
 
 @dashboard_bp.route("/dashboard/informe_estadisticas")
