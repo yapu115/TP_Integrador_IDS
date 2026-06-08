@@ -1,8 +1,17 @@
 #!/bin/bash
 echo "=== Instalando dependencias en venv ==="
-python -m venv venv
+python3 -m venv venv
 
-./venv/Scripts/pip install --upgrade pip
-./venv/Scripts/pip install -r requirements.txt
+if [ -x ./venv/bin/pip ]; then
+  PIP=./venv/bin/pip
+elif [ -x ./venv/Scripts/pip.exe ]; then
+  PIP=./venv/Scripts/pip.exe
+else
+  echo "No se encontró pip en el entorno virtual."
+  exit 1
+fi
 
-echo "=== Instalación finalizada. Ahora activa el entorno con: source venv/Scripts/activate ==="
+"$PIP" install --upgrade pip
+"$PIP" install -r requirements.txt
+
+echo "=== Instalación finalizada. Ahora activa el entorno con: source venv/bin/activate ==="

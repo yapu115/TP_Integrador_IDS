@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}Portal de alumno{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/portal_alumno.css') }}">
+{% endblock %}
+
+{% block body_attr %} class="student-page"{% endblock %}
+
+{% block page %}
+<main class="student-shell">
+  <header class="student-topbar">
+    <a class="student-back" href="{{ url_for('auth.login') }}">Volver al login</a>
+    {% if datos %}
+    <div class="student-identity">
+      <span data-student-display-name>{{ datos.cursos[0].alumno.apellido }}, {{ datos.cursos[0].alumno.nombre }}</span>
+      <strong data-student-display-padron>Padrón {{ datos.cursos[0].alumno.padron }}</strong>
+    </div>
+    {% endif %}
+  </header>
+
+  <section class="student-panel">
+    <header class="student-header">
+      <h1>Portal de alumno</h1>
+      <p>Consultá tus cursos, notas, materiales, grupos y asistencias.</p>
+    </header>
+
+    <form class="student-search" method="post" action="{{ url_for('portal_alumno.portal_alumno') }}">
+      <label for="padron">Número de padrón</label>
+      <div>
+        <input
+          id="padron"
+          name="padron"
+          type="text"
+          value="{{ padron }}"
+          placeholder="Ej: 1001"
+          autocomplete="off"
+          required
+        >
+        <button type="submit">Consultar</button>
+      </div>
+    </form>
+
+    {% if error %}
+    <div class="student-message">{{ error }}</div>
+    {% endif %}
+
+    {% if datos %}
+    <div class="course-layout" data-student-portal>
+      <aside class="course-list" aria-label="Cursos del alumno">
+        <h2>Cursos</h2>
+        {% for item in datos.cursos %}
+        <button
+          class="course-button {% if loop.first %}is-active{% endif %}"
+          type="button"
+          data-course-target="course-{{ item.curso.id }}-{{ item.alumno.id }}"
+          data-student-name="{{ item.alumno.apellido }}, {{ item.alumno.nombre }}"
+          data-student-padron="Padrón {{ item.alumno.padron }}"
+        >
+          <span>{{ item.curso.nombre }}</span>
+          <small>{{ item.alumno.abandono and "Abandonado" or "Activo" }}</small>
+        </button>
+        {% endfor %}
+      </aside>
+
+      <section class="course-detail">
+        {% for item in datos.cursos %}
+        <article
+          class="course-panel {% if loop.first %}is-active{% endif %}"
+          id="course-{{ item.curso.id }}-{{ item.alumno.id }}"
+        >
+          <div class="course-heading">
+            <div>
+              <h2>{{ item.curso.nombre }}</h2>
+              {% if item.curso.descripcion %}
+              <p>{{ item.curso.descripcion }}</p>
+              {% endif %}
+            </div>
+            <span>{{ item.notas|length }} notas</span>
+          </div>
+
+          <nav class="student-tabs" aria-label="Información del curso">
+            <button class="student-tab is-active" type="button" data-tab-target="notas-{{ item.curso.id }}-{{ item.alumno.id }}">Notas</button>
+            <button class="student-tab" type="button" data-tab-target="materiales-{{ item.curso.id }}-{{ item.alumno.id }}">Materiales</button>
+            <button class="student-tab" type="button" data-tab-target="grupos-{{ item.curso.id }}-{{ item.alumno.id }}">Grupos</button>
+            <button class="student-tab" type="button" data-tab-target="asistencias-{{ item.curso.id }}-{{ item.alumno.id }}">Asistencias</button>
+          </nav>
+
+          <div class="tab-panel is-active" id="notas-{{ item.curso.id }}-{{ item.alumno.id }}">
+            {% if item.notas %}
+            <div class="data-table">
+              <div class="data-row data-row--head">
+                <span>Evaluación</span>
+                <span>Nota</span>
+                <span>Fecha</span>
+              </div>
+              {% for nota in item.notas %}
+              <div class="data-row">
+                <span>{{ nota.nombre }}</span>
+                <strong>{{ nota.nota }}</strong>
+                <span>{{ nota.fecha_carga or "-" }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">Todavía no hay notas cargadas para este curso.</p>
+            {% endif %}
+          </div>
+
+          <div class="tab-panel" id="materiales-{{ item.curso.id }}-{{ item.alumno.id }}">
+            {% if item.materiales %}
+            <div class="material-list">
+              {% for material in item.materiales %}
+              <a class="material-item" href="{{ material.url_archivo }}" target="_blank" rel="noopener noreferrer">
+                <span>{{ material.titulo }}</span>
+                <small>{{ material.fecha_subida }}</small>
+              </a>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No hay materiales publicados para este curso.</p>
+            {% endif %}
+          </div>
+
+          <div class="tab-panel" id="grupos-{{ item.curso.id }}-{{ item.alumno.id }}">
+            {% if item.grupos %}
+            <div class="group-list">
+              {% for grupo in item.grupos %}
+              <section class="group-item">
+                <h3>{{ grupo.nombre }}</h3>
+                {% if grupo.evaluaciones %}
+                <p>Trabajos: {{ grupo.evaluaciones|map(attribute='nombre')|join(', ') }}</p>
+                {% endif %}
+                <ul>
+                  {% for integrante in grupo.integrantes %}
+                  <li>{{ integrante.apellido }}, {{ integrante.nombre }} · {{ integrante.legajo }} · {{ integrante.email }}</li>
+                  {% endfor %}
+                </ul>
+              </section>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No estás asignado a grupos en este curso.</p>
+            {% endif %}
+          </div>
+
+          <div class="tab-panel" id="asistencias-{{ item.curso.id }}-{{ item.alumno.id }}">
+            {% if item.asistencias %}
+            <div class="data-table">
+              <div class="data-row data-row--head">
+                <span>Fecha</span>
+                <span>Estado</span>
+                <span>Registrado</span>
+              </div>
+              {% for asistencia in item.asistencias %}
+              <div class="data-row">
+                <span>{{ asistencia.fecha }}</span>
+                <strong>{{ asistencia.estado }}</strong>
+                <span>{{ asistencia.creado_en }}</span>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-state">No hay asistencias registradas para este curso.</p>
+            {% endif %}
+          </div>
+        </article>
+        {% endfor %}
+      </section>
+    </div>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/portal_alumno.js') }}"></script>
+{% endblock %}
