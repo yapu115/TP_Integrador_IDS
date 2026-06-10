@@ -201,11 +201,11 @@ El usuario ingresa sus credenciales en la vista de templates/login.html.
 
 El controlador de Frontend (routes/auth.py) recibe los datos y, mediante el api_client.py, hace un POST /usuarios/login hacia el Backend.
 
-El Backend valida las credenciales contra la base de datos usando Werkzeug (para verificar el hash de la contraseña). Si son correctas, genera un JWT firmado con una clave secreta y un tiempo de expiración.
+El Backend valida las credenciales contra la base de datos (para verificar el hash de la contraseña). Si son correctas, genera un JWT firmado con una clave secreta y un tiempo de expiración.
 
 El Backend responde al Frontend con el token JSON. El Frontend almacena este token en la sesión de Flask (session['token']) para mantener al usuario logueado en el navegador de forma segura.
 ```
-Fronten (Cliente)                                          Backend (API REST)
+Frontend (Cliente)                                          Backend (API REST)
      │                                                          │
      │─── GET /alumnos ────────────────────────────────────────>│
      │    Header: Authorization: Bearer <JWT_TOKEN>             │
@@ -217,6 +217,69 @@ Fronten (Cliente)                                          Backend (API REST)
      │                                                          │
      │<── 200 OK (JSON Data) ───────────────────────────────────│
 ```
+### 2. Sistema de asistencia
+El sistema de asistencia posee un formato que lo hace eficiente y seguro, cuenta con caracteristicas como las siguientes:
+
+1. Optimización de Memoria (Códigos QR)
+Los códigos QR se generan dinámicamente en la memoria RAM en formato PNG. Esto evita el desgaste del almacenamiento físico del servidor.
+La URL del QR codifica los datos del alumno bajo el formato ASISTENCIA-{id_alumno}-{fecha}.
+
+2. Envío Masivo por Correo (SMTP)
+Al momento de enviarse los correos se seleccionan solo los alumnos activos (abandono = FALSE).
+Se utiliza la librería smtplib con cifrado TLS, permitiendo que los datos viajen de forma segura.
+Los QR se incrustan en el cuerpo del correo (HTML/Texto plano), suprimiendo su logica y evitando que el usuario tenga que descargar archivos adjuntos.
+
+3. Robustez y Seguridad
+Soporta peticiones POST y enlaces GET optimizados para móviles.
+Para evitar errores por doble escaneo o reenvíos, se usa la cláusula SQL ON DUPLICATE KEY UPDATE. Si el registro ya existe, se actualizan los metadatos de auditoría en lugar de duplicar la asistencia.
+
+4. Gestión del Calendario
+Flexibilidad: Permite reprogramar clases obligatorias y alterar el calendario escolar.
+
+```
+Dispositivo Móvil (Escaneo)                               Backend (API REST)
+     │                                                          │
+     │─── GET /asistencia/registrar?codigo_qr=... ─────────────>│
+     │    Query: ASISTENCIA-12-2026-06-09                       │
+     │                                                          │
+     │                                               [services/asistencia.py]
+     │                                               • Descompone el string con .split("-")
+     │                                               • Extrae id_alumno (12) y fecha
+     │                                                          │
+     │                                                          │
+     │                                                          │
+     │<── 200 OK (HTML Éxito) / 400 (Error) ────────────────────│
+```
+
+### 3. Dashbord (listado de alumnos)
+Se cuenta con un sistema para manejar grandes volúmenes de datos de alumnos de forma eficiente. El mismo posee:
+
+1. Filtrado Dinámico de Estudiantes, filtra según la condición académica usando el campo booleano abandono mediante cláusulas AND dinámicas en SQL.
+   Cuando el usuario escribe un nombre o legajo, el sistema busca en tiempo real y por coincidencias parciales de forma instantánea y fluida.
+
+2. Ingesta y Exportación Masiva (Archivos CSV)
+Importación (POST): El Frontend envía un archivo vía Multipart/Form-Data. El Backend lo procesa en UTF-8 usando un buffer de memoria (io.StringIO) y la librería csv.DictReader, transformando las filas en tuplas para una inserción rápida en la base de datos.
+
+Exportación (GET): Genera la descarga de la lista filtrada en tiempo real. Utiliza la clase Response de Flask con el tipo text/csv y la cabecera Content-Disposition: attachment. El navegador descarga un archivo físico (alumnos_curso_{id}.csv) generado directamente desde la memoria RAM.
+
+### 4. Gestion de grupos
+El sistema permite armar grupos de alumnos, asignarles evaluaciones y mostrar sus datos.Algunas de sus caracteristicas son:
+
+1.Limpiar los datos duplicados que genera la base de datos.
+Cuando se cruzan tablas en la base de datos (como Grupos, Evaluaciones e Integrantes), los motores SQL suelen duplicar filas.
+para ello la función _agrupar_resultados() toma ese "bloque" de datos desordenado y usa conjuntos mutables (set()) en la memoria del servidor para unificar los IDs repetidos.
+
+2.Integridad de los datos.
+Crear o modificar un grupo exige tocar varias tablas al mismo tiempo. Para evitar que un grupo se cree sin alumnos o con datos incompletos
+los cambios se guardan físicamente en el disco de la base de datos solo si todas las inserciones terminan con éxito.
+
+Arrepentimiento (Rollback): Si algo falla en el medio el sistema ejecuta un rollback. Esto borra cualquier cambio parcial que se haya hecho en esa operación.
+
+3. Carga eficiente en la Pantalla.
+Los nombres y detalles de los integrantes no se descargan hasta que el usuario hace clic específicamente en el botón de información de un equipo.
+Esto evita que la página web no se vuelva lenta al listar decenas de grupos
+
+
 ## Requisitos previos
 
 - Python 3.10+
@@ -227,7 +290,7 @@ Fronten (Cliente)                                          Backend (API REST)
 
 Si ya tenes MySQL 8 corriendo en tu maquina (puerto `3306` por default):
 
-1. Con los comandos de abajos se crean las tablas y datos de prueba.
+1. Con los comandos de abajo se crean las tablas y datos de prueba.
 
    ```bash
    mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS curso_universitario;"
