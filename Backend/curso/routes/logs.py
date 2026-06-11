@@ -17,11 +17,11 @@ logs_bp = Blueprint("logs", __name__)
 @logs_bp.route("/log", methods=["GET"])
 @token_required
 def get_logs():
-    usuario_id = request.args.get("usuario_id")
+    usuario = request.args.get("usuario")
     accion = request.args.get("accion")
     fecha = request.args.get("fecha")
 
-    resultado = listar_logs(usuario_id, accion, fecha)
+    resultado = listar_logs(usuario, accion, fecha)
 
     return jsonify(resultado), 200
 

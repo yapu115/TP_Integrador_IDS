@@ -7,6 +7,7 @@ from curso.services.evaluaciones import (
     eliminar_evaluacion_service
 )
 from curso.utils.security import token_required
+from curso.utils.utils import registrar_actividad
 
 evaluacion_bp = Blueprint('evaluaciones', __name__)
 
@@ -27,6 +28,7 @@ def listar_evaluaciones_route():
     
 @evaluacion_bp.route("/evaluaciones", methods=['POST'])
 @token_required
+@registrar_actividad("CREACION_EVALUACION")
 def crear_evaluacion_route():
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -63,6 +65,7 @@ def mostrar_evaluacion_route(id_evaluacion):
 
 @evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>", methods=['PUT'])
 @token_required
+@registrar_actividad("MODIFICAR_EVALUACION")
 def modificar_evaluacion_route(id_evaluacion):
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -80,7 +83,7 @@ def modificar_evaluacion_route(id_evaluacion):
                 if cambios is None:
                     retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error al modificar."}]}), 500
                 else:
-                    retorno = "", 204
+                    retorno = "", 200
         except Exception:
             retorno = jsonify({"errors": [{"code": "INTERNAL_SERVER_ERROR", "message": "Error interno del servidor."}]}), 500
             
@@ -88,6 +91,7 @@ def modificar_evaluacion_route(id_evaluacion):
 
 @evaluacion_bp.route("/evaluaciones/<int:id_evaluacion>", methods=['DELETE'])
 @token_required
+@registrar_actividad("ELIMINAR_EVALUACION")
 def eliminar_evaluacion_route(id_evaluacion):
     retorno = None
     try:

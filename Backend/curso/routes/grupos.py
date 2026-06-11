@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from curso.utils.security import token_required
+from curso.utils.utils import registrar_actividad
 from curso.validators.grupos import validar_grupo
 from curso.services.cursos import curso_existe
 from curso.services.grupos import (
@@ -44,6 +45,7 @@ def route_listar_grupos():
 
 @grupos_bp.route("/grupos", methods=["POST"])
 @token_required
+@registrar_actividad("CEACION_GRUPO")
 def route_crear_grupo():
     curso_id, error = get_curso_id()
     if error:
@@ -80,6 +82,7 @@ def route_obtener_grupo(id_grupo):
 
 @grupos_bp.route("/grupos/<int:id_grupo>", methods=["PUT"])
 @token_required
+@registrar_actividad("MODIFICACION_GRUPO")
 def route_modificar_grupo(id_grupo):
     data    = request.get_json(silent=True) or {}
     errores = validar_grupo(data)
@@ -100,6 +103,7 @@ def route_modificar_grupo(id_grupo):
 
 @grupos_bp.route("/grupos/<int:id_grupo>", methods=["DELETE"])
 @token_required
+@registrar_actividad("ELIMINAR_GRUPO")
 def route_eliminar_grupo(id_grupo):
     resultado = eliminar_grupo(id_grupo)
     if "error" in resultado:

@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, request
 from curso.utils.security import token_required, role_required
+from curso.utils.utils import registrar_actividad
 from curso.validators.cursos import validar_curso
 from curso.services.cursos import (
     listar_cursos,
@@ -41,6 +42,7 @@ def route_obtener_curso(curso_id):
 @cursos_bp.route("/cursos", methods=["POST"])
 @token_required
 @role_required("admin")
+@registrar_actividad("CREACION_CURSO")
 def route_crear_curso():
     data = request.get_json(silent=True) or {}
     errores = validar_curso(data)
@@ -59,6 +61,7 @@ def route_crear_curso():
 @cursos_bp.route("/cursos/<int:curso_id>", methods=["PUT"])
 @token_required
 @role_required("admin")
+@registrar_actividad("MODIFICACION_CURSO")
 def route_modificar_curso(curso_id):
     data = request.get_json(silent=True) or {}
     errores = validar_curso(data)
@@ -79,6 +82,7 @@ def route_modificar_curso(curso_id):
 @cursos_bp.route("/cursos/<int:curso_id>", methods=["DELETE"])
 @token_required
 @role_required("admin")
+@registrar_actividad("ELIMINAR_CURSO")
 def route_eliminar_curso(curso_id):
     resultado = eliminar_curso(curso_id)
     if "error" in resultado:

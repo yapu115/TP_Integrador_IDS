@@ -8,6 +8,7 @@ import datetime
 
 # Módulos propios del proyecto
 from curso.utils.security import token_required, role_required
+from curso.utils.utils import registrar_actividad
 from curso.services.cursos import curso_existe
 from curso.validators.alumnos import validar_get_alumnos
 from curso.services.alumnos import (
@@ -142,6 +143,7 @@ def get_asistencias_alumno(id):
 
 @alumnos_bp.route('/alumnos', methods=['POST'])
 @token_required
+@registrar_actividad("CREACION_ALUMNO")
 def crear_alumno():
     curso_id, error = get_curso_id()
     if error:
@@ -178,6 +180,7 @@ def importar_alumnos():
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['PATCH'])
 @token_required
+@registrar_actividad("MODIFICAR_ALUMNO")
 def actualizar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
@@ -221,7 +224,8 @@ def actualizar_alumno(id):
 
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
 @token_required
-@role_required
+@role_required("admin")
+@registrar_actividad("ELIMINAR_ALUMNO")
 def borrar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
