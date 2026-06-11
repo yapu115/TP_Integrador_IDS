@@ -260,7 +260,7 @@ Se utiliza un decorador parametrizado (@registrar_actividad("Nombre de la Acció
 2.Reutilización.
 Aprovecha el ciclo de vida global del objeto request. El sistema lee los datos del usuario (usuario_actual). Estos datos son inyectados previamente en la petición por el decorador de autenticación (@token_required), asegurando una identificación precisa sin necesidad de realizar nuevas consultas a la base de datos.
 
-
+```
 Frontend (Cliente)                                        Backend (API REST)
      │                                                          │
      │─── POST /usuarios (Crear Usuario) ─────────────────────> │
@@ -284,7 +284,7 @@ Frontend (Cliente)                                        Backend (API REST)
      │                                                      Crear_log(datos para la creacion del log)
      │                                                          │
      │<── 201 Created (JSON Data) ──────────────────────────────│
-
+```
 ### 4. Dashbord (listado de alumnos)
 Se cuenta con un sistema para manejar grandes volúmenes de datos de alumnos de forma eficiente. El mismo posee:
 
