@@ -251,7 +251,41 @@ Dispositivo Móvil (Escaneo)                               Backend (API REST)
      │<── 200 OK (HTML Éxito) / 400 (Error) ────────────────────│
 ```
 
-### 3. Dashbord (listado de alumnos)
+### 3. Sistema de logs (Registro de actividad)
+El sistema de logs permite registrar cualquier actividad interactiva de la web, su funcionamiento esta dado por las siguientes caracteristicas:
+
+1. Automatización.
+Se utiliza un decorador parametrizado (@registrar_actividad("Nombre de la Acción")) que envuelve las rutas de la aplicación. Este intercepta la petición, espera la ejecución de la función original y evalúa el código de estado HTTP devuelto de forma dinámica.
+
+2.Reutilización.
+Aprovecha el ciclo de vida global del objeto request. El sistema lee los datos del usuario (usuario_actual). Estos datos son inyectados previamente en la petición por el decorador de autenticación (@token_required), asegurando una identificación precisa sin necesidad de realizar nuevas consultas a la base de datos.
+
+
+Frontend (Cliente)                                        Backend (API REST)
+     │                                                          │
+     │─── POST /usuarios (Crear Usuario) ─────────────────────> │
+     │    Header: Authorization: Bearer                         │
+     │    Body: {"nombre": "Juan", "rol": "admin"}              │
+     │                                                          │
+     │                                                    [utils/security]
+     │                                                 @token_required valida e inyecta `usuario_actual`
+     │                                                 @registrar_actividad envuelve la función
+     │                                                          │
+     │                                                    [route/usuario]
+     │                                                 Ejecuta la lógica principal (Crear usuario)
+     │                                                 Devuelve la tupla de respuesta y estado (201)
+     │                                                          │
+     │                                                    [utils/utils]
+     │                                                 @registrar_actividad evalúa la respuesta (201)
+     │                                                 Extrae el Body y el Usuario de `request`
+     │                                                          │
+     │                                                      [services/logs.py]
+     │                                                          │
+     │                                                      Crear_log(datos para la creacion del log)
+     │                                                          │
+     │<── 201 Created (JSON Data) ──────────────────────────────│
+
+### 4. Dashbord (listado de alumnos)
 Se cuenta con un sistema para manejar grandes volúmenes de datos de alumnos de forma eficiente. El mismo posee:
 
 1. Filtrado Dinámico de Estudiantes, filtra según la condición académica usando el campo booleano abandono mediante cláusulas AND dinámicas en SQL.
@@ -262,7 +296,7 @@ Importación (POST): El Frontend envía un archivo vía Multipart/Form-Data. El 
 
 Exportación (GET): Genera la descarga de la lista filtrada en tiempo real. Utiliza la clase Response de Flask con el tipo text/csv y la cabecera Content-Disposition: attachment. El navegador descarga un archivo físico (alumnos_curso_{id}.csv) generado directamente desde la memoria RAM.
 
-### 4. Gestion de grupos
+### 5. Gestion de grupos
 El sistema permite armar grupos de alumnos, asignarles evaluaciones y mostrar sus datos.Algunas de sus caracteristicas son:
 
 1.Limpiar los datos duplicados que genera la base de datos.
@@ -322,7 +356,7 @@ Si ya tenes MySQL 8 corriendo en tu maquina (puerto `3306` por default):
    ```bash
    cd Backend
    bash init.sh
-   source venv/bin/activate
+   source .venv/bin/activate
    ```
 
 3. **Ejecutar la aplicación:**
