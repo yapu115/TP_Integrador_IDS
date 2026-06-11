@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Logs{% endblock %}
+{% block breadcrumbs %}<span class="breadcrumbs__item">REGISTRO DE ACTIVIDAD</span>{% endblock %}
+{% block extra_css %}<link
+  rel="stylesheet"
+  href="{{ url_for('static', filename='css/logs.css') }}"
+/>{% endblock %}
+{% block content%}
+<div class="chat-container">
+    <header class="chat-header">
+        <div class="status-indicator"></div>
+        <div>
+            <h1>Registro de actividad</h1>
+            <p>Flujo en tiempo real de eventos y auditoría del sistema</p>
+        </div>
+    </header>
+    <main id="chat-feed" class="chat-feed">
+        <div class="system-message">Registro de actividad</div>
+        {% for log in lista_logs %}
+        <div class="log-message">
+            <div class="log-meta">
+                <span class="log-user"> {{ log.usuario if log.usuario else 'Sistema' }}</span>
+                <span class="log-time">{{ log.fecha }}</span>
+            </div>
+            <div class="log-action-title">Acción: <span class="badge">{{ log.accion }}</span></div>
+            
+            {% if log.detalles %}
+            <pre class="log-details">{{ log.detalles }}</pre>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </main>
+</div>
+{% endblock %}

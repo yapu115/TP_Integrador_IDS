@@ -18,6 +18,7 @@ from routes.alumnos import alumnos_bp
 from routes.dashboard import dashboard_bp
 from routes.materiales import materiales_bp
 from routes.portal_alumno import portal_alumno_bp
+from routes.logs import logs_bp
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
 
@@ -32,6 +33,7 @@ app.register_blueprint(alumnos_bp)
 app.register_blueprint(dashboard_bp)
 app.register_blueprint(materiales_bp)
 app.register_blueprint(portal_alumno_bp)
+app.register_blueprint(logs_bp)
 
 
 if __name__ == "__main__":
