@@ -43,7 +43,7 @@ def cargar_historial_asistencia(token, curso_id):
 
 
 @asistencia_bp.route("/asistencia", methods=["GET"])
-#@login_required
+@login_required
 def asistencia():
     token = session.get("token")
     curso_id = session.get("curso_id")
@@ -96,7 +96,7 @@ def asistencia():
     )
 
 @asistencia_bp.route("/asistencia", methods=["POST"])
-#@login_required
+@login_required
 def enviar_qr_desde_asistencia():
     token = session.get("token")
     curso_id = session.get("curso_id")
