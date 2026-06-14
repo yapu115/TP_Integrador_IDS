@@ -225,10 +225,6 @@ def actualizar_alumno(id):
 @alumnos_bp.route('/alumnos/<int:id>', methods=['DELETE'])
 @token_required
 @role_required("admin")
-<<<<<<< HEAD
-@registrar_actividad("ELIMINAR_ALUMNO")
-=======
->>>>>>> f4e58b1 (arreglos)
 def borrar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
