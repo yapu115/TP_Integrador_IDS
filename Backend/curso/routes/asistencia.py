@@ -7,7 +7,7 @@ from curso.validators.asistencia import (
     validar_generar_qr,
     validar_enviar_qr,
     validar_enviar_qr_curso,
-    validar_registrar_asistencia
+    validar_registrar_asistencia,
 )
 
 from curso.services.asistencia import (
@@ -20,7 +20,8 @@ from curso.services.asistencia import (
     obtener_estado_asistencia_hoy,
     crear_clase_obligatoria,
     obtener_clases_obligatorias,
-    reprogramar_clase_obligatoria
+    reprogramar_clase_obligatoria,
+    obtener_detalle_clases_alumno
 )
 
 
@@ -183,46 +184,15 @@ def registrar_desde_qr():
         </html>
         """, 500
 
-@asistencia_bp.route("/asistencia/registrar", methods=["POST"])
-#@token_required
-def registrar():
-    retorno = None
-    data = request.get_json(silent=True) or {}
-
-    errores, datos_validados = validar_registrar_asistencia(data)
-
-    if errores:
-        retorno = jsonify({"errors": errores}), 400
-    else:
-        resultado = registrar_asistencia(datos_validados["codigo_qr"])
-
-        if "error" in resultado:
-            if resultado["error"] == "BAD_REQUEST":
-                retorno = jsonify({"errors": [{"code": "BAD_REQUEST", "message": resultado["mensaje"]}]}), 400
-            elif resultado["error"] == "NOT_FOUND":
-                retorno = jsonify({"errors": [{"code": "NOT_FOUND", "message": resultado["mensaje"]}]}), 404
-            else:
-                retorno = jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), 500
-        else:
-            retorno = "", 204
-
-    return retorno
-
-
-@asistencia_bp.route("/asistencia/clases", methods=["GET"])
-def obtener_clases():
-    resultado = obtener_clases_obligatorias()
-
-    if isinstance(resultado, dict) and "error" in resultado:
-        return jsonify(resultado), 400
-
-    return jsonify(resultado), 200
-
 @asistencia_bp.route("/asistencia/crear-clase", methods=["POST"])
-def crear_clase():
-    
-    fecha = request.form.get('fecha')
-    nombre_clase = request.form.get('nombre_clase')
+def crear_clase_obligatoria_route():
+    data = request.get_json(silent=True)
+
+    if data is None:
+        data = request.form
+
+    fecha = data.get("fecha") or data.get("fecha_clase")
+    nombre_clase = data.get("nombre_clase")
 
     if not fecha or not nombre_clase:
         return jsonify({
@@ -236,6 +206,23 @@ def crear_clase():
 
     return jsonify(resultado), 200
 
+
+@asistencia_bp.route("/asistencia/clases", methods=["GET"])
+def obtener_clases():
+    resultado = obtener_clases_obligatorias()
+
+    if isinstance(resultado, dict) and "error" in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify(resultado), 200
+
+@asistencia_bp.route("/asistencia/tabla", methods=["GET"])
+def tabla_asistencia():
+    resultado = obtener_estado_asistencia_hoy()
+    return jsonify(resultado), 200
+
+
+
 @asistencia_bp.route("/asistencia/reprogramar-clase", methods=["POST"])
 def reprogramar_clase():
     data = request.get_json(silent=True)
@@ -246,6 +233,15 @@ def reprogramar_clase():
     fecha_actual = data.get("fecha_actual")
     nombre_clase = data.get("nombre_clase")
     nueva_fecha = data.get("nueva_fecha")
+
+    clase_seleccionada = data.get("clase_seleccionada")
+
+    if clase_seleccionada and (not fecha_actual or not nombre_clase):
+        partes = clase_seleccionada.split("|", 1)
+
+        if len(partes) == 2:
+            fecha_actual = partes[0]
+            nombre_clase = partes[1]
 
     if not fecha_actual or not nombre_clase or not nueva_fecha:
         return jsonify({
@@ -259,6 +255,16 @@ def reprogramar_clase():
     )
 
     if isinstance(resultado, dict) and "error" in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify(resultado), 200
+
+
+@asistencia_bp.route("/asistencia/detalle/<int:id_alumno>", methods=["GET"])
+def detalle_asistencia_alumno(id_alumno):
+    resultado = obtener_detalle_clases_alumno(id_alumno)
+
+    if "error" in resultado:
         return jsonify(resultado), 400
 
     return jsonify(resultado), 200
