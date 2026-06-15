@@ -36,4 +36,74 @@ btnGerarQr.addEventListener("click", async () => {
         console.error(error);
     }
 
-   });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const botonesDetalle = document.querySelectorAll(".btn-ver-detalle");
+    const modal = document.getElementById("modal-detalle");
+    const btnCerrar = document.getElementById("cerrar-modal-detalle");
+
+    const detalleLegajo = document.getElementById("detalle-legajo");
+    const detalleNombre = document.getElementById("detalle-nombre");
+    const detalleEmail = document.getElementById("detalle-email");
+    const detalleEstado = document.getElementById("detalle-estado");
+    const detalleCondicion = document.getElementById("detalle-condicion");
+    const detalleObservacion = document.getElementById("detalle-observacion-texto");
+
+    botonesDetalle.forEach(function (boton) {
+        boton.addEventListener("click", function () {
+            const legajo = boton.dataset.legajo || "Sin dato";
+            const nombre = boton.dataset.nombre || "Sin dato";
+            const email = boton.dataset.email || "Sin dato";
+            const estado = boton.dataset.estado || "Pendiente";
+            const condicion = boton.dataset.condicion || "Sin definir";
+
+            detalleLegajo.textContent = legajo;
+            detalleNombre.textContent = nombre;
+            detalleEmail.textContent = email;
+            detalleEstado.textContent = estado;
+            detalleCondicion.textContent = condicion;
+
+            if (condicion === "Sin definir") {
+                detalleObservacion.textContent = "Todavía no hay suficientes clases registradas para calcular la regularidad final.";
+            } else {
+                detalleObservacion.textContent = "La condición fue calculada según las asistencias registradas del alumno.";
+            }
+
+            modal.hidden = false;
+            modal.classList.add("is-open");
+        });
+    });
+
+    if (btnCerrar) {
+        btnCerrar.addEventListener("click", function () {
+            modal.hidden = true;
+        });
+    }
+
+    if (modal) {
+        modal.addEventListener("click", function (event) {
+            if (event.target === modal) {
+                modal.hidden = true;
+            }
+        });
+    }
+
+    function cerrarDetalleAlumno() {
+       const modal = document.getElementById("modal-detalle");
+       modal.classList.remove("is-open");
+       modal.hidden = true;
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("modal-detalle");
+        modal.removeAttribute("hidden");
+        modal.classList.add("is-open");
+    
+        if (modal) {
+            modal.classList.remove("is-open");
+            modal.hidden = true;
+        }
+    });
+
+});

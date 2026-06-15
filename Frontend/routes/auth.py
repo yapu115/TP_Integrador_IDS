@@ -11,7 +11,7 @@ def primer_mensaje_error(data):
         return errores[0].get("message", "Ocurrió un error.")
     return data.get("mensaje", "Ocurrió un error.")
 
-
+#CAMIBADO PARA PRUEBAS
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -28,7 +28,8 @@ def login():
         if status == 200 and "token" in data:
             session["token"] = data["token"]
             session["rol"] = data["rol"]
-            return redirect(url_for("cursos.seleccionar_curso", _external=True))
+            session['curso_id'] = 1
+            return redirect(url_for("asistencia.asistencia", _external=True))
 
         return render_template(
             "login.html",
