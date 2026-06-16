@@ -1,13 +1,10 @@
 from flask import Blueprint, request, jsonify
 from curso.utils.security import token_required
-from datetime import date
-from curso.db import mysql
 
 from curso.validators.asistencia import (
     validar_generar_qr,
     validar_enviar_qr,
     validar_enviar_qr_curso,
-    validar_registrar_asistencia,
 )
 
 from curso.services.asistencia import (
@@ -15,7 +12,6 @@ from curso.services.asistencia import (
     enviar_qr_asistencia,
     enviar_qr_asistencia_curso,
     registrar_asistencia,
-    obtener_asistencias_por_alumno,
     obtener_envios_qr_curso,
     obtener_estado_asistencia_hoy,
     crear_clase_obligatoria,
@@ -29,7 +25,7 @@ asistencia_bp = Blueprint("asistencia", __name__)
 
 
 @asistencia_bp.route("/asistencia/qr", methods=["POST"])
-#@token_required
+@token_required
 def generar_qr():
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -55,7 +51,7 @@ def generar_qr():
 
 
 @asistencia_bp.route("/asistencia/qr/enviar", methods=["POST"])
-#@token_required
+@token_required
 def enviar_qr():
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -81,7 +77,7 @@ def enviar_qr():
 
 
 @asistencia_bp.route("/asistencia/qr/enviar/todos", methods=["POST"])
-#@token_required
+@token_required
 def enviar_qr_todos():
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -107,7 +103,7 @@ def enviar_qr_todos():
 
 
 @asistencia_bp.route("/asistencia/envios", methods=["GET"])
-#@token_required
+@token_required
 def listar_envios_qr():
     curso_id = request.args.get("curso_id", type=int)
     fecha = request.args.get("fecha")
@@ -122,6 +118,7 @@ def listar_envios_qr():
 
 
 @asistencia_bp.route("/asistencia/registrar", methods=["GET"])
+@token_required
 def registrar_desde_qr():
     codigo_qr = request.args.get("codigo_qr")
 
@@ -185,6 +182,7 @@ def registrar_desde_qr():
         """, 500
 
 @asistencia_bp.route("/asistencia/crear-clase", methods=["POST"])
+@token_required
 def crear_clase_obligatoria_route():
     data = request.get_json(silent=True)
 
@@ -208,6 +206,7 @@ def crear_clase_obligatoria_route():
 
 
 @asistencia_bp.route("/asistencia/clases", methods=["GET"])
+@token_required
 def obtener_clases():
     resultado = obtener_clases_obligatorias()
 
@@ -217,6 +216,7 @@ def obtener_clases():
     return jsonify(resultado), 200
 
 @asistencia_bp.route("/asistencia/tabla", methods=["GET"])
+@token_required
 def tabla_asistencia():
     resultado = obtener_estado_asistencia_hoy()
     return jsonify(resultado), 200
@@ -224,6 +224,7 @@ def tabla_asistencia():
 
 
 @asistencia_bp.route("/asistencia/reprogramar-clase", methods=["POST"])
+@token_required
 def reprogramar_clase():
     data = request.get_json(silent=True)
 
@@ -261,6 +262,7 @@ def reprogramar_clase():
 
 
 @asistencia_bp.route("/asistencia/detalle/<int:id_alumno>", methods=["GET"])
+@token_required
 def detalle_asistencia_alumno(id_alumno):
     resultado = obtener_detalle_clases_alumno(id_alumno)
 
