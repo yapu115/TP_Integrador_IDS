@@ -95,15 +95,6 @@ def importar_desde_csv(rows, curso_id):
 
 
 
-def actualizar_abandono(id_alumno, estado):
-    conexion = get_connection()
-    cursor   = conexion.cursor(dictionary=True)
-    cursor.execute("UPDATE alumnos SET abandono = %s WHERE id = %s", (estado, id_alumno))
-    conexion.commit()
-    cursor.close()
-    conexion.close()
-
-
 def eliminar_alumno(id_alumno):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
@@ -111,16 +102,6 @@ def eliminar_alumno(id_alumno):
     conexion.commit()
     cursor.close()
     conexion.close()
-
-
-def alumno_en_curso(id_alumno, curso_id):
-    conexion = get_connection()
-    cursor   = conexion.cursor()
-    cursor.execute("SELECT 1 FROM alumnos WHERE id = %s AND curso_id = %s", (id_alumno, curso_id))
-    existe = cursor.fetchone() is not None
-    cursor.close()
-    conexion.close()
-    return existe
 
 
 def _serializar_valor(valor):
