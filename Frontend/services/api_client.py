@@ -82,7 +82,7 @@ def post_json(path, body, token=None):
     )
 
     try:
-        with urllib.request.urlopen(request, timeout=15) as response:
+        with urllib.request.urlopen(request, timeout=180) as response:
             raw = response.read().decode("utf-8")
             data = json.loads(raw) if raw else {}
             return response.status, data

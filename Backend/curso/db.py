@@ -1,10 +1,17 @@
 import mysql.connector
+import os
+import mysql.connector
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent.parent / ".env")
+
 
 def get_connection():
     return mysql.connector.connect(
         host="localhost",
         user="root",
-        #password="",
+        password="test",
         database="curso_universitario"
     )
 

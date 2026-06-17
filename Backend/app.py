@@ -1,5 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
 
 from curso.routes.asistencia import asistencia_bp
 from curso.routes.evaluaciones import evaluacion_bp

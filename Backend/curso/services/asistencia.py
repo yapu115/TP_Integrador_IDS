@@ -31,40 +31,108 @@ def alumno_existe(id_alumno):
 
 
 def obtener_alumno_contacto(id_alumno):
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    connection = None
+    cursor = None
 
-    query = """
-        SELECT id, curso_id, nombre, apellido, email
-        FROM alumnos
-        WHERE id = %s
-    """
-    cursor.execute(query, (id_alumno,))
-    alumno = cursor.fetchone()
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
 
-    cursor.close()
-    connection.close()
+        query = """
+            SELECT id, nombre, apellido, email
+            FROM alumnos
+            WHERE id = %s
+        """
 
-    return alumno
+        cursor.execute(query, (id_alumno,))
+        alumno = cursor.fetchone()
+
+        return alumno
+
+    except Exception as error:
+        print("ERROR obtener_alumno_contacto:", error)
+        return None
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
 
 
 def obtener_alumnos_activos_curso(curso_id):
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
+    connection = None
+    cursor = None
 
-    query = """
-        SELECT id, nombre, apellido, email
-        FROM alumnos
-        WHERE curso_id = %s AND abandono = FALSE
-        ORDER BY apellido, nombre
-    """
-    cursor.execute(query, (curso_id,))
-    alumnos = cursor.fetchall()
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
 
-    cursor.close()
-    connection.close()
+        query = """
+            SELECT id, nombre, apellido, email
+            FROM alumnos
+            WHERE abandono = FALSE
+              AND email IS NOT NULL
+              AND TRIM(email) <> ''
+            ORDER BY apellido, nombre
+        """
 
-    return alumnos
+        cursor.execute(query)
+        alumnos = cursor.fetchall()
+
+        return alumnos
+
+    except Exception as error:
+        print("ERROR obtener_alumnos_activos_curso:", error)
+        return []
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+
+
+
+def obtener_alumnos_con_email():
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+            SELECT id, nombre, apellido, email
+            FROM alumnos
+            WHERE email IS NOT NULL
+              AND TRIM(email) <> ''
+            ORDER BY apellido, nombre
+        """
+
+        cursor.execute(query)
+        alumnos = cursor.fetchall()
+
+        return alumnos
+
+    except Exception as error:
+        print("ERROR obtener_alumnos_con_email:", error)
+        return []
+
+    finally:
+        if cursor is not None:
+            cursor.close()
+
+        if connection is not None:
+            connection.close()
+
+
+
+
+
 
 
 def registrar_envio_qr(id_alumno, curso_id, fecha, codigo_qr, destinatario):
@@ -270,99 +338,212 @@ def generar_qr_asistencia(id_alumno, fecha):
         "url_registrado": url_registro
     }
 
-def enviar_qr_asistencia(id_alumno, fecha):
-    
-   #Busco al alumno, genera el qr y envia un mail con el qr
+def enviar_qr_asistencia(id_alumno, fecha, curso_id=None):
     alumno = obtener_alumno_contacto(id_alumno)
-      
+
     if not alumno:
         return {
             "error": "NOT_FOUND",
-            "mensaje":"No existe un alumno con ese id"
+            "mensaje": "No existe un alumno con ese id."
+        }
+
+    if not alumno.get("email"):
+        return {
+            "error": "EMAIL_NOT_FOUND",
+            "mensaje": "El alumno no tiene un email registrado."
         }
 
     codigo_qr = generar_codigo_qr(id_alumno, fecha)
     nombre_alumno = f"{alumno['nombre']} {alumno['apellido']}"
 
-        
     try:
-        retorno = enviar_mail_asistencia(
+        resultado_mail = enviar_mail_asistencia(
             alumno["email"],
             nombre_alumno,
             fecha,
             codigo_qr
         )
 
-        if retorno is None:
+        if resultado_mail is None:
             return {
                 "error": "EMAIL_SEND_ERROR",
-                "mensaje": "La función enviar_mail_asistencia no devolvió ninguna respuesta."
+                "mensaje": (
+                    "La función enviar_mail_asistencia "
+                    "no devolvió ninguna respuesta."
+                )
             }
 
-        if "error" in retorno:
-            return retorno
+        if "error" in resultado_mail:
+            return resultado_mail
 
-        registrar_envio_qr(
-            alumno["id"],
-            alumno["curso_id"],
-            fecha,
-            codigo_qr,
-            alumno["email"]
-        )
+        if curso_id is not None:
+            registrar_envio_qr(
+                alumno["id"],
+                curso_id,
+                fecha,
+                codigo_qr,
+                alumno["email"]
+            )
 
-        retorno["destinatario"] = alumno["email"]
-        retorno["codigo_qr"] = codigo_qr
+        resultado_mail["destinatario"] = alumno["email"]
+        resultado_mail["codigo_qr"] = codigo_qr
 
-        return retorno
+        return resultado_mail
 
-    except Exception as exc:
+    except Exception as error:
+        print("ERROR enviar_qr_asistencia:", error)
+
         return {
             "error": "EMAIL_SEND_ERROR",
-            "mensaje": f"No se pudo enviar el correo: {exc}"
+            "mensaje": f"No se pudo enviar el correo: {error}"
         }
 
 
-def enviar_qr_asistencia_curso(curso_id, fecha):
-    alumnos = obtener_alumnos_activos_curso(curso_id)
+def enviar_qr_mail_todos(fecha):
+    alumnos = obtener_alumnos_con_email()
 
     if not alumnos:
         return {
-            "error": "NOT_FOUND",
-            "mensaje": "No hay alumnos activos en este curso."
+            "error": "EMAIL_NOT_FOUND",
+            "mensaje": "No hay alumnos con correo electrónico registrado.",
+            "enviados": 0,
+            "fallidos": 0
         }
 
-    enviados = []
+    enviados = 0
     fallidos = []
 
     for alumno in alumnos:
-        resultado = enviar_qr_asistencia(alumno["id"], fecha)
-        if "error" in resultado:
-            fallidos.append({
-                "id_alumno": alumno["id"],
-                "email": alumno["email"],
-                "error": resultado.get("error"),
-                "mensaje": resultado.get("mensaje")
-            })
-        else:
-            enviados.append({
-                "id_alumno": alumno["id"],
-                "email": alumno["email"]
-            })
+        try:
+            codigo_qr = generar_codigo_qr(
+                alumno["id"],
+                fecha
+            )
 
-    if not enviados:
-        return {
-            "error": "EMAIL_SEND_ERROR",
-            "mensaje": "No se pudo enviar ningun correo a los alumnos activos.",
-            "total_activos": len(alumnos),
-            "fallidos": fallidos
-        }
+            nombre_alumno = (
+                f"{alumno['nombre']} {alumno['apellido']}"
+            )
+
+            resultado = enviar_mail_asistencia(
+                alumno["email"],
+                nombre_alumno,
+                fecha,
+                codigo_qr
+            )
+
+            print(
+                "RESULTADO ENVÍO:",
+                alumno["email"],
+                resultado
+            )
+
+            if resultado and "error" not in resultado:
+                enviados += 1
+            else:
+                mensaje_error = (
+                    resultado.get("mensaje")
+                    if resultado
+                    else "La función de mail no devolvió respuesta."
+                )
+
+                fallidos.append({
+                    "email": alumno["email"],
+                    "mensaje": mensaje_error
+                })
+
+        except Exception as error:
+            print(
+                f"ERROR enviando a {alumno['email']}:",
+                error
+            )
+
+            fallidos.append({
+                "email": alumno["email"],
+                "mensaje": str(error)
+            })
 
     return {
-        "mensaje": f"Envio finalizado: {len(enviados)} enviados, {len(fallidos)} con error.",
-        "total_activos": len(alumnos),
+        "mensaje": "Finalizó el envío de QR por correo.",
         "enviados": enviados,
-        "fallidos": fallidos
+        "fallidos": len(fallidos),
+        "detalle_fallidos": fallidos
     }
+
+
+
+
+
+#envia el correo a cada alumno
+def enviar_qr_asistencia_curso(curso_id, fecha):
+    alumnos = obtener_alumnos_con_email()
+
+    if not alumnos:
+        return {
+            "error": "EMAIL_NOT_FOUND",
+            "mensaje": "No hay alumnos con correo electrónico registrado."
+        }
+
+    cantidad_enviados = 0
+    cantidad_fallidos = 0
+
+    for alumno in alumnos:
+        resultado = enviar_qr_asistencia(
+            alumno["id"],
+            fecha,
+            curso_id
+        )
+
+        if resultado and "error" not in resultado:
+            cantidad_enviados += 1
+        else:
+            cantidad_fallidos += 1
+
+    return {
+        "mensaje": "Finalizó el envío de los códigos QR por correo.",
+        "enviados": cantidad_enviados,
+        "fallidos": cantidad_fallidos
+    }
+
+
+
+
+
+#duevuel alumnos regulares, con email
+def obtener_alumnos_activos_curso(curso_id=None):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+            SELECT id, nombre, apellido, email
+            FROM alumnos
+            WHERE abandono = FALSE
+              AND email IS NOT NULL
+              AND TRIM(email) <> ''
+            ORDER BY apellido, nombre
+        """
+
+        cursor.execute(query)
+        alumnos = cursor.fetchall()
+
+        return alumnos
+
+    except Exception as error:
+        print("ERROR obtener_alumnos_activos_curso:", error)
+        return []
+
+    finally:
+        if cursor:
+            cursor.close()
+
+        if connection:
+            connection.close()
+
+
+
 
 def registrar_asistencia(codigo_qr):
     retorno = None
@@ -479,26 +660,57 @@ def crear_clase_obligatoria(fecha, nombre_clase):
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        cursor.execute("""
+        nombre_clase = nombre_clase.strip()
+
+        cursor.execute(
+            """
+            SELECT id_clase
+            FROM clases_obligatorias
+            WHERE fecha = %s
+              AND LOWER(TRIM(nombre_clase)) = LOWER(TRIM(%s))
+            LIMIT 1
+            """,
+            (fecha, nombre_clase)
+        )
+
+        clase_existente = cursor.fetchone()
+
+        if clase_existente:
+            return {
+                "error": "CLASE_DUPLICADA",
+                "message": "Ya existe una clase con ese nombre para esa fecha."
+            }
+
+        cursor.execute(
+            """
             INSERT INTO clases_obligatorias (fecha, nombre_clase)
             VALUES (%s, %s)
-        """, (fecha, nombre_clase))
+            """,
+            (fecha, nombre_clase)
+        )
 
         connection.commit()
 
         return {
-            "mensaje": "Clase creada exitosamente."
+            "message": "Clase creada exitosamente.",
+            "id_clase": cursor.lastrowid
         }
 
-    except Exception as e:
-        print("ERROR crear_clase_obligatoria:", e)
+    except Exception as error:
+        if connection:
+            connection.rollback()
+
+        print("ERROR crear_clase_obligatoria:", error)
+
         return {
-            "error": str(e)
+            "error": "DATABASE_ERROR",
+            "message": str(error)
         }
 
     finally:
         if cursor:
             cursor.close()
+
         if connection:
             connection.close()
 

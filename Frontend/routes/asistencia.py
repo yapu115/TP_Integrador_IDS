@@ -166,70 +166,184 @@ def enviar_qr_desde_asistencia():
     fecha_hoy = date.today().strftime("%Y-%m-%d")
     action = request.form.get("action")
 
-    #Temporal
     print("ACTION RECIBIDA:", action)
     print("FORM RECIBIDO:", request.form)
 
-    #crear clase
+
+   
+    # Si no hay token, la sesión expiró
+    if not token:
+        session.clear()
+        return redirect(url_for("auth.login"))
+
+    # Crea una clase obligatoria
     if action == "crear-clase":
-       fecha_clase = request.form.get("fecha_clase")
-       nombre_clase = request.form.get("nombre_clase")
+        fecha_clase = request.form.get("fecha_clase")
+        nombre_clase = request.form.get("nombre_clase", "").strip()
 
-       if not fecha_clase:
-          flash("Debe seleccionar la fecha de la clase.", "error")
-          return redirect(url_for("asistencia.asistencia"))
+        if not fecha_clase:
+            flash("Debe seleccionar la fecha de la clase.", "error")
+            return redirect(url_for("asistencia.asistencia"))
 
-       if not nombre_clase:
-          flash("Debe ingresar el nombre de la clase.", "error")
-          return redirect(url_for("asistencia.asistencia"))
+        if not nombre_clase:
+            flash("Debe ingresar el nombre de la clase.", "error")
+            return redirect(url_for("asistencia.asistencia"))
 
-       status, data = post_json(
-          "/asistencia/crear-clase",
-          {
-              "fecha_clase": fecha_clase,
-              "nombre_clase": nombre_clase
-          },
-          token=token
+        status, data = post_json(
+            "/asistencia/crear-clase",
+            {
+                "fecha": fecha_clase,
+                "nombre_clase": nombre_clase
+            },
+            token=token
         )
 
-       if status == 200:
-           flash("Clase creada exitosamente.", "success")
-       else:
-           flash(primer_mensaje_error(data, "No se pudo crear la clase."), "error")
+        if status in (401, 403):
+            session.clear()
+            return redirect(url_for("auth.login"))
 
-       return redirect(url_for("asistencia.asistencia"))
+        if status in (200, 201):
+            flash(
+                primer_mensaje_error(
+                    data,
+                    "Clase creada exitosamente."
+                ),
+                "success"
+            )
+        else:
+            flash(
+                primer_mensaje_error(
+                    data,
+                    "No se pudo crear la clase."
+                ),
+                "error"
+            )
 
-    #Reprogramar
-    if action == "reprogramar-clase":
-       clase_seleccionada = request.form.get("clase_seleccionada")
-       nueva_fecha = request.form.get("nueva_fecha")
+        return redirect(url_for("asistencia.asistencia"))
 
-       if not clase_seleccionada:
-          flash("Seleccioná una clase para reprogramar.", "error")
-          return redirect(url_for("asistencia.asistencia"))
+    # Reprograma una clase obligatoria
+    elif action == "reprogramar-clase":
+        clase_seleccionada = request.form.get("clase_seleccionada")
+        nueva_fecha = request.form.get("nueva_fecha")
 
-       if not nueva_fecha:
-          flash("Seleccioná la nueva fecha.", "error")
-          return redirect(url_for("asistencia.asistencia"))
+        if not clase_seleccionada:
+            flash("Seleccioná una clase para reprogramar.", "error")
+            return redirect(url_for("asistencia.asistencia"))
 
-    fecha_actual, nombre_clase = clase_seleccionada.split("|")
+        if not nueva_fecha:
+            flash("Seleccioná la nueva fecha.", "error")
+            return redirect(url_for("asistencia.asistencia"))
 
-    status, data = post_json(
-        "/asistencia/reprogramar-clase",
+        # El valor debe tener el formato: fecha|nombre de la clase
+        partes = clase_seleccionada.split("|", 1)
+
+        if len(partes) != 2:
+            flash(
+                "La clase seleccionada tiene un formato inválido.",
+                "error"
+            )
+            return redirect(url_for("asistencia.asistencia"))
+
+        fecha_actual = partes[0]
+        nombre_clase = partes[1]
+
+        status, data = post_json(
+            "/asistencia/reprogramar-clase",
+            {
+                "fecha_actual": fecha_actual,
+                "nombre_clase": nombre_clase,
+                "nueva_fecha": nueva_fecha
+            },
+            token=token
+        )
+
+        if status in (401, 403):
+            session.clear()
+            return redirect(url_for("auth.login"))
+
+        if status in (200, 201):
+            flash(
+                primer_mensaje_error(
+                    data,
+                    "Clase reprogramada correctamente."
+                ),
+                "success"
+            )
+        else:
+            flash(
+                primer_mensaje_error(
+                    data,
+                    "No se pudo reprogramar la clase."
+                ),
+                "error"
+            )
+
+        return redirect(url_for("asistencia.asistencia"))
+
+   
+    # Enviar QR a todos los alumnos
+    elif action == "enviar_qr_hoy":
+           status, data = post_json(
+           "/asistencia/qr/enviar/todos",
         {
-            "fecha_actual": fecha_actual,
-            "nombre_clase": nombre_clase,
-            "nueva_fecha": nueva_fecha
+            "curso_id": curso_id,
+            "fecha": fecha_hoy
         },
         token=token
     )
 
-    if status == 200:
-        flash("Clase reprogramada correctamente.", "success")
+    print("====================================")
+    print("STATUS ENVÍO QR:", status)
+    print("RESPUESTA BACKEND:", data)
+    print("====================================")
+
+    if status in (401, 403):
+        session.clear()
+        return redirect(url_for("auth.login"))
+
+    if status in (200, 201):
+        enviados = data.get(
+            "cantidad_enviados",
+            data.get("enviados", 0)
+        )
+
+        fallidos = data.get(
+            "cantidad_fallidos",
+            data.get("fallidos", 0)
+        )
+
+        flash(
+            f"Se enviaron {enviados} códigos QR. "
+            f"Fallaron {fallidos} envíos.",
+            "success"
+        )
+
     else:
-        flash(primer_mensaje_error(data, "No se pudo reprogramar la clase."), "error")
+        mensaje = data.get("mensaje")
+
+        if not mensaje:
+            errores = data.get("errors", [])
+
+            if errores and isinstance(errores[0], dict):
+                mensaje = errores[0].get("message")
+
+        if not mensaje:
+            mensaje = (
+                f"No se pudieron enviar los QR. "
+                f"Estado HTTP: {status}. Respuesta: {data}"
+            )
+
+        flash(mensaje, "error")
 
     return redirect(url_for("asistencia.asistencia"))
+
+    # Accion desconocida
+    flash("La acción solicitada no es válida.", "error")
+    return redirect(url_for("asistencia.asistencia"))
+
+
+
+
 
 @asistencia_bp.route("/asistencia/detalle/<int:id_alumno>", methods=["GET"])
 @login_required

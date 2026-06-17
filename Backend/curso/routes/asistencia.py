@@ -12,7 +12,6 @@ from curso.validators.asistencia import (
 
 from curso.services.asistencia import (
     generar_qr_asistencia,
-    enviar_qr_asistencia,
     enviar_qr_asistencia_curso,
     registrar_asistencia,
     obtener_asistencias_por_alumno,
@@ -21,7 +20,8 @@ from curso.services.asistencia import (
     crear_clase_obligatoria,
     obtener_clases_obligatorias,
     reprogramar_clase_obligatoria,
-    obtener_detalle_clases_alumno
+    obtener_detalle_clases_alumno,
+    enviar_qr_mail_todos
 )
 
 
@@ -54,34 +54,7 @@ def generar_qr():
     return retorno
 
 
-@asistencia_bp.route("/asistencia/qr/enviar", methods=["POST"])
-#@token_required
-def enviar_qr():
-    retorno = None
-    data = request.get_json(silent=True) or {}
-
-    errores, datos_validados = validar_enviar_qr(data)
-
-    if errores:
-        retorno = jsonify({"errors": errores}), 400
-    else:
-        resultado = enviar_qr_asistencia(datos_validados["id_alumno"], datos_validados["fecha"])
-
-        if "error" in resultado:
-            if resultado["error"] == "NOT_FOUND":
-                retorno = jsonify({
-                    "errors": [{"code": "NOT_FOUND", "message": resultado["mensaje"], "description": "Verifique el ID del alumno."}]
-                }), 404
-            else:
-                retorno = jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), 500
-        else:
-            retorno = jsonify(resultado), 200
-
-    return retorno
-
-
 @asistencia_bp.route("/asistencia/qr/enviar/todos", methods=["POST"])
-#@token_required
 def enviar_qr_todos():
     retorno = None
     data = request.get_json(silent=True) or {}
@@ -91,15 +64,27 @@ def enviar_qr_todos():
     if errores:
         retorno = jsonify({"errors": errores}), 400
     else:
-        resultado = enviar_qr_asistencia_curso(datos_validados["curso_id"], datos_validados["fecha"])
+        resultado = enviar_qr_asistencia_curso(
+            datos_validados["curso_id"],
+            datos_validados["fecha"]
+        )
 
         if "error" in resultado:
             if resultado["error"] == "NOT_FOUND":
                 retorno = jsonify({
-                    "errors": [{"code": "NOT_FOUND", "message": resultado["mensaje"], "description": "Verifique que el curso tenga alumnos activos."}]
+                    "errors": [{
+                        "code": "NOT_FOUND",
+                        "message": resultado["mensaje"],
+                        "description": "No hay alumnos activos con email."
+                    }]
                 }), 404
             else:
-                retorno = jsonify({"errors": [{"code": resultado["error"], "message": resultado["mensaje"]}]}), 500
+                retorno = jsonify({
+                    "errors": [{
+                        "code": resultado["error"],
+                        "message": resultado["mensaje"]
+                    }]
+                }), 500
         else:
             retorno = jsonify(resultado), 200
 
@@ -263,6 +248,29 @@ def reprogramar_clase():
 @asistencia_bp.route("/asistencia/detalle/<int:id_alumno>", methods=["GET"])
 def detalle_asistencia_alumno(id_alumno):
     resultado = obtener_detalle_clases_alumno(id_alumno)
+
+    if "error" in resultado:
+        return jsonify(resultado), 400
+
+    return jsonify(resultado), 200
+
+
+
+@asistencia_bp.route("/enviar-qr-mail", methods=["POST"])
+def enviar_qr_mail():
+    datos = request.get_json(silent=True) or {}
+
+    fecha = datos.get("fecha")
+
+    if not fecha:
+        fecha = date.today().isoformat()
+
+    print("INICIANDO ENVÍO QR POR MAIL")
+    print("FECHA:", fecha)
+
+    resultado = enviar_qr_mail_todos(fecha)
+
+    print("RESULTADO FINAL:", resultado)
 
     if "error" in resultado:
         return jsonify(resultado), 400
