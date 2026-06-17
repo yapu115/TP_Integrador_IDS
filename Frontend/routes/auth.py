@@ -29,8 +29,7 @@ def login():
         if status == 200 and "token" in data:
             session["token"] = data["token"]
             session["rol"] = data["rol"]
-            session['curso_id'] = 1
-            return redirect(url_for("asistencia.asistencia", _external=True))
+            return redirect(url_for("cursos.seleccionar_curso", _external=True))
 
         return render_template(
             "login.html",

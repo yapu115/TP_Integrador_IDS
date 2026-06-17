@@ -1,344 +1,363 @@
 /* ── GRUPOS PAGE ──────────────────────────────────────────── */
 .grupos-page {
-    max-width: 1100px;
-    margin: 0 auto;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
 .grupos-layout {
-    display: flex;
-    gap: 30px;
-    align-items: flex-start;
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
 }
 
 .grupos-title {
-    font-family: Georgia, "Times New Roman", serif;
-    font-size: 1.4rem;
-    color: var(--alabaster);
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 2px solid var(--dusk-blue);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.4rem;
+  color: var(--alabaster);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--dusk-blue);
 }
 
 /* ── CONTENEDOR GRUPOS ────────────────────────────────────── */
 .form-grupos {
-    flex: 0 0 380px;
+  flex: 0 0 380px;
 }
 
 .contenedor-grupos {
-    background: var(--prussian-blue);
-    border: 1px solid var(--dusk-blue);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
 .scrollableWrapper {
-    width: 100%;
-    height: 260px;
-    border: 1px solid var(--dusk-blue);
-    border-radius: 10px;
-    overflow: hidden;
-    background: var(--ink-black);
-    margin-bottom: 18px;
+  width: 100%;
+  height: 260px;
+  border: 1px solid var(--dusk-blue);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--ink-black);
+  margin-bottom: 18px;
 }
 
 .scrollableContent {
-    width: 100%;
-    height: 100%;
-    overflow-y: auto;
-    overflow-x: hidden;
-    padding: 10px;
-    box-sizing: border-box;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 /* Scrollbar styling */
 .scrollableContent::-webkit-scrollbar {
-    width: 6px;
+  width: 6px;
 }
 .scrollableContent::-webkit-scrollbar-track {
-    background: var(--prussian-blue);
+  background: var(--prussian-blue);
 }
 .scrollableContent::-webkit-scrollbar-thumb {
-    background: var(--dusk-blue);
-    border-radius: 3px;
+  background: var(--dusk-blue);
+  border-radius: 3px;
 }
 .scrollableContent::-webkit-scrollbar-thumb:hover {
-    background: var(--accent);
+  background: var(--accent);
 }
 
 .grupo-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .grupo-item input[type="radio"] {
-    accent-color: var(--accent);
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    flex-shrink: 0;
+  accent-color: var(--accent);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .grupo-label {
-    color: var(--alabaster);
-    font-size: 0.95rem;
-    cursor: pointer;
-    padding: 8px 12px;
-    border-radius: 8px;
-    flex: 1;
-    transition: background 0.2s;
+  color: var(--alabaster);
+  font-size: 0.95rem;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  flex: 1;
+  transition: background 0.2s;
 }
 
 .grupo-label:hover {
-    background: var(--dusk-blue);
+  background: var(--dusk-blue);
 }
 
 .btn-ver-grupo {
-    width: 100%;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--accent-hover), var(--accent));
-    color: #ffffff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: filter 0.2s ease, transform 0.15s ease;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent-hover), var(--accent));
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
+}
+
+.grupo-actions-spacing {
+  margin-bottom: 12px;
 }
 
 .btn-ver-grupo:hover {
-    filter: brightness(1.12);
+  filter: brightness(1.12);
 }
 
 .btn-ver-grupo:active {
-    transform: scale(0.97);
+  transform: scale(0.97);
 }
 
 /* ── CONTENEDOR ALUMNOS ───────────────────────────────────── */
 .contenedor-alumnos {
-    flex: 1;
-    background: var(--prussian-blue);
-    border: 1px solid var(--dusk-blue);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 12px 28px rgba(0,0,0,0.4);
-    min-height: 340px;
+  flex: 1;
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+  min-height: 340px;
 }
 
 .info-alumno-grupo {
-    margin-bottom: 8px;
+  margin-bottom: 8px;
 }
 
 .btn-alumno {
-    width: 100%;
-    text-align: left;
-    padding: 12px 18px;
-    background: var(--ink-black);
-    color: var(--alabaster);
-    border: 1px solid var(--dusk-blue);
-    border-radius: 10px;
-    font-size: 0.95rem;
-    cursor: pointer;
-    transition: background 0.2s, border-color 0.2s, transform 0.15s;
+  width: 100%;
+  text-align: left;
+  padding: 12px 18px;
+  background: var(--ink-black);
+  color: var(--alabaster);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.15s;
 }
 
 .btn-alumno:hover {
-    background: var(--dusk-blue);
-    border-color: var(--accent);
-    transform: translateX(4px);
+  background: var(--dusk-blue);
+  border-color: var(--accent);
+  transform: translateX(4px);
 }
 
 .grupos-empty-hint {
-    color: var(--lavender-grey);
-    font-style: italic;
-    margin-top: 20px;
-    text-align: center;
+  color: var(--lavender-grey);
+  font-style: italic;
+  margin-top: 20px;
+  text-align: center;
 }
 
 /* ── ESTADO VACÍO ─────────────────────────────────────────── */
 .grupos-empty {
-    text-align: center;
-    padding: 60px 20px;
-    color: var(--lavender-grey);
-    background: var(--prussian-blue);
-    border-radius: 16px;
-    border: 1px solid var(--dusk-blue);
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--lavender-grey);
+  background: var(--prussian-blue);
+  border-radius: 16px;
+  border: 1px solid var(--dusk-blue);
 }
 
 .grupos-empty-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 16px;
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 16px;
 }
 
 /* ── MODAL ────────────────────────────────────────────────── */
 .modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(13, 27, 42, 0.85);
-    backdrop-filter: blur(4px);
-    z-index: 9999;
-    justify-content: center;
-    align-items: center;
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 27, 42, 0.85);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
 }
 
 .modal--open {
-    display: flex;
-    animation: fadeIn 0.2s ease;
+  display: flex;
+  animation: fadeIn 0.2s ease;
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.95); }
-    to   { opacity: 1; transform: scale(1); }
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 .modal-content {
-    background: var(--prussian-blue);
-    border: 1px solid var(--dusk-blue);
-    border-radius: 18px;
-    padding: 0;
-    width: 90%;
-    max-width: 440px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-    overflow: hidden;
+  background: var(--prussian-blue);
+  border: 1px solid var(--dusk-blue);
+  border-radius: 18px;
+  padding: 0;
+  width: 90%;
+  max-width: 440px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+  overflow: hidden;
 }
 
 .modal-header {
-    background: var(--ink-black);
-    padding: 20px 24px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid var(--dusk-blue);
+  background: var(--ink-black);
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--dusk-blue);
 }
 
 .modal-header h2 {
-    font-size: 1.2rem;
-    color: var(--alabaster);
-    margin: 0;
+  font-size: 1.2rem;
+  color: var(--alabaster);
+  margin: 0;
 }
 
 .close {
-    font-size: 1.5rem;
-    color: var(--lavender-grey);
-    cursor: pointer;
-    transition: color 0.2s;
-    line-height: 1;
+  font-size: 1.5rem;
+  color: var(--lavender-grey);
+  cursor: pointer;
+  transition: color 0.2s;
+  line-height: 1;
 }
 
 .close:hover {
-    color: var(--accent);
+  color: var(--accent);
 }
 
 .modal-body {
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .modal-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--ink-black);
-    border-radius: 8px;
-    font-size: 0.95rem;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 14px;
+  background: var(--ink-black);
+  border-radius: 8px;
+  font-size: 0.95rem;
 }
 
 .modal-label {
-    color: var(--lavender-grey);
-    font-weight: 600;
-    min-width: 70px;
+  color: var(--lavender-grey);
+  font-weight: 600;
+  min-width: 70px;
 }
 /* -- FORMULARIO CREAR GRUPO --------------------------------- */
 .form-crear-grupo {
-    margin-top: 20px;
+  margin-top: 20px;
 }
 
 .form-group-crear {
-    margin-bottom: 15px;
+  margin-bottom: 15px;
 }
 
 .input-crear-grupo {
-    width: 100%;
-    padding: 12px 14px;
-    border-radius: 8px;
-    background: var(--ink-black);
-    border: 1px solid var(--dusk-blue);
-    color: var(--alabaster);
-    font-size: 0.95rem;
-    box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--ink-black);
+  border: 1px solid var(--dusk-blue);
+  color: var(--alabaster);
+  font-size: 0.95rem;
+  box-sizing: border-box;
 }
 
 .input-crear-grupo:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(139, 92, 246, 0.2);
 }
 
 .btn-crear-grupo {
-    width: 100%;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #10b981, #059669);
-    color: #ffffff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: filter 0.2s ease, transform 0.15s ease;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #10b981, #059669);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
 }
 
 .btn-eliminar-grupo {
-    width: 100%;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 999px;
-    background: linear-gradient(90deg, #b91010, #960505);
-    color: #ffffff;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: filter 0.2s ease, transform 0.15s ease;
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #b91010, #960505);
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    filter 0.2s ease,
+    transform 0.15s ease;
 }
 
 .btn-eliminar-grupo:hover {
-    filter: brightness(1.12);
+  filter: brightness(1.12);
 }
 
 .btn-eliminar-grupo:active {
-    transform: scale(0.97);
+  transform: scale(0.97);
 }
 
 .btn-crear-grupo:hover {
-    filter: brightness(1.12);
+  filter: brightness(1.12);
 }
 
 .btn-crear-grupo:active {
-    transform: scale(0.97);
+  transform: scale(0.97);
 }
 
 .grupo-seleccionado-nombre {
-    color: var(--accent);
-    font-weight: normal;
-    font-size: 1.1rem;
+  color: var(--accent);
+  font-weight: normal;
+  font-size: 1.1rem;
 }
 .form-group-alumnos .scrollableWrapper {
-    height: 150px;
-    margin-bottom: 0;
+  height: 150px;
+  margin-bottom: 0;
 }
 .label-alumnos {
-    color: var(--lavender-grey);
-    font-size: 0.9rem;
-    margin: 0 0 8px 0;
+  color: var(--lavender-grey);
+  font-size: 0.9rem;
+  margin: 0 0 8px 0;
 }
 .btn-crear-grupo {
-    margin-top: 15px;
+  margin-top: 15px;
 }
