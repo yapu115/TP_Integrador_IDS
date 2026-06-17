@@ -41,6 +41,7 @@ def grupos():
             status, detalle = delete_json(f"/grupos/{id_grupo_seleccionado}", token=token)
             if status == 204:
                 print(f"Status del borrado en la API: {status}")
+                return redirect(url_for("grupos.grupos"))
     # Cargar alumnos y evaluaciones para el formulario de crear/editar grupo
     st_al, data_al = get_json(f"/alumnos?curso_id={curso_id}&_limit=100", token=token)
     lista_alumnos = data_al.get("alumnos", []) if st_al == 200 else []
