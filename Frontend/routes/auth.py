@@ -6,12 +6,13 @@ auth_bp = Blueprint("auth", __name__)
 
 
 def primer_mensaje_error(data):
+    if isinstance(data, str) and data.strip().startswith("<!doctype"):
+        return "Error de comunicación con el servidor externo (404)."
     errores = data.get("errors", [])
     if errores:
         return errores[0].get("message", "Ocurrió un error.")
     return data.get("mensaje", "Ocurrió un error.")
 
-#CAMIBADO PARA PRUEBAS
 @auth_bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
