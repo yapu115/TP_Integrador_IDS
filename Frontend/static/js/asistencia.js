@@ -97,8 +97,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     document.addEventListener("DOMContentLoaded", function () {
         const modal = document.getElementById("modal-detalle");
-        modal.removeAttribute("hidden");
-        modal.classList.add("is-open");
     
         if (modal) {
             modal.classList.remove("is-open");
