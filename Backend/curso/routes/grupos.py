@@ -45,7 +45,7 @@ def route_listar_grupos():
 
 @grupos_bp.route("/grupos", methods=["POST"])
 @token_required
-@registrar_actividad("CEACION_GRUPO")
+@registrar_actividad("CREACION_GRUPO")
 def route_crear_grupo():
     curso_id, error = get_curso_id()
     if error:

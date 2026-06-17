@@ -1,6 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
-from services.api_client import get_json, post_json, delete_json
-from utils.auth import login_required
+from flask import Blueprint, render_template, session
+from services.api_client import get_json
 
 logs_bp = Blueprint('logs', __name__)
 

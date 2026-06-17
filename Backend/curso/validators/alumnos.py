@@ -178,6 +178,7 @@ def validar_csv_import(rows):
         }], None
 
     filas_validadas = []
+    legajos_vistos = set()
     for i, row in enumerate(rows, start=2):
         legajo = (row.get('legajo') or '').strip()
         nombre = (row.get('nombre') or '').strip()
@@ -191,6 +192,21 @@ def validar_csv_import(rows):
                 "level": "error"
             }], None
 
+        if legajo in legajos_vistos:
+            return [{
+                "code": "VALIDATION_ERROR",
+                "message": f"Fila {i}: el legajo {legajo} esta duplicado dentro del archivo.",
+                "level": "error"
+            }], None
+
+        if not re.match(r'^[^@]+@[^@]+\.[^@]+$', email):
+            return [{
+                "code": "VALIDATION_ERROR",
+                "message": f"Fila {i}: el email no tiene un formato valido.",
+                "level": "error"
+            }], None
+
+        legajos_vistos.add(legajo)
         filas_validadas.append({
             'legajo': legajo,
             'nombre': nombre,

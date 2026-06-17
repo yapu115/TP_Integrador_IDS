@@ -1,17 +1,17 @@
 USE curso_universitario;
 
 -- Alumnos de prueba
-INSERT IGNORE INTO alumnos (legajo, nombre, apellido, email, abandono) VALUES
-('62001', 'Juan', 'Pérez', 'jperez@fi.uba.ar', FALSE),
-('62002', 'María', 'González', 'mgonzalez@fi.uba.ar', FALSE),
-('62003', 'Carlos', 'López', 'clopez@fi.uba.ar', FALSE),
-('62004', 'Ana', 'Martínez', 'amartinez@fi.uba.ar', FALSE),
-('62005', 'Pedro', 'Rodríguez', 'prodriguez@fi.uba.ar', TRUE),
-('62006', 'Laura', 'Fernández', 'lfernandez@fi.uba.ar', FALSE),
-('62007', 'Diego', 'Ramírez', 'dramirez@fi.uba.ar', FALSE),
-('62008', 'Sofía', 'Torres', 'storres@fi.uba.ar', TRUE),
-('62009', 'Lucas', 'Díaz', 'ldiaz@fi.uba.ar', FALSE),
-('62010', 'Valentina', 'Castro', 'vcastro@fi.uba.ar', FALSE);
+INSERT IGNORE INTO alumnos (legajo, nombre, apellido, email, abandono, curso_id) VALUES
+('62001', 'Juan', 'Pérez', 'jperez@fi.uba.ar', FALSE, 1),
+('62002', 'María', 'González', 'mgonzalez@fi.uba.ar', FALSE, 1),
+('62003', 'Carlos', 'López', 'clopez@fi.uba.ar', FALSE, 1),
+('62004', 'Ana', 'Martínez', 'amartinez@fi.uba.ar', FALSE, 1),
+('62005', 'Pedro', 'Rodríguez', 'prodriguez@fi.uba.ar', TRUE, 1),
+('62006', 'Laura', 'Fernández', 'lfernandez@fi.uba.ar', FALSE, 1),
+('62007', 'Diego', 'Ramírez', 'dramirez@fi.uba.ar', FALSE, 1),
+('62008', 'Sofía', 'Torres', 'storres@fi.uba.ar', TRUE, 1),
+('62009', 'Lucas', 'Díaz', 'ldiaz@fi.uba.ar', FALSE, 1),
+('62010', 'Valentina', 'Castro', 'vcastro@fi.uba.ar', FALSE, 1);
 
 -- Notas de prueba (id_evaluacion: 1=Parcial, 2=Parcialito, 3=Trabajo Práctico)
 INSERT IGNORE INTO notas (id_alumno, id_evaluacion, nota) VALUES
@@ -26,9 +26,9 @@ INSERT IGNORE INTO notas (id_alumno, id_evaluacion, nota) VALUES
 (7, 3, 6.0), (9, 3, 7.5), (10, 3, 9.0);
 
 -- Grupos (equipos) de prueba
-INSERT IGNORE INTO grupos (id, nombre_grupo) VALUES
-(1, 'Los Binarios'),
-(2, 'Los Algorítmicos');
+INSERT IGNORE INTO grupos (id, nombre_grupo, curso_id) VALUES
+(1, 'Los Binarios', 1),
+(2, 'Los Algorítmicos', 1);
 
 INSERT IGNORE INTO grupo_evaluaciones (id_grupo, id_evaluacion) VALUES
 (1, 3),

@@ -129,10 +129,10 @@ CREATE TABLE IF NOT EXISTS asistencia_qr_envios (
 );
 
 
-INSERT IGNORE INTO tipos_evaluacion (nombre) VALUES
-    ('Parcial'),
-    ('Parcialito'),
-    ('Trabajo Práctico');
+INSERT IGNORE INTO tipos_evaluacion (nombre,descripcion,fecha,hora) VALUES
+    ('Parcial','Evaluación de mitad de cuatrimestre', '2026-06-20', '10:00:00'),
+    ('Parcialito','Evaluación corta de lectura', '2026-06-25', '14:30:00'),
+    ('Trabajo Practico','Entrega de proyecto grupal', '2026-07-01', '23:59:00');
 
 INSERT IGNORE INTO usuarios (username, email, password_hash, rol, activo)
 VALUES (

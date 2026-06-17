@@ -79,39 +79,4 @@ def crear_nota(data):
     cursor.close()
     connection.close()
 
-def devolver_notas(id_alumno):
-    connection = get_connection()
-    cursor = connection.cursor(dictionary=True)
 
-    query = """
-        SELECT 
-            e.id AS evaluacion_id,
-            e.nombre AS evaluacion_nombre,
-            e.descripcion AS evaluacion_descripcion,
-            n.nota,
-            n.fecha_carga
-        FROM notas n
-        INNER JOIN tipos_evaluacion e ON n.id_evaluacion = e.id
-        WHERE n.id_alumno = %s
-    """
-
-    cursor.execute(query, (id_alumno,))
-    resultados = cursor.fetchall()
-
-    cursor.close()
-    connection.close()
-
-    notas = []
-
-    for fila in resultados:
-        notas.append({
-            "evaluacion": {
-                "id": fila["evaluacion_id"],
-                "nombre": fila["evaluacion_nombre"],
-                "descripcion": fila["evaluacion_descripcion"]
-            },
-            "nota": fila["nota"],
-            "fecha_carga": fila["fecha_carga"]
-        })
-
-    return notas

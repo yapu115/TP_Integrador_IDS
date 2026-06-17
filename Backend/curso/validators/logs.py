@@ -3,22 +3,13 @@ def validar_crear_log(data):
     errores = []
     datos_validados = {}
 
-    id_usuario = data.get("id_usuario")
-    if id_usuario is None and "usuario" in data:
-        id_usuario = data.get("usuario")
+    usuario = data.get("usuario") or data.get("id_usuario")
 
     accion = data.get("accion")
     detalles = data.get("detalles")
 
-    if id_usuario is not None:
-        try:
-            datos_validados["id_usuario"] = int(id_usuario)
-        except (TypeError, ValueError):
-            errores.append({
-                "code": "VALIDATION_ERROR",
-                "message": "El id_usuario debe ser un número entero.",
-                "level": "error",
-            })
+    if usuario is not None:
+        datos_validados["usuario"] = str(usuario).strip()
 
     if not accion:
         errores.append({

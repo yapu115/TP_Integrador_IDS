@@ -3,7 +3,7 @@ import os
 from functools import wraps
 from flask import request, jsonify, abort, session
 
-SECRET_KEY = os.environ.get('JWT_SECRET_KEY', '11501284827B383944290E9348723R483E')
+SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'clave-secreta123')
 
 def token_required(f):
     """

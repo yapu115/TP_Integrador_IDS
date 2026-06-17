@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, session, redirect, url_for
+from flask import Blueprint, render_template, request, session
 from utils.auth import login_required
 from services.api_client import get_json, post_json
 

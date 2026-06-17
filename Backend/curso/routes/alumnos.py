@@ -1,16 +1,23 @@
 # Módulos estándar
 import csv
 import io
+import re
 
 # Módulos de terceros (Flask)
 from flask import Blueprint, jsonify, request
 import datetime
+from mysql.connector import Error as MySQLError, IntegrityError
 
 # Módulos propios del proyecto
 from curso.utils.security import token_required, role_required
 from curso.utils.utils import registrar_actividad
 from curso.services.cursos import curso_existe
-from curso.validators.alumnos import validar_get_alumnos
+from curso.validators.alumnos import (
+    validar_actualizar_alumno,
+    validar_crear_alumno,
+    validar_csv_import,
+    validar_get_alumnos,
+)
 from curso.services.alumnos import (
     obtener_todos_los_alumnos,
     insertar_alumno,
@@ -21,6 +28,40 @@ from curso.services.alumnos import (
 from curso.db import get_connection
 
 alumnos_bp = Blueprint('alumnos', __name__)
+
+
+def extraer_legajo_duplicado(error):
+    texto_error = getattr(error, "msg", str(error))
+    coincidencia = re.search(r"Duplicate entry '([^']+)'", texto_error)
+    if not coincidencia:
+        return None
+
+    valor_duplicado = coincidencia.group(1)
+    if "-" in valor_duplicado:
+        return valor_duplicado.rsplit("-", 1)[0]
+    return valor_duplicado
+
+
+def respuesta_error_bd(error, legajo=None):
+    if isinstance(error, IntegrityError) and error.errno == 1062:
+        legajo = legajo or extraer_legajo_duplicado(error)
+        mensaje = "Ya existe un alumno con ese legajo en este curso."
+        if legajo:
+            mensaje = f"Ya existe el alumno con el legajo: {legajo}."
+
+        return jsonify({
+            "errors": [{
+                "code": "DUPLICATE_RESOURCE",
+                "message": mensaje
+            }]
+        }), 409
+
+    return jsonify({
+        "errors": [{
+            "code": "INTERNAL_SERVER_ERROR",
+            "message": "No se pudo completar la operacion en la base de datos."
+        }]
+    }), 500
 
 
 @alumnos_bp.route('/alumnos/portal', methods=['GET'])
@@ -150,12 +191,15 @@ def crear_alumno():
         return error
 
     data = request.get_json(silent=True) or {}
-    campos_requeridos = ['legajo', 'nombre', 'apellido', 'email']
-    faltantes = [c for c in campos_requeridos if not data.get(c)]
-    if faltantes:
-        return jsonify({"errors": [{"code": "VALIDATION_ERROR", "message": f"Faltan campos obligatorios: {', '.join(faltantes)}"}]}), 400
+    errores, datos_validados = validar_crear_alumno(data)
+    if errores:
+        return jsonify({"errors": errores}), 400
 
-    insertar_alumno(data, curso_id)
+    try:
+        insertar_alumno(datos_validados, curso_id)
+    except MySQLError as exc:
+        return respuesta_error_bd(exc, datos_validados["legajo"])
+
     return jsonify({"message": "Alumno creado exitosamente"}), 201
 
 
@@ -169,12 +213,23 @@ def importar_alumnos():
     if 'file' not in request.files:
         return jsonify({"errors": [{"code": "BAD_REQUEST", "message": "No se envió archivo"}]}), 400
 
-    file       = request.files['file']
-    stream     = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
-    csv_reader = list(csv.DictReader(stream))
+    file = request.files['file']
+    try:
+        stream = io.StringIO(file.stream.read().decode("UTF8"), newline=None)
+    except UnicodeDecodeError:
+        return jsonify({"errors": [{"code": "VALIDATION_ERROR", "message": "El archivo CSV debe estar codificado en UTF-8."}]}), 400
 
-    importar_desde_csv(csv_reader, curso_id)
-    return jsonify({"procesados": len(csv_reader)}), 200
+    csv_reader = list(csv.DictReader(stream))
+    errores, filas_validadas = validar_csv_import(csv_reader)
+    if errores:
+        return jsonify({"errors": errores}), 400
+
+    try:
+        importar_desde_csv(filas_validadas, curso_id)
+    except MySQLError as exc:
+        return respuesta_error_bd(exc)
+
+    return jsonify({"procesados": len(filas_validadas)}), 200
 
 
 
@@ -193,6 +248,12 @@ def actualizar_alumno(id):
         return jsonify({"errors": [{"code": "NOT_FOUND", "message": f"Alumno con ID {id} no encontrado"}]}), 404
 
     data = request.get_json(silent=True) or {}
+    errores, datos_validados = validar_actualizar_alumno(data)
+    if errores:
+        cursor.close()
+        conexion.close()
+        return jsonify({"errors": errores}), 400
+
     campos_permitidos = {
         "nombre": "nombre",
         "apellido": "apellido",
@@ -203,9 +264,9 @@ def actualizar_alumno(id):
     valores = []
 
     for campo_json, campo_sql in campos_permitidos.items():
-        if campo_json in data:
+        if campo_json in datos_validados:
             campos_update.append(f"{campo_sql} = %s")
-            valores.append(data[campo_json])
+            valores.append(datos_validados[campo_json])
 
     if not campos_update:
         cursor.close()
@@ -214,8 +275,14 @@ def actualizar_alumno(id):
 
     valores.append(id)
     query = f"UPDATE alumnos SET {', '.join(campos_update)} WHERE id = %s"
-    cursor.execute(query, tuple(valores))
-    conexion.commit()
+    try:
+        cursor.execute(query, tuple(valores))
+        conexion.commit()
+    except MySQLError as exc:
+        conexion.rollback()
+        cursor.close()
+        conexion.close()
+        return respuesta_error_bd(exc)
 
     cursor.close()
     conexion.close()
@@ -226,7 +293,6 @@ def actualizar_alumno(id):
 @token_required
 @role_required("admin")
 @registrar_actividad("ELIMINAR_ALUMNO")
-
 def borrar_alumno(id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)

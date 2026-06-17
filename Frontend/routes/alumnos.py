@@ -1,5 +1,6 @@
 import csv
 from io import StringIO
+from urllib.parse import urlencode
 
 from flask import Blueprint, Response, flash, render_template, request, session, redirect, url_for
 from utils.auth import login_required
@@ -123,7 +124,28 @@ def alumnos():
             flash(exito, "success")
         return redirect(url_for("alumnos.alumnos"))
 
-    status, data = get_json(f"/alumnos?curso_id={curso_id}&_limit=100", token=token)
+    filtros = {
+        "nombre": request.args.get("nombre", "").strip(),
+        "apellido": request.args.get("apellido", "").strip(),
+        "legajo": request.args.get("legajo", "").strip(),
+        "estado": request.args.get("estado", "").strip(),
+    }
+    params = {
+        "curso_id": curso_id,
+        "_limit": 100,
+    }
+    if filtros["nombre"]:
+        params["nombre"] = filtros["nombre"]
+    if filtros["apellido"]:
+        params["apellido"] = filtros["apellido"]
+    if filtros["legajo"]:
+        params["legajo"] = filtros["legajo"]
+    if filtros["estado"] == "activo":
+        params["abandono"] = "false"
+    elif filtros["estado"] == "abandono":
+        params["abandono"] = "true"
+
+    status, data = get_json(f"/alumnos?{urlencode(params)}", token=token)
 
     if status in (401, 403):
         session.clear()
@@ -135,12 +157,6 @@ def alumnos():
     elif status not in (200, 204) and not error:
         error = primer_mensaje_error(data, "No se pudieron cargar los alumnos.")
 
-    filtros = {
-        "nombre": request.args.get("nombre", "").strip(),
-        "apellido": request.args.get("apellido", "").strip(),
-        "legajo": request.args.get("legajo", "").strip(),
-        "estado": request.args.get("estado", "").strip(),
-    }
     alumnos_lista = aplicar_filtros(alumnos_lista, filtros)
 
     return render_template(
@@ -189,19 +205,34 @@ def exportar_alumnos():
     token = session.get("token")
     curso_id = session.get("curso_id")
 
-    status, data = get_json(f"/alumnos?curso_id={curso_id}&_limit=1000", token=token)
-
-    if status in (401, 403):
-        session.clear()
-        return redirect(url_for("auth.login"))
-
-    alumnos_lista = data.get("alumnos", []) if status == 200 and isinstance(data, dict) else []
     filtros = {
         "nombre": request.args.get("nombre", "").strip(),
         "apellido": request.args.get("apellido", "").strip(),
         "legajo": request.args.get("legajo", "").strip(),
         "estado": request.args.get("estado", "").strip(),
     }
+    params = {
+        "curso_id": curso_id,
+        "_limit": 10000,
+    }
+    if filtros["nombre"]:
+        params["nombre"] = filtros["nombre"]
+    if filtros["apellido"]:
+        params["apellido"] = filtros["apellido"]
+    if filtros["legajo"]:
+        params["legajo"] = filtros["legajo"]
+    if filtros["estado"] == "activo":
+        params["abandono"] = "false"
+    elif filtros["estado"] == "abandono":
+        params["abandono"] = "true"
+
+    status, data = get_json(f"/alumnos?{urlencode(params)}", token=token)
+
+    if status in (401, 403):
+        session.clear()
+        return redirect(url_for("auth.login"))
+
+    alumnos_lista = data.get("alumnos", []) if status == 200 and isinstance(data, dict) else []
     alumnos_lista = aplicar_filtros(alumnos_lista, filtros)
 
     buffer = StringIO()

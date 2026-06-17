@@ -1,29 +1,39 @@
 services:
-  db: 
+  db:
     image: mysql:8.0
+    restart: always
+    env_file:
+      - .env
     environment:
-      .env_file: .env.example
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
     ports:
-      - "3307:3307"
+      - "3307:3306"
     volumes:
-      - ./Backend/data/init_db.mysql:/docker-entrypoint-initdb.d/init_db.mysql
+      - db-data:/var/lib/mysql
+      - ./Backend/data/init_db.sql:/docker-entrypoint-initdb.d/1_init_db.sql
+      - ./Backend/data/migration_clases_obligatorias.sql:/docker-entrypoint-initdb.d/2_migration_clases_obligatorias.sql
+      - ./Backend/data/seed_data.sql:/docker-entrypoint-initdb.d/3_seed_data.sql
 
   backend:
     build: ./Backend
-    ports: 
+    restart: always
+    env_file:
+      - .env
+    ports:
       - "5000:5000"
-    environment:
-      .env_file: .env.example
-
+    depends_on:
+      - db
 
   frontend:
     build: ./Frontend
+    restart: always
+    env_file:
+      - .env
     ports:
       - "5001:5001"
-    
-volumes:  
+    depends_on:
+      - backend
+
+volumes:
   db-data:

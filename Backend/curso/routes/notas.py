@@ -1,12 +1,14 @@
 from flask import Blueprint, request, jsonify
 from curso.validators.notas import validar_notas
-from curso.services.notas import evaluacion_existe, alumno_existe, crear_nota, devolver_notas
+from curso.services.notas import evaluacion_existe, alumno_existe, crear_nota
 from curso.utils.security import token_required
+from curso.utils.utils import registrar_actividad
 
 notas_bp = Blueprint("notas", __name__)
 
 @notas_bp.route("/notas", methods=["PUT"])
 @token_required
+@registrar_actividad("MODIFICAR_NOTA")
 def notas():
     data = request.get_json()
 

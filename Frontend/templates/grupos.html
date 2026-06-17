@@ -29,8 +29,13 @@ block extra_css %}
             {% endfor %}
           </div>
         </div>
-        <input type="submit" name="action" value="Ver integrantes del grupo" class="btn-ver-grupo">
-        <input type="submit" name="action" value="ELIMINAR GRUPO" class="btn-ver-grupo">
+        <div class="grupo-actions-spacing">
+          <input type="submit" name="action" value="Ver integrantes del grupo" class="btn-ver-grupo">
+        </div>
+        <div>
+          <input type="submit" name="action" value="ELIMINAR GRUPO" class="btn-eliminar-grupo">
+        </div>
+        
         {% else %}
         <p class="grupos-empty-hint">No hay grupos registrados.</p>
         {% endif %}
@@ -120,7 +125,7 @@ block extra_css %}
     <div class="modal-content">
       <div class="modal-header">
         <h2>Información del alumno</h2>
-        <span class="close">&times;</span>
+        <span class="close" onclick="ocultarModalAlumnos(modalAlumnos)">&times;</span>
       </div>
       <div class="modal-body">
         <div class="modal-row">
