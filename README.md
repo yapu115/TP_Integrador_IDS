@@ -366,7 +366,22 @@ Si ya tenes MySQL 8 corriendo en tu maquina (puerto `3306` por default):
    cd Backend
    python app.py
    ```
+## Si vas a usar Docker
 
+### Prerrequisitos
+* Tener instalado (si usas Windows, asegúrate de tener la integración con WSL 2 activa).
+
+### Pasos para el inicio rápido
+
+1. **Configurar las variables de entorno**
+   En el archivo .env edita la contraseña de tu base de datos:
+   ```env
+   DB_PASSWORD=tu_clave
+   ```
+2. Ejecuta docker con el siguiente comando.
+    ```
+    docker-compose up --build
+    ```
 ## Documentación de la API(Funcionamiento de endpoints)
 La especificación completa de los endpoints se encuentra en el archivo `Backend/docs/swagger.yaml`. Puede ser visualizada gráficamente copiando su contenido en [Swagger Editor](https://editor.swagger.io/) o utilizando una extensión como *Swagger Viewer* en Visual Studio Code.
 
