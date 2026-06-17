@@ -296,6 +296,27 @@
     transition: filter 0.2s ease, transform 0.15s ease;
 }
 
+.btn-eliminar-grupo {
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #b91010, #960505);
+    color: #ffffff;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.btn-eliminar-grupo:hover {
+    filter: brightness(1.12);
+}
+
+.btn-eliminar-grupo:active {
+    transform: scale(0.97);
+}
+
 .btn-crear-grupo:hover {
     filter: brightness(1.12);
 }

@@ -447,12 +447,12 @@ def obtener_estado_asistencia_hoy():
 
     query= """
     SELECT 
-      alumnos.id AS padron,
+      alumnos.id,
+      alumnos.legajo,
       alumnos.nombre, 
       alumnos.apellido,
       alumnos.email,
       COALESCE(asistencias.estado, 'pendiente') AS estado
-    
     FROM alumnos
     LEFT JOIN asistencias
        ON alumnos.id = asistencias.id_alumno
@@ -503,8 +503,6 @@ def crear_clase_obligatoria(fecha, nombre_clase):
             connection.close()
 
 
-
-
 def obtener_clases_obligatorias():
     connection = None
     cursor = None
@@ -513,23 +511,16 @@ def obtener_clases_obligatorias():
         connection = get_connection()
         cursor = connection.cursor(dictionary=True)
 
-        cursor.execute("""
-            SELECT DISTINCT fecha, nombre_clase
-            FROM asistencias
-            WHERE nombre_clase IS NOT NULL
-            AND nombre_clase <> ''
-            ORDER BY fecha DESC
-        """)
-
-        resultados = cursor.fetchall()
-
-        clases = []
-
-        for clase in resultados:
-            clases.append({
-                "fecha": str(clase["fecha"]),
-                "nombre_clase": clase["nombre_clase"]
-            })
+        query = """
+            SELECT id_clase AS id, 
+            DATE_FORMAT(fecha, '%Y-%m-%d') AS fecha,
+            nombre_clase
+            FROM clases_obligatorias
+            ORDER BY fecha DESC, id_clase DESC
+            """
+        
+        cursor.execute(query)
+        clases = cursor.fetchall()
 
         return clases
 
@@ -545,7 +536,6 @@ def obtener_clases_obligatorias():
         if connection:
             connection.close()
 
-
 def reprogramar_clase_obligatoria(fecha_actual, nombre_clase, nueva_fecha):
     connection = None
     cursor = None
@@ -555,7 +545,7 @@ def reprogramar_clase_obligatoria(fecha_actual, nombre_clase, nueva_fecha):
         cursor = connection.cursor()
 
         cursor.execute("""
-            UPDATE asistencias
+            UPDATE clases_obligatorias
             SET fecha = %s
             WHERE fecha = %s
             AND nombre_clase = %s
@@ -564,12 +554,103 @@ def reprogramar_clase_obligatoria(fecha_actual, nombre_clase, nueva_fecha):
         connection.commit()
 
         if cursor.rowcount == 0:
-            return {"error": "No se encontró la clase para reprogramar."}
+            return {
+                "error": "NOT_FOUND",
+                "mensaje": "No se encontró la clase para reprogramar."
+            }
 
-        return {"mensaje": "Clase reprogramada correctamente."}
+        return {
+            "mensaje": "Clase reprogramada correctamente."
+        }
 
     except Exception as e:
-        return {"error": str(e)}
+        print("ERROR reprogramar_clase_obligatoria:", e)
+        return {
+            "error": str(e),
+            "mensaje": "No se pudo reprogramar la clase."
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+def obtener_detalle_clases_alumno(id_alumno):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+            SELECT
+                DATE_FORMAT(c.fecha, '%Y-%m-%d') AS fecha,
+                c.nombre_clase,
+                COALESCE(a.estado, 'pendiente') AS estado
+            FROM clases_obligatorias c
+            LEFT JOIN asistencias a
+                ON a.id_alumno = %s
+                AND a.fecha = c.fecha
+            ORDER BY c.fecha DESC, c.id_clase DESC
+        """
+
+        cursor.execute(query, (id_alumno,))
+        clases = cursor.fetchall()
+
+        return {
+            "id_alumno": id_alumno,
+            "clases": clases
+        }
+
+    except Exception as e:
+        print("ERROR obtener_detalle_clases_alumno:", e)
+        return {
+            "error": str(e)
+        }
+
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
+
+def obtener_detalle_clases_alumno(id_alumno):
+    connection = None
+    cursor = None
+
+    try:
+        connection = get_connection()
+        cursor = connection.cursor(dictionary=True)
+
+        query = """
+            SELECT
+                DATE_FORMAT(c.fecha, '%Y-%m-%d') AS fecha,
+                c.nombre_clase,
+                COALESCE(a.estado, 'pendiente') AS estado
+            FROM clases_obligatorias c
+            LEFT JOIN asistencias a
+                ON a.id_alumno = %s
+                AND a.fecha = c.fecha
+            ORDER BY c.fecha DESC, c.id_clase DESC
+        """
+
+        cursor.execute(query, (id_alumno,))
+        clases = cursor.fetchall()
+
+        return {
+            "id_alumno": id_alumno,
+            "clases": clases
+        }
+
+    except Exception as e:
+        print("ERROR obtener_detalle_clases_alumno:", e)
+        return {
+            "error": str(e)
+        }
 
     finally:
         if cursor:

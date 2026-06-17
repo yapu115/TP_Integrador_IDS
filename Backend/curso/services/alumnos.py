@@ -1,6 +1,7 @@
 from flask import request
 from curso.db import get_connection
 from decimal import Decimal
+from urllib.parse import urlencode
 
 
 
@@ -9,46 +10,75 @@ def _extraer_parametros():
     limit       = request.args.get('_limit',   default=10,   type=int)
     offset      = request.args.get('_offset',  default=0,    type=int)
     abandono_raw = request.args.get('abandono', default=None)
+    nombre = request.args.get('nombre', default='', type=str).strip()
+    apellido = request.args.get('apellido', default='', type=str).strip()
+    legajo = request.args.get('legajo', default='', type=str).strip()
     if limit  < 1: limit  = 10
     if offset < 0: offset = 0
-    return limit, offset, abandono_raw
+    return limit, offset, abandono_raw, nombre, apellido, legajo
 
 
-def _construir_filtro_abandono(abandono_raw):
-    if abandono_raw is None:
-        return ""
+def _construir_filtros(abandono_raw, nombre, apellido, legajo):
+    filtros = []
+    valores = []
+
     if abandono_raw.lower() == 'true':
-        return "AND abandono = 1"
-    if abandono_raw.lower() == 'false':
-        return "AND abandono = 0"
-    return ""
+        filtros.append("abandono = %s")
+        valores.append(True)
+    elif abandono_raw.lower() == 'false':
+        filtros.append("abandono = %s")
+        valores.append(False)
+
+    if nombre:
+        filtros.append("LOWER(nombre) LIKE %s")
+        valores.append(f"%{nombre.lower()}%")
+
+    if apellido:
+        filtros.append("LOWER(apellido) LIKE %s")
+        valores.append(f"%{apellido.lower()}%")
+
+    if legajo:
+        filtros.append("LOWER(legajo) LIKE %s")
+        valores.append(f"%{legajo.lower()}%")
+
+    if not filtros:
+        return "", valores
+
+    return "AND " + " AND ".join(filtros), valores
 
 
-def _generar_links_hateoas(base_url, limit, offset, total, abandono_raw, curso_id):
-    filtro = f"&abandono={abandono_raw}" if abandono_raw is not None else ""
-    base  = f"{base_url}?curso_id={curso_id}"
+def _generar_links_hateoas(base_url, limit, offset, total, filtros):
+    base_params = {clave: valor for clave, valor in filtros.items() if valor not in (None, "")}
 
     prev_offset = max(0, offset - limit)
     next_offset = offset + limit
     last_offset = ((total - 1) // limit) * limit if total > 0 else 0
 
+    def construir_link(nuevo_offset):
+        params = {
+            **base_params,
+            "_offset": nuevo_offset,
+            "_limit": limit,
+        }
+        return {"href": f"{base_url}?{urlencode(params)}"}
+
     return {
-        "_first": {"href": f"{base}&_offset=0&_limit={limit}{filtro}"},
-        "_prev":  {"href": f"{base}&_offset={prev_offset}&_limit={limit}{filtro}"},
-        "_next":  {"href": f"{base}&_offset={next_offset}&_limit={limit}{filtro}"} if next_offset < total else None,
-        "_last":  {"href": f"{base}&_offset={last_offset}&_limit={limit}{filtro}"},
+        "_first": construir_link(0),
+        "_prev":  construir_link(prev_offset),
+        "_next":  construir_link(next_offset) if next_offset < total else None,
+        "_last":  construir_link(last_offset),
     }
 
 
 def obtener_todos_los_alumnos(curso_id):
-    limit, offset, abandono_raw = _extraer_parametros()
-    filtro_abandono = _construir_filtro_abandono(abandono_raw)
+    limit, offset, abandono_raw, nombre, apellido, legajo = _extraer_parametros()
+    filtro_sql, valores_filtros = _construir_filtros(abandono_raw or "", nombre, apellido, legajo)
 
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
 
-    query_count = f"SELECT COUNT(*) as total FROM alumnos WHERE curso_id = %s {filtro_abandono}"
-    cursor.execute(query_count, (curso_id,))
+    query_count = f"SELECT COUNT(*) as total FROM alumnos WHERE curso_id = %s {filtro_sql}"
+    cursor.execute(query_count, (curso_id, *valores_filtros))
     total = cursor.fetchone()["total"]
 
     if total == 0:
@@ -59,68 +89,70 @@ def obtener_todos_los_alumnos(curso_id):
     query_alumnos = f"""
         SELECT id, legajo, nombre, apellido, email, abandono
         FROM alumnos
-        WHERE curso_id = %s {filtro_abandono}
+        WHERE curso_id = %s {filtro_sql}
         ORDER BY id
         LIMIT %s OFFSET %s
     """
-    cursor.execute(query_alumnos, (curso_id, limit, offset))
+    cursor.execute(query_alumnos, (curso_id, *valores_filtros, limit, offset))
     alumnos = cursor.fetchall()
 
     cursor.close()
     conexion.close()
 
-    links = _generar_links_hateoas(request.base_url, limit, offset, total, abandono_raw, curso_id)
+    links = _generar_links_hateoas(request.base_url, limit, offset, total, {
+        "curso_id": curso_id,
+        "abandono": abandono_raw,
+        "nombre": nombre,
+        "apellido": apellido,
+        "legajo": legajo,
+    })
     return {"alumnos": alumnos, "_links": links}, 200
 
 
 def insertar_alumno(data, curso_id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
-    query    = "INSERT INTO alumnos (curso_id, legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"
-    cursor.execute(query, (curso_id, data['legajo'], data['nombre'], data['apellido'], data['email']))
-    conexion.commit()
-    cursor.close()
-    conexion.close()
+    try:
+        query    = "INSERT INTO alumnos (curso_id, legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"
+        cursor.execute(query, (curso_id, data['legajo'], data['nombre'], data['apellido'], data['email']))
+        conexion.commit()
+    except Exception:
+        conexion.rollback()
+        raise
+    finally:
+        cursor.close()
+        conexion.close()
 
 
 def importar_desde_csv(rows, curso_id):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
-    query    = "INSERT INTO alumnos (curso_id, legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"
-    for row in rows:
-        cursor.execute(query, (curso_id, row['legajo'], row['nombre'], row['apellido'], row['email']))
-    conexion.commit()
-    cursor.close()
-    conexion.close()
+    try:
+        query    = "INSERT INTO alumnos (curso_id, legajo, nombre, apellido, email) VALUES (%s, %s, %s, %s, %s)"
+        for row in rows:
+            cursor.execute(query, (curso_id, row['legajo'], row['nombre'], row['apellido'], row['email']))
+        conexion.commit()
+    except Exception:
+        conexion.rollback()
+        raise
+    finally:
+        cursor.close()
+        conexion.close()
 
-
-
-def actualizar_abandono(id_alumno, estado):
-    conexion = get_connection()
-    cursor   = conexion.cursor(dictionary=True)
-    cursor.execute("UPDATE alumnos SET abandono = %s WHERE id = %s", (estado, id_alumno))
-    conexion.commit()
-    cursor.close()
-    conexion.close()
 
 
 def eliminar_alumno(id_alumno):
     conexion = get_connection()
     cursor   = conexion.cursor(dictionary=True)
-    cursor.execute("DELETE FROM alumnos WHERE id = %s", (id_alumno,))
-    conexion.commit()
-    cursor.close()
-    conexion.close()
-
-
-def alumno_en_curso(id_alumno, curso_id):
-    conexion = get_connection()
-    cursor   = conexion.cursor()
-    cursor.execute("SELECT 1 FROM alumnos WHERE id = %s AND curso_id = %s", (id_alumno, curso_id))
-    existe = cursor.fetchone() is not None
-    cursor.close()
-    conexion.close()
-    return existe
+    try:
+        cursor.execute("DELETE FROM alumnos WHERE id = %s", (id_alumno,))
+        conexion.commit()
+    except Exception:
+        conexion.rollback()
+        raise
+    finally:
+        cursor.close()
+        conexion.close()
 
 
 def _serializar_valor(valor):

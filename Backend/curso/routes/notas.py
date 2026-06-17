@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from curso.validators.notas import validar_notas
-from curso.services.notas import evaluacion_existe, alumno_existe, crear_nota, devolver_notas
+from curso.services.notas import evaluacion_existe, alumno_existe, crear_nota
 from curso.utils.security import token_required
 
 notas_bp = Blueprint("notas", __name__)

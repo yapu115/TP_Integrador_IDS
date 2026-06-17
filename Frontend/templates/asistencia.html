@@ -53,7 +53,7 @@
             <div class="bloque-interno">
                 <h3>Crear nueva clase</h3>
 
-                <form class="asistencia-form" method="post" action="{{ url_for('asistencia.asistencia_test') }}">
+                <form class="asistencia-form" method="post" action="{{ url_for('asistencia.asistencia') }}">
                     <input type="hidden" name="action" value="crear-clase">
 
                     <div class="form-grid-2">
@@ -66,7 +66,6 @@
                             Nombre de la clase
                             <input type="text" name="nombre_clase" id = "id_clase" placeholder="Ej: Clase 10 - Patrones de Diseño" required>
                         </label>
-
                     </div>
 
                     <button type="submit" class="btn-qr">
@@ -74,34 +73,100 @@
                     </button>
                 </form>
             </div>
-
-            
-                <div id="gestion-clases-box">
+         
+                <div id="gestion-clases-box" class="bloque-gestion">
                     <h3>Gestionar clases existentes</h3>
-                                    
-                            <form method="POST" action="{{ url_for('asistencia.reprogramar_clase') }}" id="form-gestion-clases">
-                        
-                                <select name="id_clase" id="select-clase" required>
+                
+                    <form method="POST"
+                          action="{{ url_for('asistencia.reprogramar_clase') }}"
+                          class="gestion-form">
+                
+                        <div class="gestion-row">
+                            <label class="campo campo-clase">
+                                <span>Clase existente</span>
+                
+                                <select name="clase_seleccionada" id="select-clase-reprogramar" required>
                                     <option value="">Seleccione una clase</option>
-                                
-                                    {% for clase in clases_obligatorias %}
-                                        <option value="{{ clase.id_clase }}">
-                                            {{ clase.nombre_clase }} - {{ clase.fecha }}
+                
+                                    {% for clase in clases %}
+                                        <option value="{{ clase.fecha }}|{{ clase.nombre_clase }}">
+                                            {{ clase.fecha }} - {{ clase.nombre_clase }}
                                         </option>
                                     {% endfor %}
                                 </select>
-                        
-                                <button type="button" id="btn-editar-clase">
-                                    Editar datos
-                                </button>
-                        
-                                <button type="submit" id="btn-reprogramar-clase">
-                                    Reprogramar
-                                </button>
-                        
-                            </form>
+                            </label>
+                
+                            <button type="button"
+                                    class="btn-reprogramar"
+                                    onclick="mostrarReprogramar()">
+                                Reprogramar
+                            </button>
                         </div>
                 
+                        <div id="panel-reprogramar" class="panel-reprogramar" style="display: none;">
+                            <h4>Reprogramar clase</h4>
+                            <p id="clase-seleccionada-texto">Seleccioná una nueva fecha.</p>
+                
+                            <div class="panel-reprogramar-body">
+                                <label class="campo">
+                                    <span>Nueva fecha</span>
+                                    <input type="date"
+                                           name="nueva_fecha"
+                                           id="nueva-fecha-reprogramar"
+                                           required
+                                           disabled>
+                                </label>
+                
+                                <div class="panel-actions">
+                                    <button type="button"
+                                            class="btn-cancelar"
+                                            onclick="cerrarReprogramar()">
+                                        Cancelar
+                                    </button>
+                
+                                    <button type="submit" class="btn-confirmar">
+                                        Confirmar reprogramación
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                
+                    </form>
+                </div>
+                
+                <script>
+                    function mostrarReprogramar() {
+                        const selectClase = document.getElementById("select-clase-reprogramar");
+                        const panel = document.getElementById("panel-reprogramar");
+                        const textoClase = document.getElementById("clase-seleccionada-texto");
+                        const inputFecha = document.getElementById("nueva-fecha-reprogramar");
+                    
+                        if (!selectClase.value) {
+                            alert("Seleccioná una clase primero.");
+                            selectClase.focus();
+                            return;
+                        }
+                    
+                        const textoSeleccionado = selectClase.options[selectClase.selectedIndex].text;
+                    
+                        textoClase.textContent = "Clase seleccionada: " + textoSeleccionado;
+                        panel.style.display = "block";
+                        inputFecha.disabled = false;
+                        inputFecha.focus();
+                    }
+                    
+                    function cerrarReprogramar() {
+                        const panel = document.getElementById("panel-reprogramar");
+                        const textoClase = document.getElementById("clase-seleccionada-texto");
+                        const inputFecha = document.getElementById("nueva-fecha-reprogramar");
+                    
+                        panel.style.display = "none";
+                        textoClase.textContent = "Seleccioná una nueva fecha.";
+                        inputFecha.value = "";
+                        inputFecha.disabled = true;
+                    }
+                    </script>
+               
         </section>
 
         <!-- Asistencia de hoy-->
@@ -120,23 +185,23 @@
                         Fecha actual: <strong>{{ fecha_hoy }}</strong>
                     </span>
 
-                    {% if clase_hoy is defined and clase_hoy %}
-                        <span class="clase-encontrada">
-                            Clase encontrada para hoy
-                        </span>
+                    {% if hay_clase_hoy %}
+                       <div class="estado-ok">
+                            Clase programada para hoy: {{ clase_hoy.nombre_clase }}
+                       </div> 
                     {% else %}
-                        <span class="sin-clase">
+                        <div class="estado-error">
                             No hay clase programada para hoy
-                        </span>
+                        </div> 
                     {% endif %}
                 </div>
             </div>
 
-            <form class="qr-hoy-form" method="post" action="{{ url_for('asistencia.asistencia') }}">
+            <form method="POST" action="{{ url_for('asistencia.asistencia') }}">
                 <input type="hidden" name="action" value="enviar_qr_hoy">
 
-                <button type="submit" class="btn-qr btn-qr-grande"
-                    {% if not clase_hoy %}disabled{% endif %}>
+                <button type="submit" class="btn-qr"
+                    {% if not hay_clase_hoy %}disabled{% endif %}>
                     Enviar QR a todos los alumnos
                 </button>
             </form>
@@ -184,8 +249,18 @@
                             </td>
 
                             <td>
-                                <button class="btn-detalle" type="button">
-                                    Ver detalle
+                                <button 
+                                   type="button"
+                                   class="btn-detalle btn-ver-detalle"
+                                   onclick="abrirDetalleAlumno(this)"
+                                   data-id="{{ alumno.id }}"
+                                   data-legajo="{{ alumno.legajo or alumno.padron }}"
+                                   data-nombre="{{ alumno.apellido }}, {{ alumno.nombre }}"
+                                   data-email="{{ alumno.email }}"
+                                   data-estado="{{ alumno.estado_asistencia }}"
+                                   data-condicion="{{ alumno.condicion if alumno.condicion is defined else 'Sin definir' }}"
+                                >
+                                 Ver detalle
                                 </button>
                             </td>
                         </tr>
@@ -196,10 +271,216 @@
                         {% endfor %}
                     </tbody>
                 </table>
-            </div>
 
-        </section>
+                <div id="modal-detalle" class="modal-detalle" hidden>
+                    <div class="modal-detalle__contenido">
+                        <div class="modal-detalle__header">
+                            <h3>Detalle de asistencia</h3>
+                            <button type="button" 
+                                    id="cerrar-modal-detalle" 
+                                    class="modal-detalle__cerrar"
+                                    onclick="cerrarDetalleAlumno()">
+                                ×    
+                            </button>
+                        </div>
 
+                        <script>
+                            async function abrirDetalleAlumno(boton) {
+                                const modal = document.getElementById("modal-detalle");
+                            
+                                const idAlumno = boton.dataset.id;
+                                const legajo = boton.dataset.legajo || "Sin dato";
+                                const nombre = boton.dataset.nombre || "Sin dato";
+                                const email = boton.dataset.email || "Sin dato";
+                                const estado = boton.dataset.estado || "Pendiente";
+                                const condicion = boton.dataset.condicion || "Sin definir";
+                            
+                                document.getElementById("detalle-legajo").textContent = legajo;
+                                document.getElementById("detalle-nombre").textContent = nombre;
+                                document.getElementById("detalle-email").textContent = email;
+                                document.getElementById("detalle-estado").textContent = estado;
+                                document.getElementById("detalle-condicion").textContent = condicion;
+                            
+                                const observacion = document.getElementById("detalle-observacion-texto");
+                                observacion.innerHTML = "Cargando detalle de clases...";
+                            
+                                modal.hidden = false;
+                            
+                                try {
+                                    const respuesta = await fetch(`/asistencia/detalle/${idAlumno}`);
+                                    const data = await respuesta.json();
+                            
+                                    if (!respuesta.ok || data.error) {
+                                        observacion.innerHTML = "No se pudo cargar el detalle de clases.";
+                                        return;
+                                    }
+                            
+                                    if (!data.clases || data.clases.length === 0) {
+                                        observacion.innerHTML = "No hay clases obligatorias registradas.";
+                                        return;
+                                    }
+                            
+                                    let html = `
+                                        <table class="tabla-detalle-clases">
+                                            <thead>
+                                                <tr>
+                                                    <th>Fecha</th>
+                                                    <th>Clase</th>
+                                                    <th>Estado</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                    `;
+                            
+                                    data.clases.forEach(function(clase) {
+                                        const estadoClase = clase.estado || "pendiente";
+                                        const claseCss = estadoClase === "presente" ? "presente" : "pendiente";
+                            
+                                        html += `
+                                            <tr>
+                                                <td>${clase.fecha}</td>
+                                                <td>${clase.nombre_clase}</td>
+                                                <td>
+                                                    <span class="estado ${claseCss}">
+                                                        ${estadoClase}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                        `;
+                                    });
+                            
+                                    html += `
+                                            </tbody>
+                                        </table>
+                                    `;
+                            
+                                    observacion.innerHTML = html;
+                            
+                                } catch (error) {
+                                    console.error(error);
+                                    observacion.innerHTML = "Error al cargar el detalle de clases.";
+                                }
+                            }
+                            
+                            function cerrarDetalleAlumno() {
+                                document.getElementById("modal-detalle").hidden = true;
+                            }
+                            </script>
+
+
+                                <div class="modal-detalle__body">
+                                    <p><strong>Legajo:</strong> <span id="detalle-legajo"></span></p>
+                                    <p><strong>Alumno:</strong> <span id="detalle-nombre"></span></p>
+                                    <p><strong>Email:</strong> <span id="detalle-email"></span></p>
+                                    <p><strong>Estado de hoy:</strong> <span id="detalle-estado"></span></p>
+                                    <p><strong>Condición:</strong> <span id="detalle-condicion"></span></p>
+                        
+                                    <div class="detalle-observacion">
+                                        <strong>Observación:</strong>
+                                        <p id="detalle-observacion-texto">
+                                            Cargando detalle de clases.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>        
     </section>
 </div>
+
+<script>
+    async function abrirDetalleAlumno(boton) {
+        const modal = document.getElementById("modal-detalle");
+    
+        modal.removeAttribute("hidden");
+        modal.classList.add("is-open");
+    
+        const idAlumno = boton.dataset.id;
+        const legajo = boton.dataset.legajo || "Sin dato";
+        const nombre = boton.dataset.nombre || "Sin dato";
+        const email = boton.dataset.email || "Sin dato";
+        const estado = boton.dataset.estado || "Pendiente";
+        const condicion = boton.dataset.condicion || "Sin definir";
+    
+        document.getElementById("detalle-legajo").textContent = legajo;
+        document.getElementById("detalle-nombre").textContent = nombre;
+        document.getElementById("detalle-email").textContent = email;
+        document.getElementById("detalle-estado").textContent = estado;
+        document.getElementById("detalle-condicion").textContent = condicion;
+    
+        const observacion = document.getElementById("detalle-observacion-texto");
+        observacion.innerHTML = "Cargando detalle de clases...";
+    
+        try {
+            const respuesta = await fetch(`/asistencia/detalle/${idAlumno}`);
+            const data = await respuesta.json();
+    
+            if (!respuesta.ok || data.error) {
+                observacion.innerHTML = "No se pudo cargar el detalle de clases.";
+                return;
+            }
+    
+            if (!data.clases || data.clases.length === 0) {
+                observacion.innerHTML = "No hay clases obligatorias registradas.";
+                return;
+            }
+    
+            let html = `
+                <table class="tabla-detalle-clases">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Clase</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+    
+            data.clases.forEach(function (clase) {
+                const estadoClase = clase.estado || "pendiente";
+                const claseCss = estadoClase === "presente" ? "presente" : "pendiente";
+    
+                html += `
+                    <tr>
+                        <td>${clase.fecha}</td>
+                        <td>${clase.nombre_clase}</td>
+                        <td>
+                            <span class="estado ${claseCss}">
+                                ${estadoClase}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            });
+    
+            html += `
+                    </tbody>
+                </table>
+            `;
+    
+            observacion.innerHTML = html;
+    
+        } catch (error) {
+            console.error(error);
+            observacion.innerHTML = "Error al cargar el detalle de clases.";
+        }
+    }
+    
+    function cerrarDetalleAlumno() {
+        const modal = document.getElementById("modal-detalle");
+        modal.classList.remove("is-open");
+        modal.setAttribute("hidden", "");
+    }
+    
+    document.addEventListener("DOMContentLoaded", function () {
+        const modal = document.getElementById("modal-detalle");
+    
+        if (modal) {
+            modal.classList.remove("is-open");
+            modal.setAttribute("hidden", "");
+        }
+    });
+    </script>
+
+
+
 {% endblock %}
