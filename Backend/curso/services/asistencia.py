@@ -439,11 +439,17 @@ def obtener_asistencias_por_alumno(id_alumno):
     return asistencias
 
 
-def obtener_estado_asistencia_hoy():
+def obtener_estado_asistencia_hoy(curso_id=None):
     fecha = date.today().isoformat()
 
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
+
+    filtro_curso = ""
+    parametros = [fecha]
+    if curso_id:
+        filtro_curso = "WHERE alumnos.curso_id = %s"
+        parametros.append(curso_id)
 
     query= """
     SELECT 
@@ -457,10 +463,11 @@ def obtener_estado_asistencia_hoy():
     LEFT JOIN asistencias
        ON alumnos.id = asistencias.id_alumno
        AND asistencias.fecha = %s
+    {filtro_curso}
     ORDER BY alumnos.apellido, alumnos.nombre 
-    """
+    """.format(filtro_curso=filtro_curso)
 
-    cursor.execute(query, (fecha,))
+    cursor.execute(query, tuple(parametros))
     alumnos = cursor.fetchall()
 
     cursor.close()

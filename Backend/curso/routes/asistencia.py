@@ -118,7 +118,6 @@ def listar_envios_qr():
 
 
 @asistencia_bp.route("/asistencia/registrar", methods=["GET"])
-@token_required
 def registrar_desde_qr():
     codigo_qr = request.args.get("codigo_qr")
 
@@ -134,9 +133,6 @@ def registrar_desde_qr():
 
     try:
         resultado = registrar_asistencia(codigo_qr)
-
-        print("CODIGO QR RECIBIDO:", codigo_qr)
-        print("RESULTADO:", resultado)
 
         if resultado is None:
             return """
@@ -218,7 +214,8 @@ def obtener_clases():
 @asistencia_bp.route("/asistencia/tabla", methods=["GET"])
 @token_required
 def tabla_asistencia():
-    resultado = obtener_estado_asistencia_hoy()
+    curso_id = request.args.get("curso_id", type=int)
+    resultado = obtener_estado_asistencia_hoy(curso_id)
     return jsonify(resultado), 200
 
 
